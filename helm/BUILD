@@ -1,2 +1,1 @@
-exports_files(["helm.bzl"])
-
+package(default_visibility = ["//visibility:public"])
