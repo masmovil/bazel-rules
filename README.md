@@ -8,7 +8,7 @@ There are two defined rules, `helm_chart` and `helm_push`.
 
 These rules generate new helm packages with specific values for each development version of your application and push generated helm packages to a provided [helm chart museum](https://chartmuseum.com/).
 
-### Getting started
+### Getting started
 
 In your Bazel `WORKSPACE` file add this repository as a dependency:
 
