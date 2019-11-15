@@ -4,9 +4,41 @@ This repository contains Bazel rules to install and manipulate Helm charts with 
 
 There are two defined rules, `helm_chart` and `helm_push`.
 
+## Documentation
+
 These rules generate new helm packages with specific values for each development version of your application and push generated helm packages to a provided [helm chart museum](https://chartmuseum.com/).
 
-## helm_chart
+### Getting started
+
+In your Bazel `WORKSPACE` file add this repository as a dependency:
+
+```
+git_repository(
+    name = "com_github_masmovil_bazel_rules",
+    tag = "0.2.2",
+    remote = "https://github.com/masmovil/bazel-rules.git",
+)
+```
+
+Then in your BUILD files include the `helm_chart` and/or `helm_push` rules:
+
+```
+load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push")
+
+helm_chart(
+    name = "my_chart",
+    srcs = glob(["**"]),
+    ...
+)
+
+helm_push(
+    name = "my_chart_push",
+    srcs = glob(["**"]),
+    ...
+)
+```
+
+### helm_chart
 
 You can use `helm_chart` rule to create a new helm package. Before creating the helm package, the rule can replace some specific values of your app: the image tag value, the image repository and the helm package version of the application. The image can be provided either by `image_tag` attribute as string/make variable or by a `image` label attribute. The `image` attribute has to be a label that specify a [docker image bazel rule](https://github.com/bazelbuild/rules_docker). This rule will extract the digest (sha256) automatically from that image, and reference that sha256 as the image tag of the helm package.
 The rule creates a tar.gz file in the bazel output directory. The name of the generated tar.gz will be the package_name + the version of the Chart.yaml (the version can be override with the `helm_chart_version` attribute).
@@ -37,7 +69,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | values_tag_yaml_path | false | `image.tag` | The yaml path (expressed in dot notation) of values.yaml where the key of the image tag is defined in the values.yaml |
 
 
-### Use of make_variables
+#### Use of make_variables
 `image_tag` and `helm_chart_version` attributes support make variables. Make variables are provided to bazel through the `--define` argument.
 To enable make variables, string values have to be inside curly braces `image_tag="{GIT_SHA}"`.
 
@@ -52,7 +84,7 @@ helm_chart(
 )
 ```
 
-## helm_push
+### helm_push
 
 `helm_push` is used to publish new helm packages to a predefined [chart museum](https://chartmuseum.com/) repository. The rule will take a helm package (targz) and make a POST request to the defined chart museum, publishing the package to a helm registry.
 
