@@ -20,6 +20,16 @@ git_repository(
 )
 ```
 
+Include and invoke `repositories` declaration in your `WORKSPACE` to register the rule toolchains.
+
+```
+load(
+    "@com_github_masmovil_bazel_rules//repositories:repositories.bzl",
+    mm_repositories = "repositories",
+)
+mm_repositories()
+```
+
 Then in your BUILD files include the `helm_chart` and/or `helm_push` rules:
 
 ```
@@ -37,6 +47,9 @@ helm_push(
     ...
 )
 ```
+### Important notes
+
+These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in YAML templates. In order to work you must have YQ installed and availabe in your PATH.
 
 ### helm_chart
 
