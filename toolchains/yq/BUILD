@@ -36,7 +36,7 @@ toolchain(
 )
 
 toolchain(
-    name = "barc_windows_toolchain",
+    name = "yq_windows_toolchain",
     exec_compatible_with = [
         "@platforms//os:windows",
         "@platforms//cpu:x86_64",
