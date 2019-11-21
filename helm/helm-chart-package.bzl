@@ -98,7 +98,7 @@ def _helm_chart_impl(ctx):
             "{CHART_MANIFEST_PATH}": chart_manifest_path,
             "{DIGEST_PATH}": digest_path,
             "{IMAGE_TAG}": image_tag,
-            "{YQ_PATH}": ctx.toolchains["//toolchains/yq:toolchain_type"].yqinfo.tool_path,
+            "{YQ_PATH}": ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool_path,
             "{PACKAGE_OUTPUT_PATH}": targz.dirname,
             "{IMAGE_REPOSITORY}": ctx.attr.image_repository,
             "{HELM_CHART_VERSION}": helm_chart_version,
@@ -134,6 +134,6 @@ helm_chart = rule(
       "values_repo_yaml_path": attr.string(default = "image.repository"),
       "values_tag_yaml_path": attr.string(default = "image.tag"),
     },
-    toolchains = ["//toolchains/yq:toolchain_type"],
+    toolchains = ["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"],
     doc = "Runs helm packaging updating the image tag on it",
 )
