@@ -18,21 +18,18 @@ else
     echo "Packaged image tag: "$DIGEST_SHA
 fi
 
-REPO_URL=""
-REPO_SUFIX=""
-
 # if the tag is a digest add @sha256 as suffix to the image.repository
-if [ ! -z $DIGEST_PATH ]; then
+if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     REPO_SUFIX="@sha256"
     REPO_URL=$({YQ_PATH} r {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH})
 fi
 
-if [ ! -z $IMAGE_REPOSITORY ]; then
+if [ -n $IMAGE_REPOSITORY ] && [ "$IMAGE_REPOSITORY" != "" ]; then
     REPO_URL="{IMAGE_REPOSITORY}"
 fi
 
 # appends suffix if REPO_URL does not already contains it
-if ([ ! -z $REPO_URL ] || [ ! -z $REPO_SUFIX ]) && [[ $REPO_URL != *"$REPO_SUFIX" ]]; then
+if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && [[ $REPO_URL != *"$REPO_SUFIX" ]] && [[ -n "$REPO_SUFIX" ]]; then
     {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
 fi
 
@@ -40,4 +37,4 @@ fi
 helm init --client-only > /dev/null
 # Remove local repo to increase reproducibility and remove errors
 helm repo remove local > /dev/null
-helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}
+helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION} > /dev/null
