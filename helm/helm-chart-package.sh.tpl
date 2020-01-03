@@ -29,7 +29,7 @@ if [ -n $IMAGE_REPOSITORY ] && [ "$IMAGE_REPOSITORY" != "" ]; then
 fi
 
 # appends suffix if REPO_URL does not already contains it
-if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && [[ $REPO_URL != *"$REPO_SUFIX" ]] && [[ -n "$REPO_SUFIX" ]]; then
+if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
     {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
 fi
 
