@@ -33,8 +33,12 @@ if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" 
     {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
 fi
 
-# pwd
 helm init --client-only > /dev/null
+
 # Remove local repo to increase reproducibility and remove errors
-helm repo remove local > /dev/null
-helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION} > /dev/null
+if [ "$(helm repo list |grep local)" != "" ]; then
+    echo "Remove local helm repo"
+    helm repo remove local > /dev/null
+fi
+
+helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}

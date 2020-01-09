@@ -7,6 +7,10 @@ load(
 
 load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 
+ChartInfo = provider(fields = [
+    "chart",
+])
+
 def _helm_chart_impl(ctx):
     """Defines a helm chart (directory containing a Chart.yaml).
     Args:
@@ -14,38 +18,77 @@ def _helm_chart_impl(ctx):
         srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
         update_deps: Whether or not to run a helm dependency update prior to packaging.
     """
-    chart_src = ""
-    chart_values_path = ""
-    chart_manifest_path = ""
+    chart_root_path = ""
+    tmp_chart_root = ""
+    tmp_chart_values_path = ""
+    tmp_chart_manifest_path = ""
+    tmp_working_dir = "_tmp"
+    inputs = [] + ctx.files.srcs
+
     digest_path = ""
     image_tag = ""
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
 
-    # declare output file
+    # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
 
     if (not ctx.attr.image_tag) and (not ctx.attr.image):
         fail("Error: 'image' or 'image_tag' arguments must be provided.")
 
+    # locate chart root path trying to find Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
         if srcfile.path.endswith("Chart.yaml"):
-            chart_src = srcfile.dirname
-            chart_manifest_path = srcfile.path
+            chart_root_path = srcfile.dirname
             break
 
+    # move chart files to temporal directory in order to manipulate necessary files
     for i, srcfile in enumerate(ctx.files.srcs):
-        if srcfile.path.endswith("values.yaml"):
-            chart_values_path = srcfile.path
-            break
+        if srcfile.path.startswith(chart_root_path):
+            out = ctx.actions.declare_file(tmp_working_dir + "/" + srcfile.path)
+            inputs.append(out)
 
-    inputs = ctx.files.srcs
+            # extract location of the chart in the new directory
+            if srcfile.path.endswith("Chart.yaml"):
+                tmp_chart_root = out.dirname
+                tmp_chart_manifest_path = out.path
 
+            # extract location of values file in the new directory
+            # TODO: Support values.dev|sta|*.yaml
+            if srcfile.path.endswith("values.yaml"):
+                tmp_chart_values_path = out.path
+
+            ctx.actions.run_shell(
+                outputs = [out],
+                inputs = [srcfile],
+                arguments = [srcfile.path, out.path],
+                command = "cp $1 $2",
+            )
+
+    # extract docker image info from dependency rule
     if ctx.attr.image:
         digest_file = ctx.attr.image[ImageInfo].container_parts["digest"]
         digest_path = digest_file.path
         inputs = inputs + [ctx.file.image, digest_file]
     else:
+        # extract docker image info from make variable or from rule attribute
         image_tag = get_make_value_or_default(ctx, ctx.attr.image_tag)
+
+    deps = ctx.attr.chart_deps or []
+
+    # copy generated charts by other rules into temporal chart_root/charts directory (treated as a helm dependency)
+    for i, dep in enumerate(deps):
+        dep_files = dep[DefaultInfo].files.to_list()
+        out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + dep[DefaultInfo].files.to_list()[0].basename)
+        inputs = inputs + dep_files + [out]
+        ctx.actions.run_shell(
+            outputs = [out],
+            inputs = dep[DefaultInfo].files,
+            arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
+            command = "cp $1 $2",
+            execution_requirements = {
+              "local": "1",
+            },
+        )
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
@@ -55,9 +98,9 @@ def _helm_chart_impl(ctx):
         output = exec_file,
         is_executable = True,
         substitutions = {
-            "{CHART_PATH}": chart_src,
-            "{CHART_VALUES_PATH}": chart_values_path,
-            "{CHART_MANIFEST_PATH}": chart_manifest_path,
+            "{CHART_PATH}": tmp_chart_root,
+            "{CHART_VALUES_PATH}": tmp_chart_values_path,
+            "{CHART_MANIFEST_PATH}": tmp_chart_manifest_path,
             "{DIGEST_PATH}": digest_path,
             "{IMAGE_TAG}": image_tag,
             "{YQ_PATH}": ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool_path,
@@ -79,9 +122,11 @@ def _helm_chart_impl(ctx):
         },
     )
 
-    return [DefaultInfo(
-        files = depset([targz])
-    )]
+    return [
+        DefaultInfo(
+            files = depset([targz])
+        )
+    ]
 
 helm_chart = rule(
     implementation = _helm_chart_impl,
@@ -95,6 +140,7 @@ helm_chart = rule(
       "values_repo_yaml_path": attr.string(default = "image.repository"),
       "values_tag_yaml_path": attr.string(default = "image.tag"),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
+      "chart_deps": attr.label_list(allow_files = True, mandatory = False),
     },
     toolchains = ["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"],
     doc = "Runs helm packaging updating the image tag on it",
