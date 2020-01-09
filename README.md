@@ -68,6 +68,19 @@ helm_chart(
 )
 ```
 
+You can reference other helm packages defined with `helm_chart` rules as helm dependencies of this package. The output of `helm_chart` dependencies will be added to the generated output tar into the charts directory.
+
+```
+helm_chart(
+  ....,
+  chart_deps = [
+    "//other-charts/chart-dep1:some_package1",
+    "//other-charts/chart-dep2:some_package2"
+  ]
+  ....
+)
+```
+
 The following attributes are accepted by the rule (some of them are mandatory).
 
 |  Attribute | Mandatory| Default | Notes |
@@ -80,6 +93,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | image_repository | false | - | The url of the docker registry where the docker image is stored. This is usually where the `image.repository` points to in the values.yaml file |
 | values_repo_yaml_path | false | `image.repository` | The yaml path (expressed in dot notation) of values.yaml where the key of the image repository is defined in the values.yaml. |
 | values_tag_yaml_path | false | `image.tag` | The yaml path (expressed in dot notation) of values.yaml where the key of the image tag is defined in the values.yaml |
+| chart_deps | false | - | Helm chart dependencies of this rules. Defined as a list of dependencies of other helm_chart rules (bazel targets). |
 
 
 #### Use of make_variables
