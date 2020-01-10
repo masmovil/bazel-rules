@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Bazel rules example. Chart with tomcat dependency
+name: deps-bazel-rules-example
+version: 1.0.0
