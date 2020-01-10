@@ -140,3 +140,42 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | repository_url | true | - | The url of the the chart museum repository. **IMPORTANT: The url must end with slash /**  |
 | repository_username | true | - | The username to login in to the chart museum registry using basic auth. It supports the use of `make_variables` |
 | repository_password | true | - | The password to login in to the chart museum registry using basic auth. It supports the use of `make_variables` |
+
+
+### helm_release
+
+`helm_release` is used to create and deploy a new release in a Kubernetes Cluster.
+
+Only `Helm 2` is supported for the moment.
+
+It has support for secrets via helm secrets (sops), which allows to have encrypted values files in the Git repository.
+
+This rule is an executable. It needs `run` instead of `build` to be invoked.
+
+It relies in existing local kubernetes config (`~/.kube/config`).
+
+Example of use:
+```
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    namespace = "myapp",
+    tiller_namespace = "tiller-system",
+    release_name = "release-name",
+    values_yaml = glob(["charts/myapp/values.yaml"]),
+    secrets_yaml = glob(["charts/myapp/secrets.*.yaml"]),
+    sops_yaml = ".sops.yaml",
+)
+```
+
+The following attributes are accepted by the rule (some of them are mandatory).
+
+|  Attribute | Mandatory| Default | Notes |
+| ---------- | --- | ------ | -------------- |
+| chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
+| namespace | true | default | Namespace where this release is installed to. It supports the use of `stamp_variables`. |
+| tiller_namespace | true | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`.|
+| release_name | true | - | Name of the Helm release. It supports the use of `stamp_variables`|
+| values_yaml | false | - | Several values files can be passed when installing release |
+| secrets_yaml | false | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
+| sops_yaml | false | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
