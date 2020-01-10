@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "base.name" . }}
+  labels:
+    app: {{ template "base.name" . }}
+    fullapp: {{ template "base.fullapp" .}}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    version: {{ .Chart.Version | replace "+" "_" }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "base.name" . }}
+        fullapp: {{ template "base.fullapp" .}}
+        version: {{ .Chart.Version | replace "+" "_" }}
+    spec:
+      containers:
+        - name: "{{ template "base.name" . }}"
+          image: {{image.repository}}:{{image.tag}}

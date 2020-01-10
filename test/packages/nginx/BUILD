@@ -1,0 +1,22 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//helm:helm-chart-package.bzl", "helm_chart")
+
+helm_chart(
+  name = "nginx_chart",
+  srcs = glob(["**"]),
+  image_tag  = "latest",
+  image_repository  = "gcr.io/test/nginx",
+  helm_chart_version = "1.0.0",
+  package_name = "dnginx",
+  values_tag_yaml_path = "image.tag",
+  values_repo_yaml_path = "image.repository"
+)
+
+helm_release(
+  name = "nginx_helm_release",
+  chart = ":nginx_chart",
+  namespace = "test-nginx",
+  release_name = "test-nginx",
+  values_yaml = glob(["values.yaml"])
+)
