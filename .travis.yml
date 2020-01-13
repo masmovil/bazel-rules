@@ -16,6 +16,12 @@ before_install:
   # - sha256sum -c tools/bazel_0.3.1-linux-x86_64.deb.sha256
   - sudo dpkg -i bazel_0.29.1-linux-x86_64.deb
   - ./kind create cluster
+  - wget https://get.helm.sh/helm-v2.15.0-linux-amd64.tar.gz
+  - tar -zxvf helm-v2.15.0-linux-amd64.tar.gz
+  - mv helm /usr/local/bin
+  - kubectl create namespace tiller-system
+  - helm init --tiller-namespace tiller-system --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -
+  - kubectl create rolebinding tiller-admin --clusterrole=cluster-admin --user=default --namespace=tiller-system
 
 after_script:
   - ./kind delete cluster
