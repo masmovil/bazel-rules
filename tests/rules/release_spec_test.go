@@ -1,15 +1,12 @@
 package test
 
 import (
-	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/helm"
-	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/shell"
 )
 
@@ -28,12 +25,15 @@ func TestBasicChartRelease(t *testing.T) {
 
 	k8s.CreateNamespace(t, options, namespaceName)
 
-	shell.RunCommand(t, Command {
+	shell.RunCommand(t, shell.Command{
 		"bazel",
-		["run", "//tests/charts/nginx:nginx_helm_release"]
+		[]string{"run", "//tests/charts/nginx:nginx_helm_release"},
+		".",
+		map[string]string{},
+		1024,
 	})
 
-	defer helm.Delete(t, options, releaseName, true)
+	defer helm.Delete(t, &helm.Options{}, releaseName, true)
 
 	defer k8s.DeleteNamespace(t, options, namespaceName)
 

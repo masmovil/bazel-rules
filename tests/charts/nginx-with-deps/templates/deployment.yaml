@@ -7,7 +7,7 @@ metadata:
     fullapp: {{ template "base.fullapp" .}}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     version: {{ .Chart.Version | replace "+" "_" }}
-    testLabel: "basic-nginx"
+    testLabel: "nginx-with-deps"
 spec:
   replicas: 1
   template:
