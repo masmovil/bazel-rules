@@ -10,6 +10,9 @@ services:
   - docker
 
 before_install:
+  - curl -sSL https://sdk.cloud.google.com | bash
+  - sudo mv /root/google-cloud-sdk/ /usr/local/google-cloud-sdk
+  - gcloud -q components install kubectl
   - curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.6.1/kind-$(uname)-amd64"
   - chmod +x ./kind
   - wget https://github.com/bazelbuild/bazel/releases/download/0.29.1/bazel_0.29.1-linux-x86_64.deb
