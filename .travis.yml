@@ -1,7 +1,7 @@
 language: go
 GO111MODULE: on
 go:
-  - 1.11
+  - 1.13
 
 git:
   quiet: true
@@ -12,21 +12,23 @@ services:
 before_install:
   - curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.6.1/kind-$(uname)-amd64"
   - chmod +x ./kind
-  - sudo apt-get -y install curl
-  - curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
-  - echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-  - sudo apt-get -y install bazel
+  - wget https://github.com/bazelbuild/bazel/releases/download/0.29.1/bazel_0.29.1-linux-x86_64.deb
+  - sha256sum -c tools/bazel_0.3.1-linux-x86_64.deb.sha256
+  - sudo dpkg -i bazel_0.3.1-linux-x86_64.deb
   - kind create cluster
+
+after_script:
+  - kind delete cluster
 
 addons:
   apt:
     update: true
-
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - wget
+      - pkg-config
 jobs:
   include:
-    - stage: helm-release
-      script: bazel run //test/packages/nginx:nginx_helm_release
-    # - # stage name not required, will continue to use `test`
-    #   script: ./test 2
-    # - stage: deploy
-    #   script: ./deploy
+    - stage: test-helm-release
+      script: go test tests/rules/release:_spec_test.go -v
