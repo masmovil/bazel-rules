@@ -17,10 +17,6 @@ func TestBasicChartRelease(t *testing.T) {
 	namespaceName := "test-nginx"
 	releaseName := "test-nginx"
 
-	// Setup the kubectl config and context. Here we choose to use the defaults, which is:
-	// - HOME/.kube/config for the kubectl config file
-	// - Current context of the kubectl config file
-	// - Random namespace
 	options := k8s.NewKubectlOptions("", "", namespaceName)
 
 	k8s.CreateNamespace(t, options, namespaceName)
