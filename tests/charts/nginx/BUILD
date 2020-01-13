@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//helm:helm-chart-package.bzl", "helm_chart")
+load("//helm:helm-release.bzl", "helm_release")
 
 helm_chart(
   name = "nginx_chart",
@@ -18,5 +19,6 @@ helm_release(
   chart = ":nginx_chart",
   namespace = "test-nginx",
   release_name = "test-nginx",
-  values_yaml = glob(["values.yaml"])
+  values_yaml = glob(["values.yaml"]),
+  tiller_namespace = "tiller-system"
 )

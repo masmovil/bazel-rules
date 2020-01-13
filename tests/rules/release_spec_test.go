@@ -26,11 +26,11 @@ func TestBasicChartRelease(t *testing.T) {
 	k8s.CreateNamespace(t, options, namespaceName)
 
 	shell.RunCommand(t, shell.Command{
-		"bazel",
-		[]string{"run", "//tests/charts/nginx:nginx_helm_release"},
-		".",
-		map[string]string{},
-		1024,
+		Command:           "bazel",
+		Args:              []string{"run", "//tests/charts/nginx:nginx_helm_release"},
+		WorkingDir:        ".",
+		Env:               map[string]string{},
+		OutputMaxLineSize: 1024,
 	})
 
 	defer helm.Delete(t, &helm.Options{}, releaseName, true)
