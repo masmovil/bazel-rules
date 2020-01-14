@@ -25,6 +25,7 @@ before_install:
   - kubectl create namespace tiller-system
   - "helm init --tiller-namespace tiller-system --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -"
   - kubectl create rolebinding tiller-admin --clusterrole=cluster-admin --user=default --namespace=tiller-system
+  - go get gopkg.in/mikefarah/yq.v2
 
 after_script:
   - ./kind delete cluster
