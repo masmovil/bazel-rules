@@ -24,7 +24,7 @@ before_install:
   - sudo mv linux-amd64/helm /usr/local/bin
   - kubectl create namespace tiller-system
   - "helm init --tiller-namespace tiller-system --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -"
-  - kubectl create rolebinding tiller-admin --clusterrole=cluster-admin --user=default --namespace=tiller-system
+  - kubectl apply -f ./tests/resources/kind/roles/roles-tiller.yaml --namespace=tiller-system
   - wget https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64
   - sudo mv yq_linux_amd64 /usr/local/bin/yq
   - sudo chmod +x /usr/local/bin/yq
