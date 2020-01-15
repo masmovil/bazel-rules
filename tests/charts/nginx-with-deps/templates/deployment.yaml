@@ -5,9 +5,6 @@ metadata:
   labels:
     app: {{ template "base.name" . }}
     fullapp: {{ template "base.fullapp" .}}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    version: {{ .Chart.Version | replace "+" "_" }}
-    testLabel: "nginx-with-deps"
 spec:
   replicas: 1
   template:
@@ -15,7 +12,6 @@ spec:
       labels:
         app: {{ template "base.name" . }}
         fullapp: {{ template "base.fullapp" .}}
-        version: {{ .Chart.Version | replace "+" "_" }}
     spec:
       containers:
         - name: "{{ template "base.name" . }}"

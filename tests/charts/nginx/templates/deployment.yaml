@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "base.name" . }}
@@ -10,6 +10,10 @@ metadata:
     testLabel: "basic-nginx"
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "base.name" . }}
+      version: {{ .Chart.Version | replace "+" "_" }}
   template:
     metadata:
       labels:
