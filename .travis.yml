@@ -27,6 +27,7 @@ before_install:
   - kubectl create rolebinding tiller-admin --clusterrole=cluster-admin --user=default --namespace=tiller-system
   - wget https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64
   - sudo mv yq_linux_amd64 /usr/local/bin/yq
+  - sudo chmod +x /usr/local/bin/yq
 
 after_script:
   - ./kind delete cluster
