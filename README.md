@@ -1,5 +1,7 @@
 # bazel rules
 
+[![Build Status](https://travis-ci.com/masmovil/bazel-rules.svg?branch=master)](https://travis-ci.com/masmovil/bazel-rules)
+
 This repository contains Bazel rules to install and manipulate Helm charts with Bazel.
 
 There are two defined rules, `helm_chart` and `helm_push`.
