@@ -18,5 +18,5 @@ spec:
         version: {{ .Chart.Version | replace "+" "_" }}
     spec:
       containers:
-        - name: "{{ template "base.name" . }}"
-          image: {{image.repository}}:{{image.tag}}
+        - name: {{ template "base.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
