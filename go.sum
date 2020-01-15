@@ -74,6 +74,7 @@ github.com/gruntwork-io/gruntwork-cli v0.5.1 h1:mVmVsFubUSLSCO8bGigI63HXzvzkC0uW
 github.com/gruntwork-io/gruntwork-cli v0.5.1/go.mod h1:IBX21bESC1/LGoV7jhXKUnTQTZgQ6dYRsoj/VqxUSZQ=
 github.com/gruntwork-io/terratest v0.23.3 h1:zf3K7Z2g88yMgiZiJja5vAWsig8tRqG537Mp9S+qrFc=
 github.com/gruntwork-io/terratest v0.23.3/go.mod h1:+fVff0FQYuRzCF3LKpKF9ac+4w384LDcwLZt7O/KmEE=
+github.com/gruntwork-io/terratest v0.23.4 h1:3H8/gS4XJvy3AwPyvil3yMMeiBB6FrGP9IvJI6e2uis=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.3/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
@@ -210,3 +211,4 @@ k8s.io/apimachinery v0.0.0-20190704094520-6f131bee5e2c h1:vdEIiO5B0/3EVwZboF6qyY
 k8s.io/apimachinery v0.0.0-20190704094520-6f131bee5e2c/go.mod h1:ccL7Eh7zubPUSh9A3USN90/OzHNSVN6zxzde07TDCL0=
 k8s.io/client-go v0.0.0-20190704095228-386e588352a4 h1:hqylj4/yit+/eO496/Yhgy2YxxumFpSY94YDFX6lBoU=
 k8s.io/client-go v0.0.0-20190704095228-386e588352a4/go.mod h1:7vJpHMYJwNQCWgzmNV+VYUl1zCObLyodBc8nIyt8L5s=
+k8s.io/kubernetes v1.17.1 h1:pHzPDwbQ7mhO/rHWRLWyEWEx69XgK3441/39956SKNs=

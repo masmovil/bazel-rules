@@ -1,3 +1,3 @@
 image:
   tag: latest
-  repository: gcr.io/lab/nginx
+  repository: nginx
