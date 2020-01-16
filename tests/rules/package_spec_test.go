@@ -52,14 +52,6 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 		OutputMaxLineSize: 1024,
 	})
 
-	shell.RunCommand(t, shell.Command{
-		Command:           "ls",
-		Args:              []string{"-l", chartPackageRootPath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
-	})
-
 	output := helm.RenderTemplate(t, &helm.Options{
 		ValuesFiles: []string{
 			relativeChartPackageRootPath + "/values.yaml",
