@@ -80,7 +80,7 @@ def _helm_chart_impl(ctx):
         dep_files = dep[DefaultInfo].files.to_list()
         out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + dep[DefaultInfo].files.to_list()[0].basename)
         inputs = inputs + dep_files + [out]
-        ctx.actions.run_shell(
+        ctx.actionss.run_shell(
             outputs = [out],
             inputs = dep[DefaultInfo].files,
             arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],

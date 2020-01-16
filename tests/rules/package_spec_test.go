@@ -1,0 +1,74 @@
+package test
+
+import (
+	"testing"
+
+	"github.com/gruntwork-io/terratest/modules/helm"
+	"github.com/gruntwork-io/terratest/modules/shell"
+	"github.com/stretchr/testify/require"
+	appsv1 "k8s.io/api/apps/v1"
+)
+
+// Test suite for testing release of chart basic package
+func TestChartPackageImageTagMakeVar(t *testing.T) {
+	t.Parallel()
+
+	chartTarPackagePath := "bazel-bin/tests/charts/nginx/nginx-1.0.0.tgz"
+	chartPackageRootPath := "nginx"
+	relativeChartPackageRootPath := "../../" + chartPackageRootPath
+
+	image_repository := "nginx"
+	imageTag := "nginxTestImageTag"
+
+	shell.RunCommand(t, shell.Command{
+		Command:           "bazel",
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag},
+		WorkingDir:        ".",
+		Env:               map[string]string{},
+		OutputMaxLineSize: 1024,
+	})
+
+	shell.RunCommand(t, shell.Command{
+		Command:           "tar",
+		Args:              []string{"-xzf", chartTarPackagePath},
+		WorkingDir:        "../..",
+		Env:               map[string]string{},
+		OutputMaxLineSize: 1024,
+	})
+
+	defer shell.RunCommand(t, shell.Command{
+		Command:           "rm",
+		Args:              []string{"-f", chartTarPackagePath},
+		WorkingDir:        "../..",
+		Env:               map[string]string{},
+		OutputMaxLineSize: 1024,
+	})
+
+	defer shell.RunCommand(t, shell.Command{
+		Command:           "rm",
+		Args:              []string{"-rf", chartPackageRootPath},
+		WorkingDir:        "../..",
+		Env:               map[string]string{},
+		OutputMaxLineSize: 1024,
+	})
+
+	shell.RunCommand(t, shell.Command{
+		Command:           "ls",
+		Args:              []string{"-l", chartPackageRootPath},
+		WorkingDir:        "../..",
+		Env:               map[string]string{},
+		OutputMaxLineSize: 1024,
+	})
+
+	output := helm.RenderTemplate(t, &helm.Options{
+		ValuesFiles: []string{
+			relativeChartPackageRootPath + "/values.yaml",
+		},
+	}, relativeChartPackageRootPath, "nginx", []string{"templates/deployment.yaml"})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(t, output, &deployment)
+
+	require.Equal(t, deployment.Spec.Template.Spec.Containers[0].Image, image_repository+":"+imageTag)
+
+}
