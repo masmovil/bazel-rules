@@ -25,6 +25,17 @@ helm_chart(
   values_repo_yaml_path = "image.repository"
 )
 
+helm_chart(
+  name = "nginx_chart_make_version",
+  srcs = glob(["**"]),
+  image_tag  = "nginx",
+  image_repository  = "nginx",
+  helm_chart_version = "{TEST_VERSION}",
+  package_name = "nginx",
+  values_tag_yaml_path = "image.tag",
+  values_repo_yaml_path = "image.repository"
+)
+
 helm_release(
   name = "nginx_helm_release",
   chart = ":nginx_chart",
