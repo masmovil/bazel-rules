@@ -4,7 +4,7 @@
 
 This repository contains Bazel rules to install and manipulate Helm charts with Bazel.
 
-There are two defined rules, `helm_chart` and `helm_push`.
+There are three defined rules, `helm_chart` , `helm_push` and `helm_release`.
 
 ## Documentation
 
