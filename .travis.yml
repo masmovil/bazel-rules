@@ -43,4 +43,4 @@ addons:
 jobs:
   include:
     - stage: test-helm-release
-      script: go test tests/rules/release_spec_test.go -v
+      script: go test tests/rules/* -v
