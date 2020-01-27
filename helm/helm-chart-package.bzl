@@ -84,7 +84,7 @@ def _helm_chart_impl(ctx):
             outputs = [out],
             inputs = dep[DefaultInfo].files,
             arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
-            command = "cp $1 $2",
+            command = "cp -f $1 $2",
             execution_requirements = {
               "local": "1",
             },
