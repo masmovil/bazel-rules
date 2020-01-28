@@ -7,7 +7,7 @@ helm_chart(
   name = "nginx_chart_with_deps",
   srcs = glob(["**"]),
   image_tag  = "latest",
-  image_repository  = "gcr.io/test/nginx",
+  image_repository  = "nginx",
   helm_chart_version = "1.0.0",
   package_name = "nginx-with-deps",
   values_tag_yaml_path = "image.tag",
