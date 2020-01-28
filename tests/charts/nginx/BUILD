@@ -41,6 +41,5 @@ helm_release(
   chart = ":nginx_chart",
   namespace = "test-nginx",
   release_name = "test-nginx",
-  values_yaml = glob(["values.yaml"]),
   tiller_namespace = "tiller-system"
 )
