@@ -5,21 +5,20 @@ set -o pipefail
 
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
+IMAGE_TAG={IMAGE_TAG}
 
-if [ -z $DIGEST_PATH ]; then
-    {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} {IMAGE_TAG}
-    echo "Packaged image tag: {IMAGE_TAG}"
-else
+if [ -z $DIGEST_PATH ] && [ "$IMAGE_TAG" != "" ]; then
+    {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} $IMAGE_TAG
+    echo "Packaged image tag: $IMAGE_TAG"
+fi
+
+if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     # extracts the digest sha and removes 'sha256' text from it
     DIGEST=$(cat {DIGEST_PATH})
     IFS=':' read -ra digest_split <<< "$DIGEST"
     DIGEST_SHA=${digest_split[1]}
     {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} $DIGEST_SHA
     echo "Packaged image tag: "$DIGEST_SHA
-fi
-
-# if the tag is a digest add @sha256 as suffix to the image.repository
-if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     REPO_SUFIX="@sha256"
     REPO_URL=$({YQ_PATH} r {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH})
 fi
