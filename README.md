@@ -32,10 +32,43 @@ load(
 mm_repositories()
 ```
 
-Then in your BUILD files include the `helm_chart` and/or `helm_push` rules:
+This rule depends on [bazel rules docker](https://github.com/bazelbuild/rules_docker). So you have to install `rules_docker` in your `WORKSPACE` in order this rules to work. To do this you can simply call `docker_deps` rule defined for this project.
+
+Include and invoke `docker_deps` declaration in your `WORKSPACE` to register docker rule dependencies
 
 ```
-load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push")
+load(
+    "@com_github_masmovil_bazel_rules//repositories:docker_deps.bzl",
+    mm_repositories_docker_deps = "docker_deps",
+)
+mm_repositories_docker_deps()
+```
+
+If you prefer to configure `rules_docker` by yourself, declare this dependency in the workspace before calling `repositories`  and do not invoke `docker_deps`. E.g:
+
+```
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = "df13123c44b4a4ff2c2f337b906763879d94871d16411bf82dcfeba892b58607",
+    strip_prefix = "rules_docker-0.13.0",
+    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.13.0/rules_docker-v0.13.0.tar.gz"],
+)
+
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
+
+container_repositories()
+
+load("//repositories:repositories.bzl", "repositories")
+
+repositories()
+```
+After the intial setup, you can use the rules including them in your BUILD files:
+
+```
+load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push", "helm_release")
 
 helm_chart(
     name = "my_chart",
@@ -48,7 +81,13 @@ helm_push(
     srcs = glob(["**"]),
     ...
 )
+
+helm_release(
+    name = "my_chart_push",
+    ...
+)
 ```
+
 ### Important notes
 
 These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in YAML templates. In order to work you must have YQ installed and availabe in your PATH.
