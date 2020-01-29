@@ -1,3 +1,5 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 def repositories():
   native.register_toolchains(
     # Register the default docker toolchain that expects the 'docker'
@@ -7,7 +9,6 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_windows_toolchain",
   )
 
-  load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
   http_archive(
     name = "io_bazel_rules_docker",
