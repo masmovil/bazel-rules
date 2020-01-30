@@ -5,32 +5,49 @@ set -o pipefail
 
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
+IMAGE_TAG={IMAGE_TAG}
 
-if [ -z $DIGEST_PATH ]; then
-    {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} {IMAGE_TAG}
-    echo "Packaged image tag: {IMAGE_TAG}"
-else
+# Application docker image is not provided by other docker bazel rule
+if  [ -z $DIGEST_PATH ]; then
+
+    # Image repository is provided as a static value
+    if [ "$IMAGE_REPOSITORY" != "" ] && [ -n $IMAGE_REPOSITORY ]; then
+        {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} $IMAGE_REPOSITORY
+        echo "Replaced image repository in chart values.yaml with: $IMAGE_REPOSITORY"
+    fi
+
+    # Image tag is provided as a static value
+    if [ "$IMAGE_TAG" != "" ] && [ -n $IMAGE_TAG ]; then
+        {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} $IMAGE_TAG
+        echo "Replaced image tag in chart values.yaml with: $IMAGE_TAG"
+    fi
+
+fi
+
+# Application docker image is provided by other docker bazel rule
+if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     # extracts the digest sha and removes 'sha256' text from it
     DIGEST=$(cat {DIGEST_PATH})
     IFS=':' read -ra digest_split <<< "$DIGEST"
     DIGEST_SHA=${digest_split[1]}
+
     {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} $DIGEST_SHA
-    echo "Packaged image tag: "$DIGEST_SHA
-fi
 
-# if the tag is a digest add @sha256 as suffix to the image.repository
-if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
+    echo "Replaced image tag in chart values.yaml with: $DIGEST_SHA"
+
     REPO_SUFIX="@sha256"
-    REPO_URL=$({YQ_PATH} r {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH})
-fi
 
-if [ -n $IMAGE_REPOSITORY ] && [ "$IMAGE_REPOSITORY" != "" ]; then
-    REPO_URL="{IMAGE_REPOSITORY}"
-fi
+    if [ -n $IMAGE_REPOSITORY ] && [ "$IMAGE_REPOSITORY" != "" ]; then
+        REPO_URL="{IMAGE_REPOSITORY}"
+    else
+        # if image_repository attr is not provided, extract it from values.yaml
+        REPO_URL=$({YQ_PATH} r {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH})
+    fi
 
-# appends suffix if REPO_URL does not already contains it
-if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
-    {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
+    # appends @sha256 suffix to image repo url value if the repository value does not already contains it
+    if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
+        {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
+    fi
 fi
 
 helm init --client-only > /dev/null

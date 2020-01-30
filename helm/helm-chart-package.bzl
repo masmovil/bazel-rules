@@ -32,9 +32,6 @@ def _helm_chart_impl(ctx):
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
 
-    if (not ctx.attr.image_tag) and (not ctx.attr.image):
-        fail("Error: 'image' or 'image_tag' arguments must be provided.")
-
     # locate chart root path trying to find Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
         if srcfile.path.endswith("Chart.yaml"):
