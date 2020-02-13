@@ -2,10 +2,13 @@
 
 set -e
 set -o pipefail
+set -x
 
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
 IMAGE_TAG={IMAGE_TAG}
+
+chmod 777 {CHART_VALUES_PATH}
 
 # Application docker image is not provided by other docker bazel rule
 if  [ -z $DIGEST_PATH ]; then
@@ -58,4 +61,4 @@ if [ "$(helm repo list |grep local)" != "" ]; then
     helm repo remove local > /dev/null
 fi
 
-helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}
+helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION
