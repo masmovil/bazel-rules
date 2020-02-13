@@ -61,5 +61,4 @@ if [ "$(helm repo list |grep local)" != "" ]; then
     helm repo remove local > /dev/null
 fi
 
-helm dependency update
-helm package {CHART_PATH} --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}
+helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}
