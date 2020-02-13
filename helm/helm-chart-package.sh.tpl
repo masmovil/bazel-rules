@@ -2,7 +2,6 @@
 
 set -e
 set -o pipefail
-set -x
 
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
@@ -58,7 +57,7 @@ helm init --client-only > /dev/null
 # Remove local repo to increase reproducibility and remove errors
 if [ "$(helm repo list |grep local)" != "" ]; then
     echo "Remove local helm repo"
-    helm repo remove local > /dev/null
+    helm repo remove local 2> /dev/null || true
 fi
 
 helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}
