@@ -3,9 +3,6 @@
 set -e
 set -o pipefail
 
-
-
-
 function guess_runfiles() {
     if [ -d ${BASH_SOURCE[0]}.runfiles ]; then
         # Runfiles are adjacent to the current script.
@@ -37,9 +34,14 @@ function read_variables() {
 
 kubectl create ns {NAMESPACE_NAME} 2>/dev/null || true
 
-gcloud --project={GCP_GKE_PROJECT} iam service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:{WORKLOAD_IDENTITY_NAMESPACE}[{NAMESPACE_NAME}/{KUBERNETES_SA}]" \
-    projects/{GCP_SA_PROJECT}/serviceAccounts/{GCP_SA}
+if [ "{GCP_SA}" != "" ]; then
 
-kubectl -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA_PROJECT} --overwrite
+    gcloud --project={GCP_GKE_PROJECT} iam service-accounts add-iam-policy-binding \
+        --role roles/iam.workloadIdentityUser \
+        --member "serviceAccount:{WORKLOAD_IDENTITY_NAMESPACE}[{NAMESPACE_NAME}/{KUBERNETES_SA}]" \
+        projects/{GCP_SA_PROJECT}/serviceAccounts/{GCP_SA}
+
+    kubectl -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA_PROJECT} --overwrite
+
+
+fi

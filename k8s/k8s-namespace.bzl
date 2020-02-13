@@ -27,6 +27,16 @@ def _k8s_namespace_impl(ctx):
     gcp_gke_project = ctx.attr.gcp_gke_project
     workload_identity_namespace = ctx.attr.workload_identity_namespace
 
+    if gcp_sa != "":
+        if kubernetes_sa == "":
+             fail(msg='ERROR: kubernetes_sa must be provided if gcp_sa is set')
+        if gcp_sa_project == "":
+             fail(msg='ERROR: gcp_sa_project must be provided if gcp_sa is set')
+        if gcp_gke_project == "":
+             fail(msg='ERROR: gcp_gke_project must be provided if gcp_sa is set')
+        if workload_identity_namespace == "":
+             fail(msg='ERROR: workload_identity_namespace must be provided if gcp_sa is set')
+
     stamp_files = [ctx.info_file, ctx.version_file]
     
 
@@ -45,7 +55,7 @@ def _k8s_namespace_impl(ctx):
             "{GCP_SA}": gcp_sa,
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
             "%{stamp_statements}": "\n".join([
-              "\tread_variables %s" % runfile(ctx, f)
+              "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
         }
     )
