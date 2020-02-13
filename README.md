@@ -92,6 +92,8 @@ helm_release(
 
 These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in YAML templates. In order to work you must have YQ installed and availabe in your PATH.
 
+## Helm rules
+
 ### helm_chart
 
 You can use `helm_chart` rule to create a new helm package. Before creating the helm package, the rule can replace some specific values of your app: the image tag value, the image repository and the helm package version of the application. The image can be provided either by `image_tag` attribute as string/make variable or by a `image` label attribute. The `image` attribute has to be a label that specify a [docker image bazel rule](https://github.com/bazelbuild/rules_docker). This rule will extract the digest (sha256) automatically from that image, and reference that sha256 as the image tag of the helm package.
@@ -220,3 +222,48 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | values_yaml | false | - | Several values files can be passed when installing release |
 | secrets_yaml | false | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
 | sops_yaml | false | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
+
+
+
+## K8s rules
+
+Import in your `BUILD.bazel`
+
+```
+load("@com_github_masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
+
+```
+
+
+### k8s_namespace
+
+`k8s_namespace` is used to create a new namespace.
+You can also configure GKE Workload Identity with it.
+
+
+Example of use:
+```
+k8s_namespace(
+    name = "namespace",
+    namespace_name = "ft-sesame-${DEPLOY_BRANCH}",
+    kubernetes_sa = "default",
+    gcp_sa_project = "mm-odissey-dev",
+    gcp_sa = "odissey-dev@mm-odissey-dev.iam.gserviceaccount.com",
+    gcp_gke_project = "mm-k8s-dev-01",
+    workload_identity_namespace = "mm-k8s-dev-01.svc.id.goog",
+
+)
+```
+
+
+The following attributes are accepted by the rule (some of them are mandatory).
+
+|  Attribute | Mandatory| Default | Notes |
+| ---------- | --- | ------ | -------------- |
+| namespace_name | yes | - | Name of the namespace to create |
+| kubernetes_sa | no | - | Kubernetes Service Account to associate with Workload Identity. I.E. default It supports the use of `stamp_variables`. |
+| kubernetes_sa | no | kube-system | Namespace where Tiller lives in the Kubernetes Cluster. It supports the use of `stamp_variables`.|
+| gcp_sa_project | no | - |GCP project name where Service Account lives. I.E. `my-project`|
+| gcp_sa | no | - | GCP Service Account. I.E.  `my-account@my-project.iam.gserviceaccount.com`|
+| gcp_gke_project | no | - | GKE Project |
+| workload_identity_namespace | no | - | Workload Identity Namespace. I.E. `mm-k8s-dev-01.svc.id.goog` |
