@@ -25,6 +25,6 @@ def helm_repositories():
   http_archive(
     name = "helm_v2.13.0_linux",
     sha256 = "15eca6ad225a8279de80c7ced42305e24bc5ac60bb7d96f2d2fa4af86e02c794",
-    urls = ["https://get.helm.sh/helm-v2.130-linux-amd64.tar.gz"],
+    urls = ["https://get.helm.sh/helm-v2.13.0-linux-amd64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",
   )
