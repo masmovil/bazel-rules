@@ -32,7 +32,7 @@ def _helm_chart_impl(ctx):
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
 
-    helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type"].helminfo.tool.files.to_list()[0].path    print(helm_path)
+    helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type"].helminfo.tool.files.to_list()[0].path
 
     # locate chart root path trying to find Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
