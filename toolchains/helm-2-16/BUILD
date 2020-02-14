@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:private"])
 
 load("//toolchains/helm:helm_toolchain.bzl", "helm_toolchain")
 
