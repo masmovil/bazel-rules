@@ -52,7 +52,7 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     fi
 fi
 
-helm init --client-only > /dev/null
+{HELM_PATH} init --client-only > /dev/null
 
 # Remove local repo to increase reproducibility and remove errors
 if [ "$(helm repo list |grep local)" != "" ]; then
@@ -60,4 +60,4 @@ if [ "$(helm repo list |grep local)" != "" ]; then
     helm repo remove local 2> /dev/null || true
 fi
 
-helm package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}
+{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {HELM_CHART_VERSION} --version {HELM_CHART_VERSION}

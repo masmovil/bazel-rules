@@ -30,9 +30,9 @@ function read_variables() {
 %{stamp_statements}
 
 
-helm init -c
+{HELM_PATH} init -c
 if [ "{SECRETS_YAML}" != "" ]; then
-    helm secrets upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML} {RELEASE_NAME} {CHART_PATH}
+    {HELM_PATH} secrets upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML} {RELEASE_NAME} {CHART_PATH}
 else
-    helm upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
+    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
 fi

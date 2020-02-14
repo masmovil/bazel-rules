@@ -32,6 +32,8 @@ def _helm_chart_impl(ctx):
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
 
+    helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type"].helminfo.tool.files.to_list()[0].path    print(helm_path)
+
     # locate chart root path trying to find Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
         if srcfile.path.endswith("Chart.yaml"):
@@ -104,6 +106,7 @@ def _helm_chart_impl(ctx):
             "{PACKAGE_OUTPUT_PATH}": targz.dirname,
             "{IMAGE_REPOSITORY}": ctx.attr.image_repository,
             "{HELM_CHART_VERSION}": helm_chart_version,
+            "{HELM_PATH}": helm_path,
             "{VALUES_REPO_YAML_PATH}": ctx.attr.values_repo_yaml_path,
             "{VALUES_TAG_YAML_PATH}": ctx.attr.values_tag_yaml_path
         }
@@ -139,6 +142,9 @@ helm_chart = rule(
       "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
       "chart_deps": attr.label_list(allow_files = True, mandatory = False),
     },
-    toolchains = ["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"],
+    toolchains = [
+        "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type",
+    ],
     doc = "Runs helm packaging updating the image tag on it",
 )
