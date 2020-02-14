@@ -1,14 +1,14 @@
 YqToolchainInfo = provider(
     doc = "Yq toolchain rule parameters",
     fields = {
-        "tool_path": "Path to the yq executable"
+        "tool": "Path to the yq executable"
     },
 )
 
 def _yq_toolchain_impl(ctx):
     toolchain_info = platform_common.ToolchainInfo(
         yqinfo = YqToolchainInfo(
-            tool_path = ctx.attr.tool_path,
+            tool = ctx.attr.tool,
         ),
     )
     return [toolchain_info]
@@ -16,6 +16,6 @@ def _yq_toolchain_impl(ctx):
 yq_toolchain = rule(
     implementation = _yq_toolchain_impl,
     attrs = {
-        "tool_path": attr.string(),
+        "tool": attr.label(allow_single_file = True),
     },
 )

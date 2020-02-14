@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load(":yq_deps.bzl", "yq_deps")
 
 def repositories():
   """Download dependencies of container rules."""
@@ -19,3 +20,5 @@ def repositories():
       strip_prefix = "rules_docker-0.13.0",
       urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.13.0/rules_docker-v0.13.0.tar.gz"],
     )
+
+  yq_deps()
