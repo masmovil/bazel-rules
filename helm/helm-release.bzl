@@ -26,6 +26,7 @@ def _helm_release_impl(ctx):
         sops_yaml = Sops file if secrets_yaml is provided
     """
     helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()[0].path
+    helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()
     chart = ctx.file.chart
     namespace = ctx.attr.namespace
     tiller_namespace = ctx.attr.tiller_namespace
@@ -66,7 +67,7 @@ def _helm_release_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = [chart, ctx.info_file, ctx.version_file] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml
+        files = [chart, ctx.info_file, ctx.version_file] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_binary
     )
 
     return [DefaultInfo(
