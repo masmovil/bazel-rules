@@ -25,18 +25,19 @@ def _helm_release_impl(ctx):
         secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
         sops_yaml = Sops file if secrets_yaml is provided
     """
-    
+    helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()[0].path
+    helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()
     chart = ctx.file.chart
     namespace = ctx.attr.namespace
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
 
     stamp_files = [ctx.info_file, ctx.version_file]
-    
+
     values_yaml = ""
     for i, values_yaml_file in enumerate(ctx.files.values_yaml):
         values_yaml = values_yaml + " -f " + values_yaml_file.path
-    
+
     secrets_yaml = ""
     for i, secrets_yaml_file in enumerate(ctx.files.secrets_yaml):
         secrets_yaml = secrets_yaml + " -f " + secrets_yaml_file.path
@@ -57,6 +58,7 @@ def _helm_release_impl(ctx):
             "{TILLER_NAMESPACE}": tiller_namespace,
             "{RELEASE_NAME}": release_name,
             "{VALUES_YAML}": values_yaml,
+            "{HELM_PATH}": helm_path,
             "{SECRETS_YAML}": secrets_yaml,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
@@ -65,7 +67,7 @@ def _helm_release_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = [chart, ctx.info_file, ctx.version_file] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml
+        files = [chart, ctx.info_file, ctx.version_file] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_binary
     )
 
     return [DefaultInfo(
@@ -86,6 +88,6 @@ helm_release = rule(
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
-    toolchains = [],
+    toolchains = ["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"],
     executable = True,
 )

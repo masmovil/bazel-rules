@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load(":yq_deps.bzl", "yq_deps")
+load("@com_github_masmovil_bazel_rules//repositories:helm_deps.bzl", "helm_repositories")
+load("@com_github_masmovil_bazel_rules//repositories:yq_deps.bzl", "yq_deps")
 
 def repositories():
   """Download dependencies of container rules."""
@@ -11,6 +12,10 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_windows_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/helm:helm_v2.13.0_linux_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/helm:helm_v2.13.0_osx_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/helm-2-16:helm_v2.16.1_linux_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/helm-2-16:helm_v2.16.1__osx_toolchain",
   )
 
   if "io_bazel_rules_docker" not in excludes:
@@ -20,5 +25,7 @@ def repositories():
       strip_prefix = "rules_docker-0.13.0",
       urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.13.0/rules_docker-v0.13.0.tar.gz"],
     )
+
+  helm_repositories()
 
   yq_deps()
