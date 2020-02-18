@@ -7,8 +7,20 @@ toolchain_type(name = "toolchain_type")
 # Default yq toolchain that expects the 'yq' executable
 # to be in the PATH.
 yq_toolchain(
-    name = "yq_default",
-    tool_path = "yq",
+    name = "yq_linux",
+    tool = "@yq_v2.4.1_linux//file",
+    visibility = ["//visibility:public"],
+)
+
+yq_toolchain(
+    name = "yq_osx",
+    tool = "@yq_v2.4.1_darwin//file",
+    visibility = ["//visibility:public"],
+)
+
+yq_toolchain(
+    name = "yq_windows",
+    tool = "yq",
     visibility = ["//visibility:public"],
 )
 
@@ -22,7 +34,7 @@ toolchain(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
-    toolchain = ":yq_default",
+    toolchain = ":yq_linux",
     toolchain_type = ":toolchain_type",
 )
 
@@ -31,7 +43,7 @@ toolchain(
     target_compatible_with = [
         "@bazel_tools//platforms:osx",
     ],
-    toolchain = ":yq_default",
+    toolchain = ":yq_osx",
     toolchain_type = ":toolchain_type",
 )
 
@@ -45,6 +57,6 @@ toolchain(
         "@platforms//os:windows",
         "@platforms//cpu:x86_64",
     ],
-    toolchain = ":yq_default",
+    toolchain = ":yq_windows",
     toolchain_type = ":toolchain_type",
 )
