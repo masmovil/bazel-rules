@@ -28,6 +28,7 @@ def _helm_chart_impl(ctx):
     digest_path = ""
     image_tag = ""
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
+    yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0].path
 
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
@@ -102,7 +103,7 @@ def _helm_chart_impl(ctx):
             "{CHART_MANIFEST_PATH}": tmp_chart_manifest_path,
             "{DIGEST_PATH}": digest_path,
             "{IMAGE_TAG}": image_tag,
-            "{YQ_PATH}": ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool_path,
+            "{YQ_PATH}": yq,
             "{PACKAGE_OUTPUT_PATH}": targz.dirname,
             "{IMAGE_REPOSITORY}": ctx.attr.image_repository,
             "{HELM_CHART_VERSION}": helm_chart_version,

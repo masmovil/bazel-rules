@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@com_github_masmovil_bazel_rules//repositories:helm_deps.bzl", "helm_repositories")
+load("@com_github_masmovil_bazel_rules//repositories:yq_deps.bzl", "yq_deps")
 
 def repositories():
   """Download dependencies of container rules."""
@@ -27,3 +28,4 @@ def repositories():
 
   helm_repositories()
 
+  yq_deps()
