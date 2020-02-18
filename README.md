@@ -32,7 +32,7 @@ load(
 mm_repositories()
 ```
 
-This rule depends on [bazel rules docker](https://github.com/bazelbuild/rules_docker). So you have to install `rules_docker` in your `WORKSPACE` in order this rules to work. To do this you can simply call `docker_deps` rule defined for this project.
+This rule depends on [bazel rules docker](https://github.com/bazelbuild/rules_docker). So you have to install `rules_docker` in your `WORKSPACE` to work. To do this you can simply call `docker_deps` rule defined for this project.
 
 Include and invoke `docker_deps` declaration in your `WORKSPACE` to register docker rule dependencies
 
@@ -129,14 +129,14 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | srcs | yes | - | Chart source files. Must be a list of **bazel labels** (or a glob pattern) containing the path where the helm chart files and values are placed. Just one helm package should placed under `srcs` files. |
-| image | false | - | Label referencing another bazel rule that implements [docker container image rule](https://github.com/bazelbuild/rules_docker#container_image-1). This attr is used to obtain the digest of the built docker image and use it as the docker image tag of the application. |
-| image_tag | false | - | Fixed image tag value that will be used in the deployment. It can contain a string (e.g `master`), or the key of a make variable if is included in curly braces (e.g {GIT_COMMIT}). If a make variable format is used, the variable has to be provided through the `--define` method. Note: This attribute is an alternative to the `image` attribute if you want to provide a "fixed" image tag of your application instead of using a bazel rule to generate the docker image of your app. If you specify both, `image` attribute has preferenece.  |
-| package_name | true | - | The name of the helm package. It must be the same name that was defined in the Chart.yaml |
-| helm_chart_version | false | `1.0.0` | Used to replace the Chart.yaml version of the helm package. It has to be defined following the [semver](https://semver.org/) nomenclature. Support make variables if the attribute is placed inside curly braces (e.g {HELM_VERSION})|
-| image_repository | false | - | The url of the docker registry where the docker image is stored. This is usually where the `image.repository` points to in the values.yaml file |
-| values_repo_yaml_path | false | `image.repository` | The yaml path (expressed in dot notation) of values.yaml where the key of the image repository is defined in the values.yaml. |
-| values_tag_yaml_path | false | `image.tag` | The yaml path (expressed in dot notation) of values.yaml where the key of the image tag is defined in the values.yaml |
-| chart_deps | false | - | Helm chart dependencies of this rules. Defined as a list of dependencies of other helm_chart rules (bazel targets). |
+| image | no | - | Label referencing another bazel rule that implements [docker container image rule](https://github.com/bazelbuild/rules_docker#container_image-1). This attr is used to obtain the digest of the built docker image and use it as the docker image tag of the application. |
+| image_tag | no | - | Fixed image tag value that will be used in the deployment. It can contain a string (e.g `master`), or the key of a make variable if is included in curly braces (e.g {GIT_COMMIT}). If a make variable format is used, the variable has to be provided through the `--define` method. Note: This attribute is an alternative to the `image` attribute if you want to provide a "fixed" image tag of your application instead of using a bazel rule to generate the docker image of your app. If you specify both, `image` attribute has preferenece.  |
+| package_name | yes | - | The name of the helm package. It must be the same name that was defined in the Chart.yaml |
+| helm_chart_version | no | `1.0.0` | Used to replace the Chart.yaml version of the helm package. It has to be defined following the [semver](https://semver.org/) nomenclature. Support make variables if the attribute is placed inside curly braces (e.g {HELM_VERSION})|
+| image_repository | no | - | The url of the docker registry where the docker image is stored. This is usually where the `image.repository` points to in the values.yaml file |
+| values_repo_yaml_path | no | `image.repository` | The yaml path (expressed in dot notation) of values.yaml where the key of the image repository is defined in the values.yaml. |
+| values_tag_yaml_path | no | `image.tag` | The yaml path (expressed in dot notation) of values.yaml where the key of the image tag is defined in the values.yaml |
+| chart_deps | no | - | Helm chart dependencies of this rules. Defined as a list of dependencies of other helm_chart rules (bazel targets). |
 
 
 #### Use of make_variables
@@ -216,12 +216,12 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
-| namespace | true | default | Namespace where this release is installed to. It supports the use of `stamp_variables`. |
-| tiller_namespace | true | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`.|
-| release_name | true | - | Name of the Helm release. It supports the use of `stamp_variables`|
-| values_yaml | false | - | Several values files can be passed when installing release |
-| secrets_yaml | false | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
-| sops_yaml | false | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
+| namespace | yes | default | Namespace where this release is installed to. It supports the use of `stamp_variables`. |
+| tiller_namespace | yes | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`.|
+| release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
+| values_yaml | no | - | Several values files can be passed when installing release |
+| secrets_yaml | no | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
+| sops_yaml | no | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
 
 
 
