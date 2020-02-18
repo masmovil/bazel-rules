@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
-def yq_deps():
+def yq_repositories():
   http_file(
     name = "yq_v2.4.1_linux",
     urls = ["https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64"],

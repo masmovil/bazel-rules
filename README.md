@@ -17,12 +17,13 @@ In your Bazel `WORKSPACE` file add this repository as a dependency:
 ```
 git_repository(
     name = "com_github_masmovil_bazel_rules",
-    tag = "0.2.2",
+    # tag = "0.2.2",
+    commit = "commit-ref",
     remote = "https://github.com/masmovil/bazel-rules.git",
 )
 ```
 
-Include and invoke `repositories` declaration in your `WORKSPACE` to register the rule toolchains.
+Include and invoke `repositories` declaration in your `WORKSPACE` to register transitive dependencies and rule toolchains.
 
 ```
 load(
@@ -32,19 +33,9 @@ load(
 mm_repositories()
 ```
 
-This rule depends on [bazel rules docker](https://github.com/bazelbuild/rules_docker). So you have to install `rules_docker` in your `WORKSPACE` to work. To do this you can simply call `docker_deps` rule defined for this project.
+This rule fetchs and installs the transitive dependencies that it needs  (e.g: [bazel rules docker](https://github.com/bazelbuild/rules_docker).
 
-Include and invoke `docker_deps` declaration in your `WORKSPACE` to register docker rule dependencies
-
-```
-load(
-    "@com_github_masmovil_bazel_rules//repositories:docker_deps.bzl",
-    mm_repositories_docker_deps = "docker_deps",
-)
-mm_repositories_docker_deps()
-```
-
-If you prefer to configure `rules_docker` by yourself, declare this dependency in the workspace before calling `repositories`  and do not invoke `docker_deps`. E.g:
+But if you prefer to configure `rules_docker` by yourself or you need a special configuration of docker rules, declare this dependency in the workspace before calling `repositories` . E.g:
 
 ```
 http_archive(
@@ -87,8 +78,6 @@ helm_release(
     ...
 )
 ```
-
-### Important notes
 
 These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in helm YAML templates. The binaries are preloaded by this rule using bazel toolchains, so you don't need have yq available in your path.
 
