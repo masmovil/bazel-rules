@@ -90,7 +90,7 @@ helm_release(
 
 ### Important notes
 
-These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in YAML templates. In order to work you must have YQ installed and availabe in your PATH.
+These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in helm YAML templates. The binaries are preloaded by this rule using bazel toolchains, so you don't need have yq available in your path.
 
 ## Helm rules
 
