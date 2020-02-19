@@ -10,6 +10,16 @@ There are three defined rules, `helm_chart` , `helm_push` and `helm_release`.
 
 These rules generate new helm packages with specific values for each development version of your application and push generated helm packages to a provided [helm chart museum](https://chartmuseum.com/).
 
+### Important notes
+
+Helm v3 is now supported.
+
+`helm_release` rule will check if tiller is installed in your cluster to decide which version of helm to use (v2 or v3).
+If the rule can't find in your cluster any deployed tiller, it will use helm v3 by default.
+To find up if you have running tiller in your cluster, the rule will be using `tiller_namespace` attribute value.
+
+You can force the use of helm v2 with `helm_v2` (set to `True`, default `False`).
+
 ### Getting started
 
 In your Bazel `WORKSPACE` file add this repository as a dependency:
@@ -211,7 +221,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | values_yaml | no | - | Several values files can be passed when installing release |
 | secrets_yaml | no | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
 | sops_yaml | no | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
-
+| helm_v2 | no | False | Force the use of helm v2 to deploy the release |
 
 
 ## K8s rules
