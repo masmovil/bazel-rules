@@ -5,13 +5,13 @@ load(":kubectl_toolchain.bzl", "kubectl_toolchain")
 toolchain_type(name = "toolchain_type", visibility = ["//visibility:public"])
 
 # Helm toolchain that points to helm binary version 2.13.0
-helm_toolchain(
+kubectl_toolchain(
     name = "kubectl_darwin",
-    tool = "@kubectl_darwin//:kubectl",
+    tool = "@kubectl_darwin//file",
     visibility = ["//visibility:public"],
 )
 
-helm_toolchain(
+kubectl_toolchain(
     name = "kubectl_linux",
     tool = "@kubectl_linux//:kubectl",
     visibility = ["//visibility:public"],

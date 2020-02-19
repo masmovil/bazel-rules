@@ -23,6 +23,8 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/helm-2-16:helm_v2.16.1__osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm-3:helm_v3.1.0_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm-3:helm_v3.1.0__osx_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_linux_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_osx_toolchain",
   )
 
   # ============================== Docker repositories ==============================

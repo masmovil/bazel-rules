@@ -29,8 +29,9 @@ def _helm_release_impl(ctx):
     helm_path = helm_binary[0].path
     helm3_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()
     helm3_path = helm3_binary[0].path
-    kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlingo.tool.files.to_list()
-    kubectl_path = kubcetl_binary[0].path
+    kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.tool.files.to_list()
+    kubectl_path = kubectl_binary[0].path
+
     chart = ctx.file.chart
     namespace = ctx.attr.namespace
     tiller_namespace = ctx.attr.tiller_namespace
@@ -90,7 +91,7 @@ helm_release = rule(
     attrs = {
       "chart": attr.label(allow_single_file = True, mandatory = True),
       "namespace": attr.string(mandatory = True, default = "default"),
-      "tiller_namespace": attr.string(mandatory = True, default = "tiller-system"),
+      "tiller_namespace": attr.string(mandatory = False, default = "tiller-system"),
       "release_name": attr.string(mandatory = True),
       "values_yaml": attr.label_list(allow_files = True, mandatory = False),
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
