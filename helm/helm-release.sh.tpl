@@ -29,9 +29,10 @@ function read_variables() {
 
 %{stamp_statements}
 
-# Check if tiller is running inside the cluster to guess which version of helm have to run
-if [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ]; then
+FORCE_HELM_V2={FORCE_HELM_V2}
 
+# Check if tiller is running inside the cluster to guess which version of helm have to run
+if ([ "$FORCE_HELM_V2" == "True" ] || [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ]); then
     # tiller pods were found, we will use helm 2 to make the release
     echo "Using helm v2 to deploy the {RELEASE_NAME} release"
 

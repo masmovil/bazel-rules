@@ -36,6 +36,7 @@ def _helm_release_impl(ctx):
     namespace = ctx.attr.namespace
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
+    force_helm_v2 = ctx.attr.helm_v2 or False
 
     stamp_files = [ctx.info_file, ctx.version_file]
 
@@ -66,6 +67,7 @@ def _helm_release_impl(ctx):
             "{HELM_PATH}": helm_path,
             "{HELM3_PATH}": helm3_path,
             "{KUBECTL_PATH}": kubectl_path,
+            "{FORCE_HELM_V2}": str(force_helm_v2),
             "{SECRETS_YAML}": secrets_yaml,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
@@ -96,6 +98,7 @@ helm_release = rule(
       "values_yaml": attr.label_list(allow_files = True, mandatory = False),
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
+      "helm_v2": attr.bool(mandatory = False, default = False),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
