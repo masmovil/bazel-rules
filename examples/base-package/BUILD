@@ -18,5 +18,5 @@ helm_release(
   name = "base_release",
   chart = ":base_package",
   namespace = "examples",
-  release_name = "base-release"
+  release_name = "base-release",
 )
