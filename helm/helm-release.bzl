@@ -25,8 +25,12 @@ def _helm_release_impl(ctx):
         secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
         sops_yaml = Sops file if secrets_yaml is provided
     """
-    helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()[0].path
     helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()
+    helm_path = helm_binary[0].path
+    helm3_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()
+    helm3_path = helm3_binary[0].path
+    kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlingo.tool.files.to_list()
+    kubectl_path = kubcetl_binary[0].path
     chart = ctx.file.chart
     namespace = ctx.attr.namespace
     tiller_namespace = ctx.attr.tiller_namespace
@@ -59,6 +63,8 @@ def _helm_release_impl(ctx):
             "{RELEASE_NAME}": release_name,
             "{VALUES_YAML}": values_yaml,
             "{HELM_PATH}": helm_path,
+            "{HELM3_PATH}": helm3_path,
+            "{KUBECTL_PATH}": kubectl_path,
             "{SECRETS_YAML}": secrets_yaml,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
@@ -67,7 +73,11 @@ def _helm_release_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = [chart, ctx.info_file, ctx.version_file] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_binary
+        files = [
+            chart,
+            ctx.info_file,
+            ctx.version_file
+        ] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_binary + helm3_binary + kubectl_binary
     )
 
     return [DefaultInfo(
@@ -88,6 +98,10 @@ helm_release = rule(
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
-    toolchains = ["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"],
+    toolchains = [
+        "@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"
+    ],
     executable = True,
 )
