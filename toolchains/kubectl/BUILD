@@ -13,7 +13,7 @@ kubectl_toolchain(
 
 kubectl_toolchain(
     name = "kubectl_linux",
-    tool = "@kubectl_linux//:file",
+    tool = "@kubectl_linux//file",
     visibility = ["//visibility:public"],
 )
 
