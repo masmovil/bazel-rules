@@ -15,7 +15,7 @@ These rules generate new helm packages with specific values for each development
 Helm v3 is now supported.
 
 `helm_release` rule will check if tiller is installed in your cluster to decide which version of helm to use (v2 or v3).
-If the rule can't find in your cluster any deployed tiller, it will use helm v3 by default.
+If the rule can't find any deployed tiller in your cluster, it will use helm v3 by default.
 To find up if you have running tiller in your cluster, the rule will be using `tiller_namespace` attribute value.
 
 You can force the use of helm v2 with `helm_v2` (set to `True`, default `False`).
