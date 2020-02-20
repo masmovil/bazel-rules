@@ -10,7 +10,7 @@ def kubectl_repositories():
 
   http_file(
     name = "kubectl_linux",
-    # sha256 = "f0fd9fe2b0e09dc9ed190239fce892a468cbb0a2a8fffb9fe846f893c8fd09de",
+    sha256 = "69cfb3eeaa0b77cc4923428855acdfc9ca9786544eeaff9c21913be830869d29",
     urls = ["https://storage.googleapis.com/kubernetes-release/release/v1.16.1/bin/linux/amd64/kubectl"],
     executable = True
   )
