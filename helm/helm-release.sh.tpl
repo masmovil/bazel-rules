@@ -29,10 +29,27 @@ function read_variables() {
 
 %{stamp_statements}
 
+FORCE_HELM_V2={FORCE_HELM_V2}
 
-{HELM_PATH} init -c
-if [ "{SECRETS_YAML}" != "" ]; then
-    {HELM_PATH} secrets upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML} {RELEASE_NAME} {CHART_PATH}
+# Check if tiller is running inside the cluster to guess which version of helm have to run
+if ([ "$FORCE_HELM_V2" == "True" ] || [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ]); then
+    # tiller pods were found, we will use helm 2 to make the release
+    echo "Using helm v2 to deploy the {RELEASE_NAME} release"
+
+    {HELM_PATH} init -c
+
+    if [ "{SECRETS_YAML}" != "" ]; then
+        {HELM_PATH} secrets upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML} {RELEASE_NAME} {CHART_PATH}
+    else
+        {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
+    fi
 else
-    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
+    # tiller pods were not found, we will use helm 3 to make the release
+    echo "Using helm v3 to deploy the {RELEASE_NAME} release"
+
+    if [ "{SECRETS_YAML}" != "" ]; then
+        {HELM3_PATH} secrets upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML}
+    else
+        {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML}
+    fi
 fi
