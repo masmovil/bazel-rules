@@ -24,7 +24,7 @@ You can force the use of helm v2 using `helm_v2` attribute (set to `True`, defau
 
 In your Bazel `WORKSPACE` file add this repository as a dependency:
 
-```
+```python
 git_repository(
     name = "com_github_masmovil_bazel_rules",
     # tag = "0.2.2",
@@ -35,7 +35,7 @@ git_repository(
 
 Include and invoke `repositories` declaration in your `WORKSPACE` to register transitive dependencies and rule toolchains.
 
-```
+```python
 load(
     "@com_github_masmovil_bazel_rules//repositories:repositories.bzl",
     mm_repositories = "repositories",
@@ -47,7 +47,7 @@ This rule fetchs and installs the transitive dependencies that it needs  (e.g: [
 
 But if you prefer to configure `rules_docker` by yourself or you need a special configuration of docker rules, declare this dependency in the workspace before calling `repositories` . E.g:
 
-```
+```python
 http_archive(
     name = "io_bazel_rules_docker",
     sha256 = "df13123c44b4a4ff2c2f337b906763879d94871d16411bf82dcfeba892b58607",
@@ -68,7 +68,7 @@ repositories()
 ```
 After the intial setup, you can use the rules including them in your BUILD files:
 
-```
+```python
 load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push", "helm_release")
 
 helm_chart(
@@ -99,7 +99,7 @@ You can use `helm_chart` rule to create a new helm package. Before creating the 
 The rule creates a tar.gz file in the bazel output directory. The name of the generated tar.gz will be the package_name + the version of the Chart.yaml (the version can be override with the `helm_chart_version` attribute).
 
 Example of use:
-```
+```python
 helm_chart(
   name = "flex_package",
   srcs = glob(["**"]),
@@ -112,7 +112,7 @@ helm_chart(
 
 You can reference other helm packages defined with `helm_chart` rules as helm dependencies of this package. The output of `helm_chart` dependencies will be added to the generated output tar into the charts directory.
 
-```
+```python
 helm_chart(
   ....,
   chart_deps = [
@@ -142,7 +142,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 `image_tag` and `helm_chart_version` attributes support make variables. Make variables are provided to bazel through the `--define` argument.
 To enable make variables, string values have to be inside curly braces `image_tag="{GIT_SHA}"`.
 
-```
+```python
 bazel build //... --define GIT_SHA="ab2cxc4z9"
 
 
@@ -162,7 +162,7 @@ This rule is an executable. It needs `run` instead of `build` to be invoked.
 It authenticates against chart museum api using basic auth, so valid username and password have to be provided.
 
 Example of use:
-```
+```python
 helm_push(
   name = "flex_push",
   chart  = ":flex_package",
@@ -197,7 +197,7 @@ This rule is an executable. It needs `run` instead of `build` to be invoked.
 It relies in existing local kubernetes config (`~/.kube/config`).
 
 Example of use:
-```
+```python
 helm_release(
     name = "chart_install",
     chart = ":chart",
@@ -228,7 +228,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 
 Import in your `BUILD.bazel`
 
-```
+```python
 load("@com_github_masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
 
 ```
@@ -241,7 +241,7 @@ You can also configure GKE Workload Identity with it.
 
 
 Example of use:
-```
+```python
 k8s_namespace(
     name = "namespace",
     namespace_name = "ft-sesame-${DEPLOY_BRANCH}",
