@@ -22,7 +22,7 @@ You can force the use of helm v2 using `helm_v2` attribute (set to `True`, defau
 
 ### Getting started
 
-In your Bazel `WORKSPACE` file add this repository as a dependency:
+In your Bazel `WORKSPACE` file, after the [rules_docker](https://github.com/bazelbuild/rules_docker#setup), add this repository as a dependency and invoke repositories helper method:
 
 ```python
 git_repository(
@@ -31,11 +31,7 @@ git_repository(
     commit = "commit-ref",
     remote = "https://github.com/masmovil/bazel-rules.git",
 )
-```
 
-Include and invoke `repositories` declaration in your `WORKSPACE` to register transitive dependencies and rule toolchains.
-
-```python
 load(
     "@com_github_masmovil_bazel_rules//repositories:repositories.bzl",
     mm_repositories = "repositories",
@@ -43,29 +39,6 @@ load(
 mm_repositories()
 ```
 
-This rule fetchs and installs the transitive dependencies that it needs  (e.g: [bazel rules docker](https://github.com/bazelbuild/rules_docker).
-
-But if you prefer to configure `rules_docker` by yourself or you need a special configuration of docker rules, declare this dependency in the workspace before calling `repositories` . E.g:
-
-```python
-http_archive(
-    name = "io_bazel_rules_docker",
-    sha256 = "df13123c44b4a4ff2c2f337b906763879d94871d16411bf82dcfeba892b58607",
-    strip_prefix = "rules_docker-0.13.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.13.0/rules_docker-v0.13.0.tar.gz"],
-)
-
-load(
-    "@io_bazel_rules_docker//repositories:repositories.bzl",
-    container_repositories = "repositories",
-)
-
-container_repositories()
-
-load("//repositories:repositories.bzl", "repositories")
-
-repositories()
-```
 After the intial setup, you can use the rules including them in your BUILD files:
 
 ```python

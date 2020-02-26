@@ -26,29 +26,3 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_osx_toolchain",
   )
-
-  # ============================== Docker repositories ==============================
-  if "io_bazel_rules_docker" not in excludes:
-    http_archive(
-      name = "io_bazel_rules_docker",
-      sha256 = "df13123c44b4a4ff2c2f337b906763879d94871d16411bf82dcfeba892b58607",
-      strip_prefix = "rules_docker-0.13.0",
-      urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.13.0/rules_docker-v0.13.0.tar.gz"],
-    )
-
-    native.register_toolchains(
-      # Register the default docker toolchain that expects the 'docker'
-      # executable to be in the PATH
-      "@io_bazel_rules_docker//toolchains/docker:default_linux_toolchain",
-      "@io_bazel_rules_docker//toolchains/docker:default_windows_toolchain",
-      "@io_bazel_rules_docker//toolchains/docker:default_osx_toolchain",
-    )
-
-  # ============================== bazel_skylib repositories ==============================
-  if "bazel_skylib" not in excludes:
-    http_archive(
-        name = "bazel_skylib",
-        sha256 = "e5d90f0ec952883d56747b7604e2a15ee36e288bb556c3d0ed33e818a4d971f2",
-        strip_prefix = "bazel-skylib-1.0.2",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/archive/1.0.2.tar.gz"],
-    )
