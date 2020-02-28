@@ -2,6 +2,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@com_github_masmovil_bazel_rules//repositories:helm_repositories.bzl", "helm_repositories")
 load("@com_github_masmovil_bazel_rules//repositories:yq_repositories.bzl", "yq_repositories")
 load("@com_github_masmovil_bazel_rules//repositories:kubectl_repositories.bzl", "kubectl_repositories")
+load("@com_github_masmovil_bazel_rules//repositories:sops_repositories.bzl", "sops_repositories")
 
 def repositories():
   """Download dependencies of container rules."""
@@ -10,6 +11,7 @@ def repositories():
   kubectl_repositories()
   helm_repositories()
   yq_repositories()
+  sops_repositories()
 
   native.register_toolchains(
     # Register the default docker toolchain that expects the 'docker'
@@ -25,4 +27,7 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/helm-3:helm_v3.1.0__osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_osx_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/sops:sops_linux_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/sops:sops_osx_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/sops:sops_windows_toolchain"
   )
