@@ -29,10 +29,10 @@ function read_variables() {
 
 %{stamp_statements}
 
-FORCE_HELM_V2={FORCE_HELM_V2}
+FORCE_HELM_VERSION={FORCE_HELM_VERSION}
 
 # Check if tiller is running inside the cluster to guess which version of helm have to run
-if ([ "$FORCE_HELM_V2" == "True" ] || [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ]); then
+if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ] ); then
     # tiller pods were found, we will use helm 2 to make the release
     echo "Using helm v2 to deploy the {RELEASE_NAME} release"
 
@@ -46,6 +46,8 @@ if ([ "$FORCE_HELM_V2" == "True" ] || [ $({KUBECTL_PATH} get pods -n {TILLER_NAM
 else
     # tiller pods were not found, we will use helm 3 to make the release
     echo "Using helm v3 to deploy the {RELEASE_NAME} release"
+
+    {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || yes
 
     if [ "{SECRETS_YAML}" != "" ]; then
         {HELM3_PATH} secrets upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML}
