@@ -47,6 +47,8 @@ else
     # tiller pods were not found, we will use helm 3 to make the release
     echo "Using helm v3 to deploy the {RELEASE_NAME} release"
 
+    {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || yes
+
     if [ "{SECRETS_YAML}" != "" ]; then
         {HELM3_PATH} secrets upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML}
     else
