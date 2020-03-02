@@ -1,6 +1,12 @@
-def sopfile(ctx, f):
+def sopfiles(ctx, f):
   """Return the sop file relative path of f."""
   return f.short_path
+
+def declare_output(ctx, f, outputs):
+  """Declare sop decrypted outputs"""
+  out = ctx.actions.declare_file(f.basename + ".dec")
+  outputs.append(out)
+  return out.path
 
 # Load docker image providers
 def _sops_decrypt_impl(ctx):
@@ -10,16 +16,11 @@ def _sops_decrypt_impl(ctx):
         srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
         update_deps: Whether or not to run a helm dependency update prior to packaging.
     """
-    inputs = [] + ctx.files.srcs
+    inputs = [ctx.file.sops_yaml] + ctx.files.srcs
     outputs = []
 
     sops = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type"].sopsinfo.tool.files.to_list()[0].path
     sops_yaml = ctx.file.sops_yaml.path
-
-    # declare output files based on src inputs
-    for i, srcfile in enumerate(ctx.files.srcs):
-      out = ctx.actions.declare_file(srcfile.basename + ".dec")
-      outputs.append(out)
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
@@ -30,7 +31,7 @@ def _sops_decrypt_impl(ctx):
         is_executable = True,
         substitutions = {
             "{DECRYPT_FILES}": "\n".join([
-              "\tdecrypt_file %s" % sopfile(ctx, f)
+              "\tdecrypt_file %s %s" % (sopfiles(ctx, f), declare_output(ctx, f, outputs))
               for f in ctx.files.srcs]),
             "{SOPS_BINARY_PATH}": sops,
             "{SOPS_CONFIG_FILE}": sops_yaml
