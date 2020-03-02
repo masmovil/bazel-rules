@@ -4,7 +4,11 @@
 
 This repository contains Bazel rules to install and manipulate Helm charts with Bazel.
 
-There are three defined rules, `helm_chart` , `helm_push` and `helm_release`.
+This repo implements the following bazel rules:
+ `helm_chart`
+ `helm_push`
+ `helm_release`
+ `k8s_namespace`
 
 ## Documentation
 
@@ -18,7 +22,7 @@ Helm v3 is now supported.
 If the rule can't find any deployed tiller in your cluster, it will use helm v3 by default.
 To look up for any installed tiller in your cluster, the rule will use `tiller_namespace` attribute value.
 
-You can force the use of helm v2 using `helm_v2` attribute (set to `True`, default `False`).
+You can force the use of helm v2 or helm v3 using `helm_version` attribute (set to `v2`, or `v3`).
 
 ### Getting started
 
@@ -161,9 +165,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 
 `helm_release` is used to create and deploy a new release in a Kubernetes Cluster.
 
-Only `Helm 2` is supported for the moment.
-
-It has support for secrets via helm secrets (sops), which allows to have encrypted values files in the Git repository.
+`Helm 3` and `Helm 2` are supported.
 
 This rule is an executable. It needs `run` instead of `build` to be invoked.
 
@@ -178,8 +180,6 @@ helm_release(
     tiller_namespace = "tiller-system",
     release_name = "release-name",
     values_yaml = glob(["charts/myapp/values.yaml"]),
-    secrets_yaml = glob(["charts/myapp/secrets.*.yaml"]),
-    sops_yaml = ".sops.yaml",
 )
 ```
 
@@ -189,11 +189,9 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | ---------- | --- | ------ | -------------- |
 | chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
 | namespace | yes | default | Namespace where this release is installed to. It supports the use of `stamp_variables`. |
-| tiller_namespace | yes | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`.|
+| tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
 | values_yaml | no | - | Several values files can be passed when installing release |
-| secrets_yaml | no | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
-| sops_yaml | no | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
 | helm_version | no | "" | Force the use of helm v2 or v3 to deploy the release. The attribute can be set to **v2** or **v3** |
 
 
