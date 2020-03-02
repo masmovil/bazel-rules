@@ -34,7 +34,8 @@ def _sops_decrypt_impl(ctx):
               "\tdecrypt_file %s %s" % (sopfiles(ctx, f), declare_output(ctx, f, outputs))
               for f in ctx.files.srcs]),
             "{SOPS_BINARY_PATH}": sops,
-            "{SOPS_CONFIG_FILE}": sops_yaml
+            "{SOPS_CONFIG_FILE}": sops_yaml,
+            "{SOPS_PROVIDER}": ctx.attr.provider
         }
     )
 
@@ -59,6 +60,7 @@ sops_decrypt = rule(
     attrs = {
       "srcs": attr.label_list(allow_files = True, mandatory = True),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = True),
+      "provider": attr.string(default = "gcp_kms"),
       "_script_template": attr.label(allow_single_file = True, default = ":sops-decrypt.sh.tpl"),
     },
     toolchains = [

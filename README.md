@@ -219,12 +219,16 @@ sops_decrypt(
 )
 ```
 
+You can specify which provider integration you want to use (gcp KMS, azure key vault etc.) through the `provider` attribute.
+* For the moment only gcp KMS is supported
+
 The following attributes are accepted by the rule (some of them are mandatory).
 
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | src | yes | - | One or more labels pointing to the secret files to decrypt. It accepts a glob pattern. |
-| sops_yaml | yes | - | One label referencing the `.sops.yaml` yaml with the sops config.
+| sops_yaml | yes | - | One label referencing the `.sops.yaml` yaml with the sops config. |
+| provider | false | "gcp_kms" | The provider integration used to decrypt/encrypt the secrets. |
 
 The output of the rule are the decrypted secrets that you can pass to `helm_release`.
 
