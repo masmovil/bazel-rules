@@ -1,9 +1,6 @@
 def sopfile(ctx, f):
   """Return the sop file relative path of f."""
-  if ctx.workspace_name:
-    return ctx.workspace_name + "/" + f.short_path
-  else:
-    return f.short_path
+  return f.short_path
 
 # Load docker image providers
 def _sops_decrypt_impl(ctx):
@@ -17,10 +14,11 @@ def _sops_decrypt_impl(ctx):
     outputs = []
 
     sops = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type"].sopsinfo.tool.files.to_list()[0].path
+    sops_yaml = ctx.file.sops_yaml.path
 
     # declare output files based on src inputs
     for i, srcfile in enumerate(ctx.files.srcs):
-      out = ctx.actions.declare_file(ctx.attr.package_name + "-" + srcfile.basename + ".dec")
+      out = ctx.actions.declare_file(srcfile.basename + ".dec")
       outputs.append(out)
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
@@ -59,7 +57,7 @@ sops_decrypt = rule(
     implementation = _sops_decrypt_impl,
     attrs = {
       "srcs": attr.label_list(allow_files = True, mandatory = True),
-      "sops_yaml": attr.label(allow_single_file = True, default = ":.sops.yaml"),
+      "sops_yaml": attr.label(allow_single_file = True, mandatory = True),
       "_script_template": attr.label(allow_single_file = True, default = ":sops-decrypt.sh.tpl"),
     },
     toolchains = [

@@ -5,19 +5,19 @@ load(":sops_toolchain.bzl", "sops_toolchain")
 toolchain_type(name = "toolchain_type", visibility = ["//visibility:public"])
 
 # Sops toolchain that points to sops binary version 3.5.0
-helm_toolchain(
+sops_toolchain(
     name = "sops_darwin",
     tool = "@sops_darwin//file",
     visibility = ["//visibility:public"],
 )
 
-helm_toolchain(
+sops_toolchain(
     name = "sops_linux",
     tool = "@sops_linux//file",
     visibility = ["//visibility:public"],
 )
 
-helm_toolchain(
+sops_toolchain(
     name = "sops_windows",
     tool = "@sops_linux//file",
     visibility = ["//visibility:public"],
@@ -47,7 +47,7 @@ toolchain(
 )
 
 toolchain(
-    name = "sops_wnidows_toolchain",
+    name = "sops_windows_toolchain",
     target_compatible_with = [
         "@bazel_tools//platforms:windows",
     ],
