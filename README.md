@@ -194,7 +194,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | values_yaml | no | - | Several values files can be passed when installing release |
 | secrets_yaml | no | - | Several values files encryopted can be passed when installing release. **IMPORTANT: It requires `helm secrets` plugin to be installed and also define `sops_yaml` for sops configuration**  |
 | sops_yaml | no | - | Provide when using `secrets_yaml`. Check  https://github.com/futuresimple/helm-secrets documentation for further information |
-| helm_v2 | no | False | Force the use of helm v2 to deploy the release |
+| helm_version | no | "" | Force the use of helm v2 or v3 to deploy the release. The attribute can be set to **v2** or **v3** |
 
 
 ## K8s rules
