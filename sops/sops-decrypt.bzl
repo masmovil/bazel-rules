@@ -10,11 +10,11 @@ def declare_output(ctx, f, outputs):
 
 # Load docker image providers
 def _sops_decrypt_impl(ctx):
-    """This impl. allows rerference and decrypr encrypted secrets.yaml files
+    """This impl. allows reference and decrypt secrets.yaml files using mozilla sops
     Args:
         name: A unique name for this rule.
-        srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
-        update_deps: Whether or not to run a helm dependency update prior to packaging.
+        srcs: Array of secret files to decrypt
+        sops_yaml: Sops config file
     """
     inputs = [ctx.file.sops_yaml] + ctx.files.srcs
     outputs = []

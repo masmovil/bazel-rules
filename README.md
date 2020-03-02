@@ -207,7 +207,7 @@ load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
 
 ### sops_decrypt
 
-You can decrypt as many secrets as you want using `sops_decrypt` rule. Use the rule attribute `src` to provide the encrypted secrets you want to decrypt.
+You can decrypt as many secrets as you want using `sops_decrypt` rule. Use the rule attribute `src` to provide the encrypted secrets that you want to decrypt.
 The rule also needs the sops config file with the keyring id in order to decrypt files (`.sops.yaml`). You can provide it using the `sops_yaml` rule attribute.
 
 Example of use:
