@@ -42,7 +42,7 @@ def _helm_release_impl(ctx):
 
     values_yaml = ""
     for i, values_yaml_file in enumerate(ctx.files.values_yaml):
-        values_yaml = values_yaml + " -f " + values_yaml_file.path
+        values_yaml = values_yaml + " -f " + values_yaml_file.short_path
 
     secrets_yaml = ""
     for i, secrets_yaml_file in enumerate(ctx.files.secrets_yaml):
