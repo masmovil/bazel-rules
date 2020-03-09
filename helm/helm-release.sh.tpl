@@ -39,7 +39,7 @@ if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [
     {HELM_PATH} init -c
 
     if [ "{SECRETS_YAML}" != "" ]; then
-        {HELM_PATH} secrets upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML} {RELEASE_NAME} {CHART_PATH}
+        {HELM_PATH} secrets upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
     else
         {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
     fi
@@ -50,7 +50,7 @@ else
     {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
 
     if [ "{SECRETS_YAML}" != "" ]; then
-        {HELM3_PATH} secrets upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML} {SECRETS_YAML}
+        {HELM3_PATH} secrets upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML}
     else
         {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install --namespace {NAMESPACE} {VALUES_YAML}
     fi

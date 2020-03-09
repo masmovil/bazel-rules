@@ -44,13 +44,6 @@ def _helm_release_impl(ctx):
     for i, values_yaml_file in enumerate(ctx.files.values_yaml):
         values_yaml = values_yaml + " -f " + values_yaml_file.short_path
 
-    secrets_yaml = ""
-    for i, secrets_yaml_file in enumerate(ctx.files.secrets_yaml):
-        secrets_yaml = secrets_yaml + " -f " + secrets_yaml_file.path
-
-    if secrets_yaml != "" and not ctx.file.sops_yaml:
-        fail(msg='sops_yaml must be provided if secrets_yaml is set')
-
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
     # Generates the exec bash file with the provided substitutions
@@ -68,7 +61,6 @@ def _helm_release_impl(ctx):
             "{HELM3_PATH}": helm3_path,
             "{KUBECTL_PATH}": kubectl_path,
             "{FORCE_HELM_VERSION}": helm_version,
-            "{SECRETS_YAML}": secrets_yaml,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
