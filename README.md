@@ -73,7 +73,7 @@ These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform su
 ### helm_chart
 
 You can use `helm_chart` rule to create a new helm package. Before creating the helm package, the rule can replace some specific values of your app: the image tag value, the image repository and the helm package version of the application. The image can be provided either by `image_tag` attribute as string/make variable or by a `image` label attribute. The `image` attribute has to be a label that specify a [docker image bazel rule](https://github.com/bazelbuild/rules_docker). This rule will extract the digest (sha256) automatically from that image, and reference that sha256 as the image tag of the helm package.
-The rule creates a tar.gz file in the bazel output directory. The name of the generated tar.gz will be the package_name + the version of the Chart.yaml (the version can be override with the `helm_chart_version` attribute).
+The rule creates a tar.gz file in the bazel output directory. The name of the generated tar.gz will be the package_name.
 
 Example of use:
 ```python
@@ -83,7 +83,7 @@ helm_chart(
   image  = "//docker/flex:flex", // Reference to the docker image rule to extract the digest sha256 from
   package_name = "flex", // name of the helm package. This will be the name of the generated tar.gz helm package
   values_tag_yaml_path = "base.k8s.deployment.image.tag", // yaml Path of the image tag in the values.yaml files
-  helm_chart_version = "v0.1.1"
+  helm_chart_version = "0.1.1"
 )
 ```
 
@@ -108,7 +108,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | image | no | - | Label referencing another bazel rule that implements [docker container image rule](https://github.com/bazelbuild/rules_docker#container_image-1). This attr is used to obtain the digest of the built docker image and use it as the docker image tag of the application. |
 | image_tag | no | - | Fixed image tag value that will be used in the deployment. It can contain a string (e.g `master`), or the key of a make variable if is included in curly braces (e.g {GIT_COMMIT}). If a make variable format is used, the variable has to be provided through the `--define` method. Note: This attribute is an alternative to the `image` attribute if you want to provide a "fixed" image tag of your application instead of using a bazel rule to generate the docker image of your app. If you specify both, `image` attribute has preferenece.  |
 | package_name | yes | - | The name of the helm package. It must be the same name that was defined in the Chart.yaml |
-| helm_chart_version | no | `1.0.0` | Used to replace the Chart.yaml version of the helm package. It has to be defined following the [semver](https://semver.org/) nomenclature. Support make variables if the attribute is placed inside curly braces (e.g {HELM_VERSION})|
+| helm_chart_version | no | `1.0.0` | Used to replace the Chart.yaml version of the helm package. It has to be defined following the [semver](https://semver.org/) nomenclature. Support make variables if the attribute is placed inside curly braces (e.g {HELM_VERSION}) and stamped variables using the following nomenclature: ${HELM_VERSION}|
 | image_repository | no | - | The url of the docker registry where the docker image is stored. This is usually where the `image.repository` points to in the values.yaml file |
 | values_repo_yaml_path | no | `image.repository` | The yaml path (expressed in dot notation) of values.yaml where the key of the image repository is defined in the values.yaml. |
 | values_tag_yaml_path | no | `image.tag` | The yaml path (expressed in dot notation) of values.yaml where the key of the image tag is defined in the values.yaml |
@@ -129,6 +129,19 @@ helm_chart(
   ...
 )
 ```
+
+#### Use of stamp variables
+
+You can specify volatile variables in any attribute using the following sintaxis: `${}` e.g:
+```python
+
+helm_chart(
+  ...
+  helm_chart_version = "${VERSION}",
+  ...
+)
+```
+These variables have to be "exported" by the `status.sh` file defined in your project root dir.
 
 ### helm_push
 
