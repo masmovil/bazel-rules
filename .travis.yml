@@ -9,28 +9,12 @@ git:
 services:
   - docker
 
-before_install:
-  - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl
-  - sudo chmod +x ./kubectl
-  - sudo mv ./kubectl /usr/local/bin/kubectl
-  - curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.6.1/kind-$(uname)-amd64"
-  - chmod +x ./kind
-  - wget https://github.com/bazelbuild/bazel/releases/download/0.29.1/bazel_0.29.1-linux-x86_64.deb
-  # - sha256sum -c tools/bazel_0.3.1-linux-x86_64.deb.sha256
-  - sudo dpkg -i bazel_0.29.1-linux-x86_64.deb
-  - ./kind create cluster
-  - wget https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz
-  - tar -zxvf helm-v2.14.3-linux-amd64.tar.gz
-  - sudo mv linux-amd64/helm /usr/local/bin
-  - kubectl create namespace tiller-system
-  - "helm init --tiller-namespace tiller-system --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -"
-  - kubectl apply -f ./tests/resources/kind/roles/roles-tiller.yaml --namespace=tiller-system
-  - wget https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64
-  - sudo mv yq_linux_amd64 /usr/local/bin/yq
-  - sudo chmod +x /usr/local/bin/yq
-
+install:
+  - ./setup-k8s-tools.sh
+  - ./create-k8s-cluster-tiller.sh
+  - ./create-k8s-cluster-tillerless.sh
 after_script:
-  - ./kind delete cluster
+  - ./delete-k8s-clusters.sh
 
 addons:
   apt:
@@ -42,5 +26,7 @@ addons:
       - pkg-config
 jobs:
   include:
-    - stage: test-helm-release
-      script: go test tests/rules/* -v
+    - stage: test-helm-v2
+      script: kctx kind-bazel-tiller && go test tests/rules/* -v
+    - stage: test-helm-v3
+      script: kctx kind-bazel-tillerless && go test test/rules/* -v
