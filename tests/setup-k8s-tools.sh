@@ -12,6 +12,6 @@ sudo mv linux-amd64/helm /usr/local/bin/helm2
 wget https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
 tar -zxvf helm-v3.1.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm3
-wget https://github.com/ahmetb/kubectx/archive/v0.8.0.tar.gz
-tar -zxvf kubectx-0.8.0.tar.gz
+wget https://github.com/ahmetb/kubectx/archive/v0.8.0.tar.gz -O ./kubectx.tar.gz
+tar -zxvf kubectx.tar.gz
 sudo mv kubectx-0.8.0/kubectx /usr/local/bin/kubectx
