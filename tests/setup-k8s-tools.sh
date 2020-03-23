@@ -2,7 +2,7 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/l
 sudo chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.6.1/kind-$(uname)-amd64"
-sudo mv ./kund /usr/local/bin
+sudo mv ./kind /usr/local/bin
 sudo chmod +x /usr/local/bin/kind
 wget https://github.com/bazelbuild/bazel/releases/download/0.29.1/bazel_0.29.1-linux-x86_64.deb
 # sha256sum -c tools/bazel_0.3.1-linux-x86_64.deb.sha256
