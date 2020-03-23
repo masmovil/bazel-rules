@@ -26,7 +26,7 @@ addons:
       - pkg-config
 jobs:
   include:
-    - stage: test-helm-v2
-      script: kubectx kind-bazel-tiller && go test tests/rules/* -v
+    # - stage: test-helm-v2
+    #   script: kubectx kind-bazel-tiller && go test tests/rules/* -v
     - stage: test-helm-v3
       script: kubectx kind-bazel-tillerless && go test test/rules/* -v
