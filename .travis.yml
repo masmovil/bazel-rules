@@ -9,8 +9,7 @@ git:
 services:
   - docker
 
-install:
-  - chmod 755 ./tests
+before_script:
   - ./tests/setup-k8s-tools.sh
   - ./tests/create-k8s-cluster-tiller.sh
   - ./tests/create-k8s-cluster-tillerless.sh
