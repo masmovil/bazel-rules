@@ -1,20 +1,23 @@
 package test
 
 import (
-	"testing"
-
-	"time"
-
+	"fmt"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/stretchr/testify/require"
 	api "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"os"
+	"testing"
+	"time"
 )
 
 // Test suite for testing release of chart basic package
 func TestBasicChartRelease(t *testing.T) {
+	t.Log("HELLOOO")
+	fmt.Println("Say hi")
+	fmt.Fprintln(os.Stdout, "hello")
 	t.Parallel()
 
 	namespaceName := "test-nginx"
@@ -37,7 +40,7 @@ func TestBasicChartRelease(t *testing.T) {
 		EnvVars: map[string]string{
 			"TILLER_NAMESPACE": "tiller-system",
 		},
-	}, releaseName, true)
+	}, releaseName, false)
 
 	defer k8s.DeleteNamespace(t, k8sOptions, namespaceName)
 
@@ -54,5 +57,4 @@ func TestBasicChartRelease(t *testing.T) {
 	pod := k8s.GetPod(t, k8sOptions, podName)
 
 	require.Equal(t, pod.Status.Phase, api.PodRunning)
-
 }

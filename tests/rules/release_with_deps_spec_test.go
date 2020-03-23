@@ -37,7 +37,7 @@ func TestChartReleaseWithDeps(t *testing.T) {
 		EnvVars: map[string]string{
 			"TILLER_NAMESPACE": "tiller-system",
 		},
-	}, releaseName, true)
+	}, releaseName, false)
 
 	defer k8s.DeleteNamespace(t, k8sOptions, namespaceName)
 
