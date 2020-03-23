@@ -1,1 +1,1 @@
-./kind create cluster --name kind-bazel-tillerless
+./kind create cluster --name bazel-tillerless
