@@ -1,23 +1,19 @@
 package test
 
 import (
-	"fmt"
+	"testing"
+	"time"
+
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/stretchr/testify/require"
 	api "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"os"
-	"testing"
-	"time"
 )
 
 // Test suite for testing release of chart basic package
 func TestBasicChartRelease(t *testing.T) {
-	t.Log("HELLOOO")
-	fmt.Println("Say hi")
-	fmt.Fprintln(os.Stdout, "hello")
 	t.Parallel()
 
 	namespaceName := "test-nginx"
