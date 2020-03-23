@@ -1,19 +1,23 @@
 package test
 
 import (
-	"testing"
-	"time"
-
+	"flag"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/stretchr/testify/require"
 	api "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"testing"
+	"time"
 )
 
 // Test suite for testing release of chart basic package
 func TestBasicChartRelease(t *testing.T) {
+	var helmVersion string = "3"
+
+	flag.StringVar(&helmVersion, "helmVersion", "", "3")
+
 	t.Parallel()
 
 	namespaceName := "test-nginx"
@@ -31,14 +35,16 @@ func TestBasicChartRelease(t *testing.T) {
 		OutputMaxLineSize: 1024,
 	})
 
-	defer helm.Delete(t, &helm.Options{
-		KubectlOptions: k8sOptions,
-		EnvVars: map[string]string{
-			"TILLER_NAMESPACE": "tiller-system",
-		},
-	}, releaseName, false)
-
 	defer k8s.DeleteNamespace(t, k8sOptions, namespaceName)
+
+	if helmVersion == "2" {
+		defer helm.Delete(t, &helm.Options{
+			KubectlOptions: k8sOptions,
+			EnvVars: map[string]string{
+				"TILLER_NAMESPACE": "tiller-system",
+			},
+		}, releaseName, false)
+	}
 
 	pods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
 		LabelSelector: "app=nginx",
