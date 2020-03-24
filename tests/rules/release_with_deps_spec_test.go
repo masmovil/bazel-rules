@@ -3,20 +3,19 @@ package test
 import (
 	"testing"
 
+	"time"
+
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/stretchr/testify/require"
 	api "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"time"
 )
 
 // Test suite for testing release of chart basic package
 func TestChartReleaseWithDeps(t *testing.T) {
 	var helmVersion string = "3"
-
-	t.Parallel()
 
 	namespaceName := "test-nginx-with-deps"
 	releaseName := "test-nginx-with-deps"
@@ -41,7 +40,7 @@ func TestChartReleaseWithDeps(t *testing.T) {
 			EnvVars: map[string]string{
 				"TILLER_NAMESPACE": "tiller-system",
 			},
-		}, releaseName, false)
+		}, releaseName, true)
 	}
 
 	basePods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
