@@ -9,10 +9,10 @@ wget https://github.com/bazelbuild/bazel/releases/download/0.29.1/bazel_0.29.1-l
 sudo dpkg -i bazel_0.29.1-linux-x86_64.deb
 wget https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz
 tar -zxvf helm-v2.14.3-linux-amd64.tar.gz
-sudo mv linux-amd64/helm /usr/local/bin/helm2
+sudo mv linux-amd64/helm /usr/local/bin/helm
 wget https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
 tar -zxvf helm-v3.1.1-linux-amd64.tar.gz
-sudo mv linux-amd64/helm /usr/local/bin/helm
+sudo mv linux-amd64/helm /usr/local/bin/helm3
 wget https://github.com/ahmetb/kubectx/archive/v0.8.0.tar.gz -O ./kubectx.tar.gz
 tar -zxvf kubectx.tar.gz
 sudo mv kubectx-0.8.0/kubectx /usr/local/bin/kubectx
