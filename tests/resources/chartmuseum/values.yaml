@@ -1,0 +1,8 @@
+persistence:
+  enabled: false
+env:
+  secret:
+    BASIC_AUTH_USER: test
+    BASIC_AUTH_PASS: test
+  open:
+    DISABLE_API: false
