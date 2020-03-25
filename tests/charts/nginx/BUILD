@@ -1,8 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//helm:helm-chart-package.bzl", "helm_chart")
-load("//helm:helm-release.bzl", "helm_release")
-load("//helm:helm-push.bzl", "helm_push")
+load("//helm:helm.bzl", "helm_chart", "helm_release", "helm_push")
+load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
 
 helm_chart(
   name = "nginx_chart",
@@ -79,4 +78,21 @@ helm_release(
   namespace = "test-nginx",
   release_name = "test-nginx",
   tiller_namespace = "tiller-system"
+)
+
+sops_decrypt(
+  name = "sops",
+  srcs = [
+    ":secrets.yaml"
+  ],
+  sops_yaml = ":.sops.yaml"
+)
+
+helm_release(
+  name = "nginx_helm_release_sops",
+  chart = ":nginx_chart",
+  namespace = "test-nginx-sops",
+  release_name = "test-nginx-sops",
+  tiller_namespace = "tiller-system",
+  values_yaml = [":sops"]
 )

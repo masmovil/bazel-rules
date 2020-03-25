@@ -16,3 +16,4 @@ sudo mv linux-amd64/helm /usr/local/bin/helm3
 wget https://github.com/ahmetb/kubectx/archive/v0.8.0.tar.gz -O ./kubectx.tar.gz
 tar -zxvf kubectx.tar.gz
 sudo mv kubectx-0.8.0/kubectx /usr/local/bin/kubectx
+gpg --import tests/resources/pgp/sops_test_key.asc
