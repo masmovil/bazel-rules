@@ -43,6 +43,24 @@ func TestChartReleaseWithDeps(t *testing.T) {
 		}, releaseName, true)
 	}
 
+	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
+		v1.ListOptions{
+			LabelSelector: "app=nginx-with-deps",
+		},
+		1,
+		5,
+		5*time.Second,
+	)
+
+	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
+		v1.ListOptions{
+			LabelSelector: "app=nginx",
+		},
+		1,
+		5,
+		5*time.Second,
+	)
+
 	basePods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
 		LabelSelector: "app=nginx-with-deps",
 	})

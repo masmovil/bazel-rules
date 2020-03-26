@@ -43,6 +43,15 @@ func TestChartReleaseUsingSops(t *testing.T) {
 		}, releaseName, true)
 	}
 
+	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
+		v1.ListOptions{
+			LabelSelector: "fullapp=test-nginx-sops",
+		},
+		1,
+		5,
+		5*time.Second,
+	)
+
 	pods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
 		LabelSelector: "fullapp=test-nginx-sops",
 	})
