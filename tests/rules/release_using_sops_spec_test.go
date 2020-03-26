@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+
 	"time"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -13,11 +14,11 @@ import (
 )
 
 // Test suite for testing release of chart basic package
-func TestBasicChartRelease(t *testing.T) {
+func TestChartReleaseUsingSops(t *testing.T) {
 	var helmVersion string = "3"
 
-	namespaceName := "test-nginx"
-	releaseName := "test-nginx"
+	namespaceName := "test-nginx-sops"
+	releaseName := "test-nginx-sops"
 
 	k8sOptions := k8s.NewKubectlOptions("", "", namespaceName)
 
@@ -25,7 +26,7 @@ func TestBasicChartRelease(t *testing.T) {
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"run", "//tests/charts/nginx:nginx_helm_release"},
+		Args:              []string{"run", "//tests/charts/nginx:nginx_helm_release_sops"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -44,7 +45,7 @@ func TestBasicChartRelease(t *testing.T) {
 
 	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
 		v1.ListOptions{
-			LabelSelector: "app=nginx",
+			LabelSelector: "fullapp=test-nginx-sops",
 		},
 		1,
 		5,
@@ -52,10 +53,10 @@ func TestBasicChartRelease(t *testing.T) {
 	)
 
 	pods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
-		LabelSelector: "app=nginx",
+		LabelSelector: "fullapp=test-nginx-sops",
 	})
 
-	require.Equal(t, len(pods), 1)
+	require.Len(t, pods, 1)
 
 	podName := pods[0].Name
 
@@ -64,4 +65,5 @@ func TestBasicChartRelease(t *testing.T) {
 	pod := k8s.GetPod(t, k8sOptions, podName)
 
 	require.Equal(t, pod.Status.Phase, api.PodRunning)
+	require.Equal(t, pod.Labels["testLabel"], "sops-nginx")
 }

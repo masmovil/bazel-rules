@@ -22,6 +22,8 @@ def _sops_decrypt_impl(ctx):
     sops = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type"].sopsinfo.tool.files.to_list()[0].path
     sops_yaml = ctx.file.sops_yaml.path
 
+    gpg = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/gpg:toolchain_type"].gpginfo.tool.files.to_list()[0].path
+
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
     # Generates the exec bash file with the provided substitutions
@@ -35,7 +37,8 @@ def _sops_decrypt_impl(ctx):
               for f in ctx.files.srcs]),
             "{SOPS_BINARY_PATH}": sops,
             "{SOPS_CONFIG_FILE}": sops_yaml,
-            "{SOPS_PROVIDER}": ctx.attr.provider
+            "{SOPS_PROVIDER}": ctx.attr.provider,
+            "{GPG_BINARY}": gpg
         }
     )
 
@@ -64,7 +67,8 @@ sops_decrypt = rule(
       "_script_template": attr.label(allow_single_file = True, default = ":sops-decrypt.sh.tpl"),
     },
     toolchains = [
-        "@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type"
+        "@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/gpg:toolchain_type"
     ],
     doc = "Runs sops decrypt to decrypt secret files",
 )

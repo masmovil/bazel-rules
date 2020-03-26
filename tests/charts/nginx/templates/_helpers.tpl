@@ -38,8 +38,3 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{ define "filename" -}}
 {{ splitList "/" . | last | join "/"}}
 {{- end -}}
-
-{{- define "serviceaccount.name" -}}
-{{- $saname := include "base.name" . }}
-{{- default $saname .Values.k8s.deployment.serviceAccount.name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
