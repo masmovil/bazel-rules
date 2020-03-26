@@ -1,3 +1,5 @@
 image:
   tag: latest-fake
   repository: fake-nginx
+labels:
+  testLabel: "basic-nginx"

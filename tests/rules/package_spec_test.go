@@ -11,8 +11,6 @@ import (
 
 // Test suite for testing release of chart basic package
 func TestChartPackageImageTagMakeVar(t *testing.T) {
-	t.Parallel()
-
 	chartTarPackagePath := "bazel-bin/tests/charts/nginx/nginx-1.0.0.tgz"
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
@@ -66,8 +64,6 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 }
 
 func TestChartPackageChartVersionMakeVar(t *testing.T) {
-	t.Parallel()
-
 	chartVersion := "0.0.2"
 	chartTarPackagePath := "bazel-bin/tests/charts/nginx/nginx-" + chartVersion + ".tgz"
 	chartPackageRootPath := "nginx"
@@ -118,8 +114,6 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 }
 
 func TestChartPackageNoImageNoTag(t *testing.T) {
-	t.Parallel()
-
 	chartVersion := "1.0.0"
 	chartTarPackagePath := "bazel-bin/tests/charts/nginx/nginx-" + chartVersion + ".tgz"
 	chartPackageRootPath := "nginx"

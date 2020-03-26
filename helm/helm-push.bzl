@@ -12,7 +12,10 @@ def _helm_push_impl(ctx):
     # get chart museum basic auth credentials
     user = get_make_value_or_default(ctx, ctx.attr.repository_username)
     user_pass = get_make_value_or_default(ctx, ctx.attr.repository_password)
-    repo_url = ctx.attr.repository_url
+    repo_url = get_make_value_or_default(ctx, ctx.attr.repository_url)
+
+    if not repo_url.endswith("/"):
+      repo_url += "/"
 
     # Generates the exec bash file with the provided substitutions
     exec_file = write_sh(

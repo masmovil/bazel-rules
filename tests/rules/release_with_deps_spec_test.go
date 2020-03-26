@@ -15,7 +15,7 @@ import (
 
 // Test suite for testing release of chart basic package
 func TestChartReleaseWithDeps(t *testing.T) {
-	t.Parallel()
+	var helmVersion string = "3"
 
 	namespaceName := "test-nginx-with-deps"
 	releaseName := "test-nginx-with-deps"
@@ -32,14 +32,34 @@ func TestChartReleaseWithDeps(t *testing.T) {
 		OutputMaxLineSize: 1024,
 	})
 
-	defer helm.Delete(t, &helm.Options{
-		KubectlOptions: k8sOptions,
-		EnvVars: map[string]string{
-			"TILLER_NAMESPACE": "tiller-system",
-		},
-	}, releaseName, true)
-
 	defer k8s.DeleteNamespace(t, k8sOptions, namespaceName)
+
+	if helmVersion == "2" {
+		defer helm.Delete(t, &helm.Options{
+			KubectlOptions: k8sOptions,
+			EnvVars: map[string]string{
+				"TILLER_NAMESPACE": "tiller-system",
+			},
+		}, releaseName, true)
+	}
+
+	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
+		v1.ListOptions{
+			LabelSelector: "app=nginx-with-deps",
+		},
+		1,
+		5,
+		5*time.Second,
+	)
+
+	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
+		v1.ListOptions{
+			LabelSelector: "app=nginx",
+		},
+		1,
+		5,
+		5*time.Second,
+	)
 
 	basePods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
 		LabelSelector: "app=nginx-with-deps",

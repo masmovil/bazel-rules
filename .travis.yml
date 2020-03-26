@@ -10,11 +10,11 @@ services:
   - docker
 
 install:
-  - ./setup-k8s-tools.sh
-  - ./create-k8s-cluster-tiller.sh
-  - ./create-k8s-cluster-tillerless.sh
+  - chmod +x ./tests/setup-k8s-tools.sh && ./tests/setup-k8s-tools.sh
+  - chmod +x ./tests/create-k8s-cluster-tiller.sh && ./tests/create-k8s-cluster-tiller.sh
+  - chmod +x ./tests/create-k8s-cluster-tillerless.sh && ./tests/create-k8s-cluster-tillerless.sh
 after_script:
-  - ./delete-k8s-clusters.sh
+  - ./tests/delete-k8s-clusters.sh
 
 addons:
   apt:
@@ -26,7 +26,7 @@ addons:
       - pkg-config
 jobs:
   include:
-    - stage: test-helm-v2
-      script: kctx kind-bazel-tiller && go test tests/rules/* -v
-    - stage: test-helm-v3
-      script: kctx kind-bazel-tillerless && go test test/rules/* -v
+    - stage: Integration testing
+      script:
+      - kubectx kind-bazel-tiller && go test tests/rules/package* -v
+      - kubectx kind-bazel-tillerless && go test tests/rules/release* tests/rules/push* -v
