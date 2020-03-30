@@ -63,7 +63,12 @@ sops_decrypt = rule(
     attrs = {
       "srcs": attr.label_list(allow_files = True, mandatory = True),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = True),
-      "provider": attr.string(default = "gcp_kms"),
+      "provider": attr.string(default = "gcp_kms", values = [
+          "gcp_kms",
+          "aws_kms",
+          "azure_vault",
+          "gpg"
+      ]),
       "_script_template": attr.label(allow_single_file = True, default = ":sops-decrypt.sh.tpl"),
     },
     toolchains = [

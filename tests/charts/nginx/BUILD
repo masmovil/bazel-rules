@@ -85,7 +85,8 @@ sops_decrypt(
   srcs = [
     ":secrets.yaml"
   ],
-  sops_yaml = ":.sops.yaml"
+  sops_yaml = ":.sops.yaml",
+  provider = "gpg"
 )
 
 helm_release(
