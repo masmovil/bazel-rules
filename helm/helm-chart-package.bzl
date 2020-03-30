@@ -29,9 +29,10 @@ def _helm_chart_impl(ctx):
     image_tag = ""
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
     yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0].path
+    stamp_files = [ctx.info_file, ctx.version_file]
 
     # declare rule output
-    targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
+    targz = ctx.actions.declare_file(ctx.attr.package_name + ".tgz")
 
     helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type"].helminfo.tool.files.to_list()[0].path
 
@@ -107,9 +108,13 @@ def _helm_chart_impl(ctx):
             "{PACKAGE_OUTPUT_PATH}": targz.dirname,
             "{IMAGE_REPOSITORY}": ctx.attr.image_repository,
             "{HELM_CHART_VERSION}": helm_chart_version,
+            "{HELM_CHART_NAME}": ctx.attr.package_name,
             "{HELM_PATH}": helm_path,
             "{VALUES_REPO_YAML_PATH}": ctx.attr.values_repo_yaml_path,
-            "{VALUES_TAG_YAML_PATH}": ctx.attr.values_tag_yaml_path
+            "{VALUES_TAG_YAML_PATH}": ctx.attr.values_tag_yaml_path,
+            "%{stamp_statements}": "\n".join([
+              "\tread_variables %s" % f.path
+              for f in stamp_files]),
         }
     )
 
