@@ -228,12 +228,12 @@ Example of use:
 sops_decrypt(
     name = "decrypt_secret_files",
     srcs = [":secrets.yaml"]
-    sops_yaml = ":.sops.yaml"
+    sops_yaml = ":.sops.yaml",
+    provider = "gcp_kms"
 )
 ```
 
 You can specify which provider integration you want to use (gcp KMS, azure key vault etc.) through the `provider` attribute.
-* For the moment only gcp KMS is supported
 
 The following attributes are accepted by the rule (some of them are mandatory).
 
@@ -241,7 +241,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | ---------- | --- | ------ | -------------- |
 | src | yes | - | One or more labels pointing to the secret files to decrypt. It accepts a glob pattern. |
 | sops_yaml | yes | - | One label referencing the `.sops.yaml` yaml with the sops config. |
-| provider | false | "gcp_kms" | The provider integration used to decrypt/encrypt the secrets. |
+| provider | false | "gcp_kms" | The provider integration used to decrypt/encrypt the secrets. The argument accepts only some string values: `gcp_kms`, `gpg`, `aws_kms` and `azure_vault` |
 
 The output of the rule are the decrypted secrets that you can pass to `helm_release`.
 
@@ -278,8 +278,8 @@ load("@com_github_masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
 `k8s_namespace` is used to create a new namespace.
 You can also configure GKE Workload Identity with it.
 
-
 Example of use:
+
 ```python
 k8s_namespace(
     name = "namespace",
@@ -292,7 +292,6 @@ k8s_namespace(
 
 )
 ```
-
 
 The following attributes are accepted by the rule (some of them are mandatory).
 
