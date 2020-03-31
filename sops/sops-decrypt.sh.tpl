@@ -3,7 +3,10 @@
 set -e
 set -o pipefail
 
+echo $GOOGLE_APPLICATION_CREDENTIALS
+
 if [ "{SOPS_PROVIDER}" == "gcp_kms" ] && [ -z $GOOGLE_APPLICATION_CREDENTIALS ]; then
+    echo "Exporting GOOGLE_APPLICATION_CREDENTIALS env var"
     # Exports GOOGLE_APPLICATION_CREDENTIALS variable to use application-default credentials
     export GOOGLE_APPLICATION_CREDENTIALS=~/.config/gcloud/application_default_credentials.json
 fi
