@@ -3,11 +3,10 @@
 set -e
 set -o pipefail
 
-ENVFILES="$(pwd)"
 TEMP_FILES="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_files')"
 
 function read_variables() {
-    local file="${ENVFILES}/$1"
+    local file="$1"
     local new_file="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_new')"
     echo "${new_file}" >> "${TEMP_FILES}"
 
@@ -71,14 +70,6 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     fi
 fi
 
-{HELM_PATH} init --client-only > /dev/null
-
-# Remove local repo to increase reproducibility and remove errors
-if [ "$({HELM_PATH} repo list |grep local)" != "" ]; then
-    echo "Remove local helm repo"
-    {HELM_PATH} repo remove local 2> /dev/null || true
-fi
-
-{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION > /dev/null
+{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
