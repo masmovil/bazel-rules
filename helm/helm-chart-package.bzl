@@ -28,13 +28,14 @@ def _helm_chart_impl(ctx):
     digest_path = ""
     image_tag = ""
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
-    yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0].path
+    yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
     stamp_files = [ctx.info_file, ctx.version_file]
+    helm = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()[0]
 
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + ".tgz")
 
-    helm_path = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type"].helminfo.tool.files.to_list()[0].path
+    inputs += [helm, yq]
 
     # locate chart root path trying to find Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
@@ -101,12 +102,13 @@ def _helm_chart_impl(ctx):
             "{CHART_MANIFEST_PATH}": tmp_chart_manifest_path,
             "{DIGEST_PATH}": digest_path,
             "{IMAGE_TAG}": image_tag,
-            "{YQ_PATH}": yq,
+            "{YQ_PATH}": yq.path,
             "{PACKAGE_OUTPUT_PATH}": targz.dirname,
             "{IMAGE_REPOSITORY}": ctx.attr.image_repository,
             "{HELM_CHART_VERSION}": helm_chart_version,
             "{HELM_CHART_NAME}": ctx.attr.package_name,
-            "{HELM_PATH}": helm_path,
+            "{HELM_PATH}": helm.path,
+            "{STAMP_FILE}": ctx.version_file.root.path,
             "{VALUES_REPO_YAML_PATH}": ctx.attr.values_repo_yaml_path,
             "{VALUES_TAG_YAML_PATH}": ctx.attr.values_tag_yaml_path,
             "%{stamp_statements}": "\n".join([
@@ -116,13 +118,10 @@ def _helm_chart_impl(ctx):
     )
 
     ctx.actions.run(
-        inputs = inputs,
+        inputs = inputs + stamp_files,
         outputs = [targz],
         arguments = [],
         executable = exec_file,
-        execution_requirements = {
-            "local": "1",
-        },
     )
 
     return [
@@ -147,7 +146,7 @@ helm_chart = rule(
     },
     toolchains = [
         "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
-        "@com_github_masmovil_bazel_rules//toolchains/helm-2-16:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
     ],
     doc = "Runs helm packaging updating the image tag on it",
 )
