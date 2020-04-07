@@ -103,4 +103,34 @@ func TestChartPush(t *testing.T) {
 	require.Equal(t, releaseV2.Name, "nginx")
 	require.Equal(t, releaseV1.Version, "1.0.0")
 	require.Equal(t, releaseV2.Version, "2.0.0")
+
+	// Clean up - Delete published charts from chartmuseum
+
+	delReq1, err1 := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://%s/api/charts/%s/%s", tunelEndpoint, releaseV1.Name, releaseV1.Version), http.NoBody)
+	delReq2, err2 := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://%s/api/charts/%s/%s", tunelEndpoint, releaseV1.Name, releaseV1.Version), http.NoBody)
+
+	if err1 != nil {
+		t.Errorf("Error deleting chart museum %s", err1)
+	}
+
+	if err2 != nil {
+		t.Errorf("Error deleting chart museum %s", err2)
+	}
+
+	delReq1.SetBasicAuth("test", "test")
+	delReq2.SetBasicAuth("test", "test")
+
+	resp1, err1 := http.DefaultClient.Do(req)
+	resp2, err2 := http.DefaultClient.Do(req)
+
+	if err1 != nil {
+		t.Errorf("Error in chart museum http response %s", err1)
+	}
+
+	if err2 != nil {
+		t.Errorf("Error in chart museum http response %s", err2)
+	}
+
+	defer resp1.Body.Close()
+	defer resp2.Body.Close()
 }
