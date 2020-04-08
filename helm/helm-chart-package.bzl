@@ -86,9 +86,6 @@ def _helm_chart_impl(ctx):
             inputs = dep[DefaultInfo].files,
             arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
             command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
-            execution_requirements = {
-              "local": "1",
-            },
         )
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
@@ -123,9 +120,6 @@ def _helm_chart_impl(ctx):
         outputs = [targz],
         arguments = [],
         executable = exec_file,
-        execution_requirements = {
-            "local": "1",
-        },
     )
 
     return [
