@@ -20,7 +20,7 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag},
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag, "--spawn_strategy=standalone"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -71,7 +71,7 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion},
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion, "--spawn_strategy=standalone"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -120,7 +120,7 @@ func TestChartPackageNoImageNoTag(t *testing.T) {
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_no_image"},
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_no_image", "--spawn_strategy=standalone"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
