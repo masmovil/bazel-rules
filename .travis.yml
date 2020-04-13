@@ -14,7 +14,7 @@ install:
   # - chmod +x ./tests/create-k8s-cluster-tiller.sh && ./tests/create-k8s-cluster-tiller.sh
   - chmod +x ./tests/create-k8s-cluster-tillerless.sh && ./tests/create-k8s-cluster-tillerless.sh
 before_script:
-  - mkdir $TRAVIS_TMPDIR/bazel-rules && cp -rf . $TRAVIS_TMPDIR/bazel-rules
+  - mkdir $TRAVIS_TMPDIR/bazel-rules $TRAVIS_TMPDIR/bazel-sandbox && cp -rf . $TRAVIS_TMPDIR/bazel-rules
 after_script:
   - ./tests/delete-k8s-clusters.sh
 

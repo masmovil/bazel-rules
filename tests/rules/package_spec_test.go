@@ -19,7 +19,7 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 	image_repository := "nginx"
 	imageTag := "nginxTestImageTag"
 
-	tmp_dir := os.Getenv("TRAVIS_TMPDIR")
+	tmp_dir := os.Getenv("TRAVIS_TMPDIR") + "/bazel-sandbox"
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
@@ -72,7 +72,7 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
-	tmp_dir := os.Getenv("TRAVIS_TMPDIR")
+	tmp_dir := os.Getenv("TRAVIS_TMPDIR") + "/bazel-sandbox"
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
@@ -123,7 +123,7 @@ func TestChartPackageNoImageNoTag(t *testing.T) {
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
-	tmp_dir := os.Getenv("TRAVIS_TMPDIR")
+	tmp_dir := os.Getenv("TRAVIS_TMPDIR") + "/bazel-sandbox"
 
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
