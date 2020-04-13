@@ -11,10 +11,10 @@ services:
 
 install:
   - chmod +x ./tests/setup-k8s-tools.sh && ./tests/setup-k8s-tools.sh
-  - chmod +x ./tests/create-k8s-cluster-tiller.sh && ./tests/create-k8s-cluster-tiller.sh
+  # - chmod +x ./tests/create-k8s-cluster-tiller.sh && ./tests/create-k8s-cluster-tiller.sh
   - chmod +x ./tests/create-k8s-cluster-tillerless.sh && ./tests/create-k8s-cluster-tillerless.sh
 before_script:
-  - mkdir $TMP_DIR/bazel-rules && cp -rf . $TMP_DIR/bazel-rules
+  - mkdir $TRAVIS_TMPDIR/bazel-rules && cp -rf . $TRAVIS_TMPDIR/bazel-rules
 after_script:
   - ./tests/delete-k8s-clusters.sh
 
@@ -30,4 +30,4 @@ jobs:
   include:
     - stage: Integration testing
       script:
-      - kubectx kind-bazel-tillerless && go test $TMP_DIR/bazel-rules/tests/rules/* -v
+      - kubectx kind-bazel-tillerless && go test $TRAVIS_TMPDIR/bazel-rules/tests/rules/* -v
