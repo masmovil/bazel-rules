@@ -111,6 +111,7 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 	helm.UnmarshalK8SYaml(t, output, &deployment)
 
 	require.Equal(t, deployment.ObjectMeta.Labels["version"], chartVersion)
+	require.Equal(t, deployment.Spec.Template.Spec.Containers[0].Image, "nginx:nginx")
 }
 
 func TestChartPackageNoImageNoTag(t *testing.T) {
