@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -19,11 +18,9 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 	image_repository := "nginx"
 	imageTag := "nginxTestImageTag"
 
-	tmp_dir := os.Getenv("TRAVIS_TMPDIR") + "/bazel-sandbox"
-
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag, "--sandbox_tmpfs_path=" + tmp_dir},
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag, "--spawn_strategy=standalone"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -72,11 +69,9 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
-	tmp_dir := os.Getenv("TRAVIS_TMPDIR") + "/bazel-sandbox"
-
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion, "--sandbox_tmpfs_path=" + tmp_dir},
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion, "--spawn_strategy=standalone"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -123,11 +118,9 @@ func TestChartPackageNoImageNoTag(t *testing.T) {
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
-	tmp_dir := os.Getenv("TRAVIS_TMPDIR") + "/bazel-sandbox"
-
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_no_image", "--sandbox_tmpfs_path=" + tmp_dir},
+		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_no_image", "--spawn_strategy=standalone"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
