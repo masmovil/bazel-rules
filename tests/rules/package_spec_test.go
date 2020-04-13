@@ -1,6 +1,7 @@
 package test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -18,9 +19,11 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 	image_repository := "nginx"
 	imageTag := "nginxTestImageTag"
 
+	tmp_dir := os.Getenv("TRAVIS_TMPDIR")
+
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag},
+		Args:              []string{"--sandbox_tmpfs_path=" + tmp_dir, "build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -69,9 +72,11 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
+	tmp_dir := os.Getenv("TRAVIS_TMPDIR")
+
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion},
+		Args:              []string{"--sandbox_tmpfs_path=" + tmp_dir, "build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
@@ -118,9 +123,11 @@ func TestChartPackageNoImageNoTag(t *testing.T) {
 	chartPackageRootPath := "nginx"
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
+	tmp_dir := os.Getenv("TRAVIS_TMPDIR")
+
 	shell.RunCommand(t, shell.Command{
 		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_no_image"},
+		Args:              []string{"--sandbox_tmpfs_path=" + tmp_dir, "build", "//tests/charts/nginx:nginx_chart_no_image"},
 		WorkingDir:        ".",
 		Env:               map[string]string{},
 		OutputMaxLineSize: 1024,
