@@ -263,6 +263,15 @@ helm_release(
 )
 ```
 
+Env variables are supported by using --action_env flag running `sops_decrypt` rules. This is usefull in scenarios where you need to provide default credentials for cloud services (gcp kms, aws kms).
+
+E.g:
+
+```python
+# GOOGLE_APPLICATION_CREDENTIALS env variable needs to be predefined
+bazel build :decrypt_secret_files --action_env=GOOGLE_APPLICATION_CREDENTIALS
+```
+
 ## K8s rules
 
 Import in your `BUILD.bazel`
