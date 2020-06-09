@@ -2,16 +2,16 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def helm_repositories():
   http_archive(
-    name = "helm_v2.16.1_darwin",
-    sha256 = "34fc397ec4a992a451d130a962944315ca782242bbd05a8d732a2e74ca2b9153",
-    urls = ["https://get.helm.sh/helm-v2.16.1-darwin-amd64.tar.gz"],
+    name = "helm_v2.16.7_darwin",
+    sha256 = "ce9f40c6929688e04e5d6f7750de7ea855a024e00bda4f15745cfb8ff72fefde",
+    urls = ["https://get.helm.sh/helm-v2.16.7-darwin-amd64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",
   )
 
   http_archive(
-    name = "helm_v2.16.1_linux",
-    sha256 = "7eebaaa2da4734242bbcdced62cc32ba8c7164a18792c8acdf16c77abffce202",
-    urls = ["https://get.helm.sh/helm-v2.16.1-linux-amd64.tar.gz"],
+    name = "helm_v2.16.7_linux",
+    sha256 = "4afe48da420e4c3adcccf8484f27991834e3a3838668103199f274f4fa6f2df2",
+    urls = ["https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",
   )
 
