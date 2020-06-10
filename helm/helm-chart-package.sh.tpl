@@ -73,13 +73,13 @@ fi
 
 {HELM_PATH} init --client-only > /dev/null
 
-{HELM_PATH} repo update
-
 # Remove local repo to increase reproducibility and remove errors
 if [ "$({HELM_PATH} repo list |grep local)" != "" ]; then
     echo "Remove local helm repo"
     {HELM_PATH} repo remove local 2> /dev/null || true
 fi
+
+{HELM_PATH} repo update
 
 {HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION > /dev/null
 
