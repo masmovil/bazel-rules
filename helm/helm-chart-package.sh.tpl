@@ -73,6 +73,8 @@ fi
 
 {HELM_PATH} init --client-only > /dev/null
 
+{HELM_PATH} repo update
+
 # Remove local repo to increase reproducibility and remove errors
 if [ "$({HELM_PATH} repo list |grep local)" != "" ]; then
     echo "Remove local helm repo"
