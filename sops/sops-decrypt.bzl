@@ -50,6 +50,7 @@ def _sops_decrypt_impl(ctx):
         execution_requirements = {
             "local": "1",
         },
+        use_default_shell_env = True
     )
 
     return [
