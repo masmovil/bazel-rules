@@ -122,6 +122,9 @@ def _helm_chart_impl(ctx):
         outputs = [targz],
         arguments = [],
         executable = exec_file,
+        execution_requirements = {
+            "local": "1",
+        },
     )
 
     return [
