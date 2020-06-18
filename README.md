@@ -270,6 +270,10 @@ E.g:
 ```python
 # GOOGLE_APPLICATION_CREDENTIALS env variable needs to be predefined
 bazel build :decrypt_secret_files --action_env=GOOGLE_APPLICATION_CREDENTIALS
+
+or
+
+bazel build :decrypt_secret_files --action_env=GOOGLE_APPLICATION_CREDENTIALS=${HOME}/.config/gcloud/application_default_credentials.json
 ```
 
 ## K8s rules
