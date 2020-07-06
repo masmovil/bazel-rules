@@ -5,6 +5,12 @@ set -o pipefail
 
 TEMP_FILES="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_files')"
 
+# Export XDG directories to get access to
+# helm user defined repos
+export XDG_CACHE_HOME={HELM_CACHE_PATH}
+export XDG_CONFIG_HOME={HELM_CONFIG_PATH}
+export XDG_DATA_HOME={HELM_DATA_PATH}
+
 function read_variables() {
     local file="$1"
     local new_file="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_new')"
@@ -70,6 +76,7 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     fi
 fi
 
-{HELM_PATH} package {CHART_PATH} -u --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION
+
+{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
