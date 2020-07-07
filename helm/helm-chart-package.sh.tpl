@@ -78,7 +78,7 @@ fi
 
 {HELM_PATH} env
 
-{HELM_PATH} repo list
+# {HELM_PATH} repo list
 
 {HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION
 
