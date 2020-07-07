@@ -131,6 +131,7 @@ def _helm_chart_impl(ctx):
         executable = exec_file,
         execution_requirements = {
             "local": "1",
+            "no-remote-exec": "1"
         },
     )
 
