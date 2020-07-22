@@ -41,7 +41,7 @@ if [ "{GCP_SA}" != "" ]; then
         --member "serviceAccount:{WORKLOAD_IDENTITY_NAMESPACE}[{NAMESPACE_NAME}/{KUBERNETES_SA}]" \
         projects/{GCP_SA_PROJECT}/serviceAccounts/{GCP_SA}
 
-    kubectl -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA_PROJECT} --overwrite
+    kubectl -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA} --overwrite
 
 
 fi
