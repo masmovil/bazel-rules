@@ -1,6 +1,8 @@
 
 load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 
+NamespaceDataInfo = provider(fields=["namespace"])
+
 def runfile(ctx, f):
   """Return the runfiles relative path of f."""
   if ctx.workspace_name:
@@ -19,7 +21,7 @@ def _k8s_namespace_impl(ctx):
         workload_identity_namespace: Workload Identity Namespace. I.E. mm-k8s-dev-01.svc.id.goog
 
     """
-    
+
     namespace_name = ctx.attr.namespace_name
     kubernetes_sa = ctx.attr.kubernetes_sa
     gcp_sa_project = ctx.attr.gcp_sa_project
@@ -38,7 +40,7 @@ def _k8s_namespace_impl(ctx):
              fail(msg='ERROR: workload_identity_namespace must be provided if gcp_sa is set')
 
     stamp_files = [ctx.info_file, ctx.version_file]
-    
+
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_k8s_bash")
 
@@ -67,6 +69,9 @@ def _k8s_namespace_impl(ctx):
     return [DefaultInfo(
       executable = exec_file,
       runfiles = runfiles,
+    ),
+    NamespaceDataInfo(
+      namespace = namespace_name
     )]
 
 k8s_namespace = rule(

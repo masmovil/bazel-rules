@@ -6,6 +6,7 @@ load(
 )
 
 load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
+load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
 def runfile(ctx, f):
   """Return the runfiles relative path of f."""
@@ -33,7 +34,6 @@ def _helm_release_impl(ctx):
     kubectl_path = kubectl_binary[0].path
 
     chart = ctx.file.chart
-    namespace = ctx.attr.namespace
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
     helm_version = ctx.attr.helm_version or ""
@@ -45,6 +45,16 @@ def _helm_release_impl(ctx):
         values_yaml = values_yaml + " -f " + values_yaml_file.short_path
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
+
+    if ctx.attr.namespace_dep:
+        namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace
+    else:
+        if ctx.attr.namespace:
+            namespace = ctx.attr.namespace
+        else:
+            namespace = "default"
+
+    print(namespace)
 
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
@@ -84,7 +94,8 @@ helm_release = rule(
     implementation = _helm_release_impl,
     attrs = {
       "chart": attr.label(allow_single_file = True, mandatory = True),
-      "namespace": attr.string(mandatory = True, default = "default"),
+      "namespace_dep": attr.label(mandatory = False),
+      "namespace": attr.string(mandatory = False),
       "tiller_namespace": attr.string(mandatory = False, default = "tiller-system"),
       "release_name": attr.string(mandatory = True),
       "values_yaml": attr.label_list(allow_files = True, mandatory = False),

@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//helm:helm.bzl", "helm_chart", "helm_release", "helm_push")
+load("//k8s:k8s.bzl", "k8s_namespace")
 load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
 
 helm_chart(
@@ -95,4 +96,17 @@ helm_release(
   release_name = "test-nginx-sops",
   tiller_namespace = "tiller-system",
   values_yaml = [":sops"]
+)
+
+k8s_namespace(
+  name = "test-namespace",
+  namespace_name = "test-namespace",
+  kubernetes_sa = "test-kubernetes-sa"
+)
+
+helm_release(
+  name = "nginx_helm_release_namespace",
+  chart = ":nginx_chart",
+  namespace_dep = ":test-namespace",
+  release_name = "test-nginx-namespace"
 )

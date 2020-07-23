@@ -190,7 +190,24 @@ Example of use:
 helm_release(
     name = "chart_install",
     chart = ":chart",
-    namespace = "myapp",
+    namespace_name = "myapp",
+    tiller_namespace = "tiller-system",
+    release_name = "release-name",
+    values_yaml = glob(["charts/myapp/values.yaml"]),
+)
+```
+
+Example of use with k8s_namespace:
+```python
+k8s_namespace(
+  name = "test-namespace",
+  namespace_name = "test-namespace",
+  kubernetes_sa = "test-kubernetes-sa"
+)
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    namespace_dep = ":test-namespace",
     tiller_namespace = "tiller-system",
     release_name = "release-name",
     values_yaml = glob(["charts/myapp/values.yaml"]),
@@ -202,7 +219,8 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
-| namespace | yes | default | Namespace where this release is installed to. It supports the use of `stamp_variables`. |
+| namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. |
+| namespace_dep | false | - | Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace |
 | tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
 | values_yaml | no | - | Several values files can be passed when installing release |
@@ -291,7 +309,6 @@ load("@com_github_masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
 `k8s_namespace` is used to create a new namespace.
 You can also configure GKE Workload Identity with it.
 
-
 Example of use:
 ```python
 k8s_namespace(
@@ -306,6 +323,24 @@ k8s_namespace(
 )
 ```
 
+You can use `k8s_namespace` in combination with `helm_release` trough `napesmace_dep` attribute.
+
+Example of use with helm_release:
+```python
+k8s_namespace(
+  name = "test-namespace",
+  namespace_name = "test-namespace",
+  kubernetes_sa = "test-kubernetes-sa"
+)
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    namespace_dep = ":test-namespace",
+    tiller_namespace = "tiller-system",
+    release_name = "release-name",
+    values_yaml = glob(["charts/myapp/values.yaml"]),
+)
+```
 
 The following attributes are accepted by the rule (some of them are mandatory).
 
