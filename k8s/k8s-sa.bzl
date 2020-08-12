@@ -13,7 +13,7 @@ def runfile(ctx, f):
 
 
 def _k8s_sa_impl(ctx):
-    """Installs or upgrades a helm release.
+    """Create a service account inside an existing namespace and annotates it with workload identity.
     Args:
         namespace: Namespace label reference where the sa will be create
         namespace_name: Namespace string reference where the sa will be create

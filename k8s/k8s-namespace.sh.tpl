@@ -34,14 +34,3 @@ function read_variables() {
 
 kubectl create ns {NAMESPACE_NAME} 2>/dev/null || true
 
-if [ "{GCP_SA}" != "" ]; then
-
-    gcloud --project={GCP_GKE_PROJECT} iam service-accounts add-iam-policy-binding \
-        --role roles/iam.workloadIdentityUser \
-        --member "serviceAccount:{WORKLOAD_IDENTITY_NAMESPACE}[{NAMESPACE_NAME}/{KUBERNETES_SA}]" \
-        projects/{GCP_SA_PROJECT}/serviceAccounts/{GCP_SA}
-
-    kubectl -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA} --overwrite
-
-
-fi
