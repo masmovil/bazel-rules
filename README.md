@@ -10,6 +10,7 @@ This repo implements the following bazel rules:
  `helm_release`
  `sops_decrypt`
  `k8s_namespace`
+ `k8s_service_account`
 
 ## Documentation
 
@@ -307,19 +308,12 @@ load("@com_github_masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
 ### k8s_namespace
 
 `k8s_namespace` is used to create a new namespace.
-You can also configure GKE Workload Identity with it.
 
 Example of use:
 ```python
 k8s_namespace(
     name = "namespace",
     namespace_name = "ft-sesame-${DEPLOY_BRANCH}",
-    kubernetes_sa = "default",
-    gcp_sa_project = "mm-odissey-dev",
-    gcp_sa = "odissey-dev@mm-odissey-dev.iam.gserviceaccount.com",
-    gcp_gke_project = "mm-k8s-dev-01",
-    workload_identity_namespace = "mm-k8s-dev-01.svc.id.goog",
-
 )
 ```
 
@@ -330,7 +324,6 @@ Example of use with helm_release:
 k8s_namespace(
   name = "test-namespace",
   namespace_name = "test-namespace",
-  kubernetes_sa = "test-kubernetes-sa"
 )
 helm_release(
     name = "chart_install",
@@ -347,6 +340,57 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | namespace_name | yes | - | Name of the namespace to create |
+| kubernetes_sa | no | - | Kubernetes Service Account to associate with Workload Identity. I.E. default It supports the use of `stamp_variables`. |
+| kubernetes_sa | no | kube-system | Namespace where Tiller lives in the Kubernetes Cluster. It supports the use of `stamp_variables`.|
+| gcp_sa_project | no | - |GCP project name where Service Account lives. I.E. `my-project`|
+| gcp_sa | no | - | GCP Service Account. I.E.  `my-account@my-project.iam.gserviceaccount.com`|
+| gcp_gke_project | no | - | GKE Project |
+| workload_identity_namespace | no | - | Workload Identity Namespace. I.E. `mm-k8s-dev-01.svc.id.goog` |
+
+### k8s_service_account
+
+`k8s_service_account` is used to create a new k8s service account inside an existing kubernetes namespace.
+
+You can also configure GKE Workload Identity with it
+
+Example of use:
+```python
+k8s_service_account(
+  name = "sa",
+  namespace_name = "default",
+  kubernetes_sa = "default",
+  gcp_sa_project = "xx-odissey-dev",
+  gcp_sa = "xxx-dev@xx-yyyy-dev.iam.gserviceaccount.com",
+  gcp_gke_project = "xx-k8s-dev-01",
+  workload_identity_namespace = "xx-k8s-dev-01.svc.id.goog",
+)
+```
+
+You can use `k8s_service_account` in combination with `k8s_namespace` rule using `namespace` attribute.
+
+Example of use with k8s_namespace:
+```python
+k8s_namespace(
+  name = "test-namespace",
+  namespace_name = "test-namespace",
+)
+k8s_service_account(
+    name = "sa",
+    namespace = ":test-namespace",
+    kubernetes_sa = "default",
+    gcp_sa_project = "xx-odissey-dev",
+    gcp_sa = "xxx-dev@xx-yyyy-dev.iam.gserviceaccount.com",
+    gcp_gke_project = "xx-k8s-dev-01",
+    workload_identity_namespace = "xx-k8s-dev-01.svc.id.goog",
+)
+```
+
+The following attributes are accepted by the rule (some of them are mandatory).
+
+|  Attribute | Mandatory| Default | Notes |
+| ---------- | --- | ------ | -------------- |
+| namespace | false | - | Namespace where where the sa will be created. Must be a label to a k8s_namespace rule. It takes precedence over namespace |
+| namespace_name | false | - | Namespace name string literal where the sa will be created. It supports the use of `stamp_variables`. |
 | kubernetes_sa | no | - | Kubernetes Service Account to associate with Workload Identity. I.E. default It supports the use of `stamp_variables`. |
 | kubernetes_sa | no | kube-system | Namespace where Tiller lives in the Kubernetes Cluster. It supports the use of `stamp_variables`.|
 | gcp_sa_project | no | - |GCP project name where Service Account lives. I.E. `my-project`|
