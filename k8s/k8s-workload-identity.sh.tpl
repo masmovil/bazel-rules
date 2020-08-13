@@ -31,7 +31,10 @@ function read_variables() {
 
 %{stamp_statements}
 
+echo "Checking if serviceaccount already exists"
+
 if ! {KUBECTL_PATH} get serviceaccount {KUBERNETES_SA} -n {NAMESPACE_NAME}; then
+    echo "Creating service account in namespace ${NAMESPACE_NAME}"
     {KUBECTL_PATH} create serviceaccount {KUBERNETES_SA} -n {NAMESPACE_NAME}
 fi
 
