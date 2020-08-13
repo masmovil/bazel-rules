@@ -112,10 +112,25 @@ helm_release(
 
 k8s_namespace(
   name = "test-sa-namespace",
-  namespace_name = "test-sa-namespace",
+  namespace_name = "test-sa-namespace"
 )
 
-k8s_service_account(
+workload_identity(
   name = "test-sa",
   namespace = ":test-sa-namespace",
+  kubernetes_sa = ":test-sa",
+  gcp_sa_project = "test-project",
+  gcp_sa = "test@test.iam.gserviceaccount.com",
+  gcp_gke_project = "test-gke-project",
+  workload_identity_namespace = "test-sa-namespace.svc.id.goog",
+)
+
+helm_release(
+  name = "nginx_helm_release_namespace",
+  chart = ":nginx_chart",
+  namespace_dep = ":test-namespace",
+  deps = [
+    "test-sa"
+  ],
+  release_name = "test-nginx-namespace"
 )
