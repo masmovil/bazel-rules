@@ -12,7 +12,7 @@ def runfile(ctx, f):
     return f.short_path
 
 
-def _k8s_sa_impl(ctx):
+def _k8s_workload_impl(ctx):
     """Create a service account inside an existing namespace and annotates it with workload identity.
     Args:
         namespace: Namespace label reference where the sa will be create
@@ -83,7 +83,7 @@ def _k8s_sa_impl(ctx):
       service_account = kubernetes_sa
     )]
 
-k8s_service_account = rule(
+k8s_workload_identity = rule(
     implementation = _k8s_sa_impl,
     attrs = {
       "namespace": attr.label(mandatory = False),

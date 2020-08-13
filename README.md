@@ -215,6 +215,34 @@ helm_release(
 )
 ```
 
+Example of use with k8s_workload_identity:
+```python
+k8s_namespace(
+  name = "test-namespace",
+  namespace_name = "test-namespace",
+)
+k8s_workload_identity(
+    name = "workload-identity",
+    namespace = ":test-namespace",
+    kubernetes_sa = "default",
+    gcp_sa_project = "xx-odissey-dev",
+    gcp_sa = "xxx-dev@xx-yyyy-dev.iam.gserviceaccount.com",
+    gcp_gke_project = "xx-k8s-dev-01",
+    workload_identity_namespace = "xx-k8s-dev-01.svc.id.goog",
+)
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    namespace_name = "myapp",
+    release_name = "release-name",
+    values_yaml = glob(["charts/myapp/values.yaml"]),
+    deps = [
+      ":workload-identity"
+    ]
+)
+)
+```
+
 The following attributes are accepted by the rule (some of them are mandatory).
 
 |  Attribute | Mandatory| Default | Notes |
@@ -222,6 +250,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
 | namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. |
 | namespace_dep | false | - | Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace |
+| deps | false | - | Array of bazel targets dependant of this rule. Bazel will take care of execute dependant targets before executing this rule. |
 | tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
 | values_yaml | no | - | Several values files can be passed when installing release |
@@ -347,15 +376,13 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | gcp_gke_project | no | - | GKE Project |
 | workload_identity_namespace | no | - | Workload Identity Namespace. I.E. `mm-k8s-dev-01.svc.id.goog` |
 
-### k8s_service_account
+### k8s_workload_identity
 
-`k8s_service_account` is used to create a new k8s service account inside an existing kubernetes namespace.
-
-You can also configure GKE Workload Identity with it
+`k8s_workload_identity` is used to create a new k8s service account inside an existing kubernetes namespace and configure GKE Workload Identity with it.
 
 Example of use:
 ```python
-k8s_service_account(
+k8s_workload_identity(
   name = "sa",
   namespace_name = "default",
   kubernetes_sa = "default",
@@ -366,7 +393,7 @@ k8s_service_account(
 )
 ```
 
-You can use `k8s_service_account` in combination with `k8s_namespace` rule using `namespace` attribute.
+You can use `k8s_workload_identity` in combination with `k8s_namespace` rule using `namespace` attribute.
 
 Example of use with k8s_namespace:
 ```python
@@ -374,7 +401,7 @@ k8s_namespace(
   name = "test-namespace",
   namespace_name = "test-namespace",
 )
-k8s_service_account(
+k8s_workload_identity(
     name = "sa",
     namespace = ":test-namespace",
     kubernetes_sa = "default",
@@ -382,6 +409,38 @@ k8s_service_account(
     gcp_sa = "xxx-dev@xx-yyyy-dev.iam.gserviceaccount.com",
     gcp_gke_project = "xx-k8s-dev-01",
     workload_identity_namespace = "xx-k8s-dev-01.svc.id.goog",
+)
+```
+
+You can set up a dependency of this rule in `helm_release` rule. This way there is no need
+to manually execute this rule to create the workload identity, when `helm_release` is executed
+bazel will create the service account and attach the workload identity to it.
+
+E.g
+```python
+k8s_namespace(
+  name = "test-namespace",
+  namespace_name = "test-namespace",
+)
+k8s_workload_identity(
+    name = "workload-identity",
+    namespace = ":test-namespace",
+    kubernetes_sa = "default",
+    gcp_sa_project = "xx-odissey-dev",
+    gcp_sa = "xxx-dev@xx-yyyy-dev.iam.gserviceaccount.com",
+    gcp_gke_project = "xx-k8s-dev-01",
+    workload_identity_namespace = "xx-k8s-dev-01.svc.id.goog",
+)
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    namespace_name = "myapp",
+    release_name = "release-name",
+    values_yaml = glob(["charts/myapp/values.yaml"]),
+    deps = [
+      ":workload-identity"
+    ]
+)
 )
 ```
 

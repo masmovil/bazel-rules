@@ -31,6 +31,7 @@ function read_variables() {
 
 %{stamp_statements}
 
-
-{KUBECTL_PATH} create ns {NAMESPACE_NAME} 2>/dev/null || true
+if ! {KUBECTL_PATH} get ns {NAMESPACE_NAME}; then
+    {KUBECTL_PATH} create ns {NAMESPACE_NAME}
+fi
 
