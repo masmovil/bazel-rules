@@ -31,7 +31,7 @@ func TestChartReleaseWithWorkloadDep(t *testing.T) {
 
 	k8s.WaitUntilNumPodsCreated(t, k8sOptions,
 		v1.ListOptions{
-			LabelSelector: "app=nginx",
+			LabelSelector: "testLabel=basic-nginx",
 		},
 		1,
 		5,
@@ -39,7 +39,7 @@ func TestChartReleaseWithWorkloadDep(t *testing.T) {
 	)
 
 	pods := k8s.ListPods(t, k8sOptions, v1.ListOptions{
-		LabelSelector: "app=nginx",
+		LabelSelector: "testLabel=basic-nginx",
 	})
 
 	require.Equal(t, len(pods), 1)
