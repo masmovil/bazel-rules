@@ -30,13 +30,14 @@ def _k8s_sa_impl(ctx):
         namespace_name = ctx.attr.namespace_name
       else fail(msg='ERROR: A namespace must be provided using "namespace" or "namespace_name" attribute')
 
+    kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.tool.files.to_list()
+    kubectl_path = kubectl_binary[0].path
 
     kubernetes_sa = ctx.attr.kubernetes_sa
     gcp_sa_project = ctx.attr.gcp_sa_project
     gcp_sa = ctx.attr.gcp_sa
     gcp_gke_project = ctx.attr.gcp_gke_project
     workload_identity_namespace = ctx.attr.workload_identity_namespace
-
     if gcp_sa != "":
         if kubernetes_sa == "":
              fail(msg='ERROR: kubernetes_sa must be provided if gcp_sa is set')
@@ -63,6 +64,7 @@ def _k8s_sa_impl(ctx):
             "{GCP_SA_PROJECT}": gcp_sa_project,
             "{GCP_SA}": gcp_sa,
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
+            "{KUBECTL_PATH}": kubectl_path,
             "%{stamp_statements}": "\n".join([
               "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -95,6 +97,8 @@ k8s_service_account = rule(
 
     },
     doc = "Creates a new kubernetes service account and annotates it with workload identity",
-    toolchains = [],
+    toolchains = [
+      "@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"
+    ],
     executable = True,
 )

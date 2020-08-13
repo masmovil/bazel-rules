@@ -16,6 +16,8 @@ def _k8s_namespace_impl(ctx):
     Args:
         namespace_name: Name of the namespace to create
     """
+    kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.tool.files.to_list()
+    kubectl_path = kubectl_binary[0].path
 
     namespace_name = ctx.attr.namespace_name
 
@@ -30,6 +32,7 @@ def _k8s_namespace_impl(ctx):
         is_executable = True,
         substitutions = {
             "{NAMESPACE_NAME}": namespace_name,
+            "{KUBECTL_PATH}": kubectl_path,
             "%{stamp_statements}": "\n".join([
               "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -56,6 +59,8 @@ k8s_namespace = rule(
 
     },
     doc = "Creates a new kubernetes namespace",
-    toolchains = [],
+    toolchains = [
+      "@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"
+    ],
     executable = True,
 )

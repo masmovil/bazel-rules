@@ -32,7 +32,7 @@ function read_variables() {
 %{stamp_statements}
 
 
-kubectl create serviceaccount {KUBERNETES_SA} -n {NAMESPACE_NAME} 2>/dev/null || true
+{KUBECTL_PATH} create serviceaccount {KUBERNETES_SA} -n {NAMESPACE_NAME} 2>/dev/null || true
 
 if [ "{GCP_SA}" != "" ]; then
 
@@ -41,6 +41,6 @@ if [ "{GCP_SA}" != "" ]; then
         --member "serviceAccount:{WORKLOAD_IDENTITY_NAMESPACE}[{NAMESPACE_NAME}/{KUBERNETES_SA}]" \
         projects/{GCP_SA_PROJECT}/serviceAccounts/{GCP_SA}
 
-    kubectl -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA} --overwrite
+    {KUBECTL_PATH} -n {NAMESPACE_NAME} annotate sa {KUBERNETES_SA} iam.gke.io/gcp-service-account={GCP_SA} --overwrite
 
 fi

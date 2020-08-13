@@ -101,7 +101,6 @@ helm_release(
 k8s_namespace(
   name = "test-namespace",
   namespace_name = "test-namespace",
-  kubernetes_sa = "test-kubernetes-sa"
 )
 
 helm_release(
@@ -109,4 +108,14 @@ helm_release(
   chart = ":nginx_chart",
   namespace_dep = ":test-namespace",
   release_name = "test-nginx-namespace"
+)
+
+k8s_namespace(
+  name = "test-sa-namespace",
+  namespace_name = "test-sa-namespace",
+)
+
+k8s_service_account(
+  name = "test-sa",
+  namespace = ":test-sa-namespace",
 )

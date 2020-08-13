@@ -32,5 +32,5 @@ function read_variables() {
 %{stamp_statements}
 
 
-kubectl create ns {NAMESPACE_NAME} 2>/dev/null || true
+{KUBECTL_PATH} create ns {NAMESPACE_NAME} 2>/dev/null || true
 
