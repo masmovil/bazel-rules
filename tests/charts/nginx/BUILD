@@ -130,7 +130,7 @@ helm_release(
   chart = ":nginx_chart",
   namespace_dep = ":test-namespace",
   deps = [
-    "test-sa"
+    ":test-sa"
   ],
   release_name = "test-nginx-namespace"
 )
