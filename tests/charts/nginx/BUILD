@@ -112,7 +112,7 @@ helm_release(
 
 k8s_namespace(
   name = "test-sa-namespace",
-  namespace_name = "test-sa-namespace"
+  namespace_name = "test-sa"
 )
 
 k8s_workload_identity(
@@ -132,5 +132,5 @@ helm_release(
   deps = [
     ":test-sa"
   ],
-  release_name = "test-nginx-namespace"
+  release_name = "test-nginx-workload"
 )

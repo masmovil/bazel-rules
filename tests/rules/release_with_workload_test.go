@@ -14,7 +14,7 @@ import (
 
 // Test suite for testing release of chart basic package
 func TestChartReleaseWithWorkloadDep(t *testing.T) {
-	namespaceName := "test-workload"
+	namespaceName := "test-sa"
 	saName := "test-sa"
 
 	k8sOptions := k8s.NewKubectlOptions("", "", namespaceName)
