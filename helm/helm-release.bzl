@@ -95,7 +95,7 @@ helm_release = rule(
     attrs = {
       "chart": attr.label(allow_single_file = True, mandatory = True),
       "namespace_dep": attr.label(mandatory = False),
-      "deps": attr.label_list(mandatory = False, allow_files = True),
+      "deps": attr.label_list(mandatory = False),
       "namespace": attr.string(mandatory = False),
       "tiller_namespace": attr.string(mandatory = False, default = "tiller-system"),
       "release_name": attr.string(mandatory = True),
