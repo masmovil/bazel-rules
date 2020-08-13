@@ -369,12 +369,6 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | namespace_name | yes | - | Name of the namespace to create |
-| kubernetes_sa | no | - | Kubernetes Service Account to associate with Workload Identity. I.E. default It supports the use of `stamp_variables`. |
-| kubernetes_sa | no | kube-system | Namespace where Tiller lives in the Kubernetes Cluster. It supports the use of `stamp_variables`.|
-| gcp_sa_project | no | - |GCP project name where Service Account lives. I.E. `my-project`|
-| gcp_sa | no | - | GCP Service Account. I.E.  `my-account@my-project.iam.gserviceaccount.com`|
-| gcp_gke_project | no | - | GKE Project |
-| workload_identity_namespace | no | - | Workload Identity Namespace. I.E. `mm-k8s-dev-01.svc.id.goog` |
 
 ### k8s_workload_identity
 
