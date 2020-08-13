@@ -10,7 +10,7 @@ This repo implements the following bazel rules:
  `helm_release`
  `sops_decrypt`
  `k8s_namespace`
- `k8s_service_account`
+ `k8s_workload_identity`
 
 ## Documentation
 
