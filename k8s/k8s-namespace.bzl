@@ -56,7 +56,6 @@ k8s_namespace = rule(
     attrs = {
       "namespace_name": attr.string(mandatory = True),
       "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl"),
-
     },
     doc = "Creates a new kubernetes namespace",
     toolchains = [

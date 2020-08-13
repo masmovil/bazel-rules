@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//helm:helm.bzl", "helm_chart", "helm_release", "helm_push")
-load("//k8s:k8s.bzl", "k8s_namespace")
+load("//k8s:k8s.bzl", "k8s_namespace", "k8s_workload_identity")
 load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
 
 helm_chart(
@@ -115,7 +115,7 @@ k8s_namespace(
   namespace_name = "test-sa-namespace"
 )
 
-workload_identity(
+k8s_workload_identity(
   name = "test-sa",
   namespace = ":test-sa-namespace",
   kubernetes_sa = "test-sa",

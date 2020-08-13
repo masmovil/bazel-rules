@@ -1,6 +1,6 @@
 
 load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
-load("//k8s:k8s.bzl", "NamespaceDataInfo")
+load("//k8s:k8s-namespace.bzl", "NamespaceDataInfo")
 
 ServiceAccountDataInfo = provider(fields=["service_account"])
 
@@ -24,11 +24,12 @@ def _k8s_workload_impl(ctx):
 
     """
     if ctx.attr.namespace:
-      namespace_name = ctx.attr.namespace_dep[NamespaceDataInfo].namespace
+      namespace_name = ctx.attr.namespace[NamespaceDataInfo].namespace
     else:
       if ctx.attr.namespace_name:
         namespace_name = ctx.attr.namespace_name
-      else fail(msg='ERROR: A namespace must be provided using "namespace" or "namespace_name" attribute')
+      else:
+        fail(msg='ERROR: A namespace must be provided using "namespace" or "namespace_name" attribute')
 
     kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.tool.files.to_list()
     kubectl_path = kubectl_binary[0].path
@@ -84,7 +85,7 @@ def _k8s_workload_impl(ctx):
     )]
 
 k8s_workload_identity = rule(
-    implementation = _k8s_sa_impl,
+    implementation = _k8s_workload_impl,
     attrs = {
       "namespace": attr.label(mandatory = False),
       "namespace_name": attr.string(mandatory = False),
