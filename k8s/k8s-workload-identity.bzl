@@ -93,7 +93,7 @@ k8s_workload_identity = rule(
       "gcp_sa": attr.string(mandatory = False),
       "gcp_gke_project": attr.string(mandatory = False),
       "workload_identity_namespace": attr.string(mandatory = False),
-      "_script_template": attr.label(allow_single_file = True, default = ":k8s-sa.sh.tpl"),
+      "_script_template": attr.label(allow_single_file = True, default = ":k8s-workload-identity.sh.tpl"),
 
     },
     doc = "Creates a new kubernetes service account and annotates it with workload identity",
