@@ -43,7 +43,6 @@ def _helm_chart_impl(ctx):
             chart_root_path = srcfile.dirname
             break
         else:    
-            self.seen_error = True
             print("Chart.yaml not found: " + srcfile.dirname)
             break
 
@@ -58,7 +57,6 @@ def _helm_chart_impl(ctx):
                 tmp_chart_root = out.dirname
                 tmp_chart_manifest_path = out.path
             else:    
-                self.seen_error = True
                 print("Chart.yaml not found: " + srcfile.dirname)
                 break
                 
