@@ -53,6 +53,8 @@ def _helm_chart_impl(ctx):
             if srcfile.path.endswith("Chart.yaml"):
                 tmp_chart_root = out.dirname
                 tmp_chart_manifest_path = out.path
+            else:
+                print("Chart.yaml not Found !!!!!!!! ") 
                 
             # extract location of values file in the new directory
             # TODO: Support values.dev|sta|*.yaml
