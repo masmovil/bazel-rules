@@ -42,6 +42,8 @@ def _helm_chart_impl(ctx):
         if srcfile.path.endswith("Chart.yaml"):
             chart_root_path = srcfile.dirname
             break
+        else:    
+            print("Chart.yaml not found: " + srcfile.dirname)
 
     # move chart files to temporal directory in order to manipulate necessary files
     for i, srcfile in enumerate(ctx.files.srcs):
@@ -53,7 +55,9 @@ def _helm_chart_impl(ctx):
             if srcfile.path.endswith("Chart.yaml"):
                 tmp_chart_root = out.dirname
                 tmp_chart_manifest_path = out.path
-
+            else:    
+                print("Chart.yaml not found: " + srcfile.dirname)
+                
             # extract location of values file in the new directory
             # TODO: Support values.dev|sta|*.yaml
             if srcfile.path.endswith("values.yaml"):
