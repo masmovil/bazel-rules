@@ -65,7 +65,7 @@ def _helm_chart_impl(ctx):
                 command = "cp $1 $2",
             )
     if tmp_chart_root.equals(""):
-        print("Chart.yaml not Found !!!!!!!!@@@@@@@"
+        print("Chart.yaml not Found !!!!!!!!@@@@@@@")
 
     # extract docker image info from dependency rule
     if ctx.attr.image:
