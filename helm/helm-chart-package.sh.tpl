@@ -81,8 +81,6 @@ fi
 
 {HELM_PATH} repo update
 
-if [ -z ${CHART_PATH} ]; then echo "!!!!!!!!! CHART_PATH is unset !!!!!!!!!"; else echo "CHART_PATH is set to '$CHART_PATH'"; fi
-
 {HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION > /dev/null
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
