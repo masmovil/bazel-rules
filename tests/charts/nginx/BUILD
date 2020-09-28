@@ -95,6 +95,7 @@ helm_release(
   namespace = "test-nginx-sops",
   release_name = "test-nginx-sops",
   tiller_namespace = "tiller-system",
+  kube_context = "kind-bazel-tillerless",
   values_yaml = [":sops"]
 )
 

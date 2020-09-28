@@ -20,5 +20,6 @@ helm_release(
   chart = ":nginx_chart_with_deps",
   namespace = "test-nginx-with-deps",
   release_name = "test-nginx-with-deps",
-  tiller_namespace = "tiller-system"
+  tiller_namespace = "tiller-system",
+  kube_context = "kind-bazel-tillerless"
 )
