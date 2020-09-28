@@ -105,7 +105,7 @@ helm_release = rule(
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
       "helm_version": attr.string(mandatory = False),
-      "kube_context": attr.string(mandatory = False, defaullt = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"),
+      "kube_context": attr.string(mandatory = False, default = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
