@@ -22,6 +22,7 @@ def _helm_release_impl(ctx):
         chart: Chart to install
         namespace: Namespace where release is installed to
         release_name: Name of the helm release
+        kube_context: Use different specific kube context (defaults to gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01)
         values_yaml: Specify values yaml to override default
         secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
         sops_yaml = Sops file if secrets_yaml is provided
@@ -37,6 +38,7 @@ def _helm_release_impl(ctx):
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
     helm_version = ctx.attr.helm_version or ""
+    kube_context = ctx.attr.kube_context
 
     stamp_files = [ctx.info_file, ctx.version_file]
 
@@ -71,6 +73,7 @@ def _helm_release_impl(ctx):
             "{HELM3_PATH}": helm3_path,
             "{KUBECTL_PATH}": kubectl_path,
             "{FORCE_HELM_VERSION}": helm_version,
+            "{KUBE_CONTEXT}": kube_context,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -102,6 +105,7 @@ helm_release = rule(
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
       "helm_version": attr.string(mandatory = False),
+      "kube_context": attr.string(mandatory = False, defaullt = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
