@@ -45,3 +45,10 @@ if [ "{GCP_SA}" != "" ]; then
 
 
 fi
+
+if  [[ "{NAMESPACES_LABELS[*]} ]]; then
+    for NAMESPACES_LABEL in {NAMESPACES_LABELS[*]}
+    do
+        kubectl label namespace {NAMESPACE_NAME}  --overwrite {NAMESPACES_LABEL}
+    done
+fi

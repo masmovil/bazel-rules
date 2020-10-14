@@ -56,6 +56,7 @@ def _k8s_namespace_impl(ctx):
             "{GCP_SA_PROJECT}": gcp_sa_project,
             "{GCP_SA}": gcp_sa,
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
+            "{NAMESPACE_LABELS}": labels,
             "%{stamp_statements}": "\n".join([
               "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -83,6 +84,7 @@ k8s_namespace = rule(
       "gcp_sa": attr.string(mandatory = False),
       "gcp_gke_project": attr.string(mandatory = False),
       "workload_identity_namespace": attr.string(mandatory = False),
+      "labels":  attr.string_list(mandatory=False, allow_empty=True, *, default=[], doc='Labels for create namespace'),
       "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl"),
 
     },
