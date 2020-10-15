@@ -35,3 +35,9 @@ if ! {KUBECTL_PATH} get ns {NAMESPACE_NAME}; then
     {KUBECTL_PATH} create ns {NAMESPACE_NAME}
 fi
 
+if [ {NAMESPACE_LABELS} != "" ]; then
+    for NAMESPACE_LABEL in "{NAMESPACE_LABELS}"
+    do
+       {KUBECTL_PATH} label namespace {NAMESPACE_NAME} ${NAMESPACE_LABEL}
+    done
+fi
