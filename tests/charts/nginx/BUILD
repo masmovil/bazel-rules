@@ -118,7 +118,7 @@ k8s_namespace(
 k8s_workload_identity(
   name = "test-sa",
   namespace = ":test-sa-namespace",
-  kubernetes_sa = "test-sa",
+  kubernetes_sa = "default",
   gcp_sa_project = "test-project",
   gcp_sa = "test@test.iam.gserviceaccount.com",
   gcp_gke_project = "test-gke-project",
