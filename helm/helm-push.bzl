@@ -25,7 +25,7 @@ def _helm_push_impl(ctx):
         HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}\n" --data-binary "@{CHART_PATH}" -u {USERNAME}:{PASSWORD} {REPOSITORY_URL}api/charts)
         echo "http post response code: "$HTTP_CODE
 
-        if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+        if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "409" ]; then
           echo "exit 0"
           exit 0
         else
