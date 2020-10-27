@@ -25,11 +25,10 @@ func TestChartReleaseUsingSops(t *testing.T) {
 	k8s.CreateNamespace(t, k8sOptions, namespaceName)
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"run", "//tests/charts/nginx:nginx_helm_release_sops", "--spawn_strategy=standalone"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"run", "//tests/charts/nginx:nginx_helm_release_sops", "--spawn_strategy=standalone"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	defer k8s.DeleteNamespace(t, k8sOptions, namespaceName)

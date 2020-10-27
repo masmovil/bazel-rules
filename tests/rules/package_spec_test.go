@@ -19,35 +19,31 @@ func TestChartPackageImageTagMakeVar(t *testing.T) {
 	imageTag := "nginxTestImageTag"
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag, "--spawn_strategy=standalone"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"build", "//tests/charts/nginx:nginx_chart_make", "--define", "TEST_IMAGE_TAG=" + imageTag, "--spawn_strategy=standalone"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "tar",
-		Args:              []string{"-xzf", chartTarPackagePath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "tar",
+		Args:       []string{"-xzf", chartTarPackagePath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	defer shell.RunCommand(t, shell.Command{
-		Command:           "rm",
-		Args:              []string{"-f", chartTarPackagePath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "rm",
+		Args:       []string{"-f", chartTarPackagePath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	defer shell.RunCommand(t, shell.Command{
-		Command:           "rm",
-		Args:              []string{"-rf", chartPackageRootPath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "rm",
+		Args:       []string{"-rf", chartPackageRootPath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	output := helm.RenderTemplate(t, &helm.Options{
@@ -70,35 +66,31 @@ func TestChartPackageChartVersionMakeVar(t *testing.T) {
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion, "--spawn_strategy=standalone"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"build", "//tests/charts/nginx:nginx_chart_make_version", "--define", "TEST_VERSION=" + chartVersion, "--spawn_strategy=standalone"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "tar",
-		Args:              []string{"-xzf", chartTarPackagePath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "tar",
+		Args:       []string{"-xzf", chartTarPackagePath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	defer shell.RunCommand(t, shell.Command{
-		Command:           "rm",
-		Args:              []string{"-f", chartTarPackagePath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "rm",
+		Args:       []string{"-f", chartTarPackagePath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	defer shell.RunCommand(t, shell.Command{
-		Command:           "rm",
-		Args:              []string{"-rf", chartPackageRootPath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "rm",
+		Args:       []string{"-rf", chartPackageRootPath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	output := helm.RenderTemplate(t, &helm.Options{
@@ -120,35 +112,31 @@ func TestChartPackageNoImageNoTag(t *testing.T) {
 	relativeChartPackageRootPath := "../../" + chartPackageRootPath
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"build", "//tests/charts/nginx:nginx_chart_no_image", "--spawn_strategy=standalone"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"build", "//tests/charts/nginx:nginx_chart_no_image", "--spawn_strategy=standalone"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "tar",
-		Args:              []string{"-xzf", chartTarPackagePath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "tar",
+		Args:       []string{"-xzf", chartTarPackagePath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	defer shell.RunCommand(t, shell.Command{
-		Command:           "rm",
-		Args:              []string{"-f", chartTarPackagePath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "rm",
+		Args:       []string{"-f", chartTarPackagePath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	defer shell.RunCommand(t, shell.Command{
-		Command:           "rm",
-		Args:              []string{"-rf", chartPackageRootPath},
-		WorkingDir:        "../..",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "rm",
+		Args:       []string{"-rf", chartPackageRootPath},
+		WorkingDir: "../..",
+		Env:        map[string]string{},
 	})
 
 	output := helm.RenderTemplate(t, &helm.Options{
