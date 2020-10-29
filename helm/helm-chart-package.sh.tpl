@@ -71,7 +71,7 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     fi
 
     # appends @sha256 suffix to image repo url value if the repository value does not already contains it
-    if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
+    if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
         {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
     fi
 fi
@@ -79,7 +79,8 @@ fi
 {HELM_PATH} env
 
 # {HELM_PATH} repo list
-
-{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION
+{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION 1>>/dev/null
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
+
+echo "Successfully packaged chart and saved it to: {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz"
