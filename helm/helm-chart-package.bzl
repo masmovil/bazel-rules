@@ -131,12 +131,7 @@ def _helm_chart_impl(ctx):
         inputs = inputs + stamp_files,
         outputs = [targz],
         arguments = [],
-        executable = exec_file,
-        execution_requirements = {
-            "local": "1",
-            "no-remote-exec": "1",
-            "no-remote": "1"
-        },
+        executable = exec_file
     )
 
     return [
