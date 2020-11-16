@@ -5,9 +5,9 @@ set -o pipefail
 
 TEMP_FILES="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_files')"
 
-HELM_TMP=$(mketmp -d)
-HELM_CACHE_TMP=$(mketmp -d)
-HELM_DATA_TMP=$(mketmp -d)
+HELM_TMP=$(mktemp -d)
+HELM_CACHE_TMP=$(mktemp -d)
+HELM_DATA_TMP=$(mktemp -d)
 
 # Export XDG directories to get access to
 # helm user defined repos
