@@ -106,7 +106,6 @@ helm_release = rule(
     },
     doc = "Installs or upgrades a new helm release",
     toolchains = [
-        "@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type",
         "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
         "@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"
     ],
