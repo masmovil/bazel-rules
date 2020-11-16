@@ -4,6 +4,11 @@ load("@com_github_masmovil_bazel_rules//repositories:yq_repositories.bzl", "yq_r
 load("@com_github_masmovil_bazel_rules//repositories:kubectl_repositories.bzl", "kubectl_repositories")
 load("@com_github_masmovil_bazel_rules//repositories:sops_repositories.bzl", "sops_repositories")
 
+load(
+    "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain.bzl",
+    _helm_toolchain_configure = "helm_toolchain_configure",
+)
+
 def repositories():
   """Download dependencies of container rules."""
   excludes = native.existing_rules().keys()
@@ -12,6 +17,10 @@ def repositories():
   helm_repositories()
   yq_repositories()
   sops_repositories()
+
+  _helm_toolchain_configure(
+    name = "helm_toolchain_configure"
+  )
 
   native.register_toolchains(
     # Register the default docker toolchain that expects the 'docker'

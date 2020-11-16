@@ -30,7 +30,11 @@ def _helm_chart_impl(ctx):
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
     yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
     stamp_files = [ctx.info_file, ctx.version_file]
-    helm = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()[0]
+    helm_toolchain = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo
+    helm = helm_toolchain.tool.files.to_list()[0]
+    helm_cache_path = helm_toolchain.helm_xdg_cache_home
+    helm_config_path = helm_toolchain.helm_xdg_config_home
+    helm_data_path = helm_toolchain.helm_xdg_data_home
 
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + ".tgz")
@@ -111,6 +115,9 @@ def _helm_chart_impl(ctx):
             "{HELM_CHART_VERSION}": helm_chart_version,
             "{HELM_CHART_NAME}": ctx.attr.package_name,
             "{HELM_PATH}": helm.path,
+            "{HELM_CACHE_PATH}": helm_cache_path,
+            "{HELM_CONFIG_PATH}": helm_config_path,
+            "{HELM_DATA_PATH}": helm_data_path,
             "{STAMP_FILE}": ctx.version_file.root.path,
             "{VALUES_REPO_YAML_PATH}": ctx.attr.values_repo_yaml_path,
             "{VALUES_TAG_YAML_PATH}": ctx.attr.values_tag_yaml_path,
@@ -127,6 +134,8 @@ def _helm_chart_impl(ctx):
         executable = exec_file,
         execution_requirements = {
             "local": "1",
+            "no-remote-exec": "1",
+            "no-remote": "1"
         },
     )
 

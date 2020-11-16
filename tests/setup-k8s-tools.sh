@@ -7,12 +7,9 @@ sudo chmod +x /usr/local/bin/kind
 wget https://github.com/bazelbuild/bazel/releases/download/3.0.0/bazel_3.0.0-linux-x86_64.deb
 # sha256sum -c tools/bazel_0.3.1-linux-x86_64.deb.sha256
 sudo dpkg -i bazel_3.0.0-linux-x86_64.deb
-wget https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz
-tar -zxvf helm-v2.14.3-linux-amd64.tar.gz
+wget https://get.helm.sh/helm-v3.4.0-linux-amd64.tar.gz
+tar -zxvf helm-v3.4.0-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
-wget https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
-tar -zxvf helm-v3.1.1-linux-amd64.tar.gz
-sudo mv linux-amd64/helm /usr/local/bin/helm3
 wget https://github.com/ahmetb/kubectx/archive/v0.8.0.tar.gz -O ./kubectx.tar.gz
 tar -zxvf kubectx.tar.gz
 sudo mv kubectx-0.8.0/kubectx /usr/local/bin/kubectx

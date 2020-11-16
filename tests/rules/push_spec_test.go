@@ -44,19 +44,17 @@ func TestChartPush(t *testing.T) {
 	defer tunnel.Close()
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"run", "//tests/charts/nginx:nginx_push"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"run", "//tests/charts/nginx:nginx_push"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"run", "//tests/charts/nginx:nginx_push_no_slash"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"run", "//tests/charts/nginx:nginx_push_no_slash"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s/api/charts", tunelEndpoint), http.NoBody)

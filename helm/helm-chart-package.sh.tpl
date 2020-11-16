@@ -5,6 +5,12 @@ set -o pipefail
 
 TEMP_FILES="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_files')"
 
+# Export XDG directories to get access to
+# helm user defined repos
+export XDG_CACHE_HOME={HELM_CACHE_PATH}
+export XDG_CONFIG_HOME={HELM_CONFIG_PATH}
+export XDG_DATA_HOME={HELM_DATA_PATH}
+
 function read_variables() {
     local file="$1"
     local new_file="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_new')"
@@ -24,6 +30,8 @@ export HELM_CHART_VERSION={HELM_CHART_VERSION}
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
 IMAGE_TAG={IMAGE_TAG}
+
+chmod 777 {CHART_VALUES_PATH}
 
 # Application docker image is not provided by other docker bazel rule
 if  [ -z $DIGEST_PATH ]; then
@@ -63,11 +71,16 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     fi
 
     # appends @sha256 suffix to image repo url value if the repository value does not already contains it
-    if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
+    if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
         {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} ${REPO_URL}${REPO_SUFIX}
     fi
 fi
 
-{HELM_PATH} package {CHART_PATH} -u --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION
+{HELM_PATH} env
+
+# {HELM_PATH} repo list
+{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION 1>>/dev/null
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
+
+echo "Successfully packaged chart and saved it to: {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz"
