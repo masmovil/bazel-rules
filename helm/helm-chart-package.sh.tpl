@@ -5,11 +5,15 @@ set -o pipefail
 
 TEMP_FILES="$(mktemp -t 2>/dev/null || mktemp -t 'helm_release_files')"
 
+HELM_TMP=$(mketmp -d)
+HELM_CACHE_TMP=$(mketmp -d)
+HELM_DATA_TMP=$(mketmp -d)
+
 # Export XDG directories to get access to
 # helm user defined repos
-export XDG_CACHE_HOME={HELM_CACHE_PATH}
-export XDG_CONFIG_HOME={HELM_CONFIG_PATH}
-export XDG_DATA_HOME={HELM_DATA_PATH}
+export XDG_CACHE_HOME=$HELM_CACHE_TMP
+export XDG_CONFIG_HOME=$HELM_TMP
+export XDG_DATA_HOME=$HELM_DATA_TMP
 
 function read_variables() {
     local file="$1"
