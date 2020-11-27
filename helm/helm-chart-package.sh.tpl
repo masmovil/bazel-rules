@@ -35,7 +35,9 @@ DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
 IMAGE_TAG={IMAGE_TAG}
 
-chmod 777 {CHART_VALUES_PATH}
+if [ -f "{CHART_VALUES_PATH}" ]; then
+    chmod 777 {CHART_VALUES_PATH}
+fi
 
 # Application docker image is not provided by other docker bazel rule
 if  [ -z $DIGEST_PATH ]; then
