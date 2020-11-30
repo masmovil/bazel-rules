@@ -37,7 +37,7 @@ def _helm_chart_impl(ctx):
     helm_data_path = helm_toolchain.helm_xdg_data_home
 
     # declare rule output
-    targz = ctx.actions.declare_file(ctx.attr.package_name + ".tgz")
+    targz = ctx.actions.declare_file(ctx.attr.package_name + "-v2.tgz")
 
     inputs += [helm, yq]
 
