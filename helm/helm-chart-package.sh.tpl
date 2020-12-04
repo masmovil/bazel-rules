@@ -85,6 +85,6 @@ fi
 # {HELM_PATH} repo list
 {HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION 1>>/dev/null
 
-mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-v2.tgz
+# mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-v2.tgz
 
-echo "Successfully packaged chart and saved it to: {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-v2.tgz"
+echo "Successfully packaged chart and saved it to: {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-{HELM_CHART_VERSION}.tgz"

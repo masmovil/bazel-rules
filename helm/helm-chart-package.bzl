@@ -37,7 +37,7 @@ def _helm_chart_impl(ctx):
     helm_data_path = helm_toolchain.helm_xdg_data_home
 
     # declare rule output
-    targz = ctx.actions.declare_file(ctx.attr.package_name + "-v2.tgz")
+    targz = ctx.actions.declare_file(ctx.attr.package_name + "-" + helm_chart_version + ".tgz")
 
     inputs += [helm, yq]
 
@@ -82,19 +82,19 @@ def _helm_chart_impl(ctx):
         # extract docker image info from make variable or from rule attribute
         image_tag = get_make_value_or_default(ctx, ctx.attr.image_tag)
 
-    # deps = ctx.attr.chart_deps or []
+    deps = ctx.attr.chart_deps or []
 
     # copy generated charts by other rules into temporal chart_root/charts directory (treated as a helm dependency)
-    # for i, dep in enumerate(deps):
-    #     dep_files = dep[DefaultInfo].files.to_list()
-    #     out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + dep[DefaultInfo].files.to_list()[0].basename)
-    #     inputs = inputs + dep_files + [out]
-    #     ctx.actions.run_shell(
-    #         outputs = [out],
-    #         inputs = dep[DefaultInfo].files,
-    #         arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
-    #         command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
-    #     )
+    for i, dep in enumerate(deps):
+        dep_files = dep[DefaultInfo].files.to_list()
+        out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + dep[DefaultInfo].files.to_list()[0].basename)
+        inputs = inputs + dep_files + [out]
+        ctx.actions.run_shell(
+            outputs = [out],
+            inputs = dep[DefaultInfo].files,
+            arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
+            command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
+        )
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
