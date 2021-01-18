@@ -22,6 +22,7 @@ def _helm_chart_impl(ctx):
     tmp_chart_root = ""
     tmp_chart_values_path = ""
     tmp_chart_manifest_path = ""
+    tmp_chart_dirname = ""
     tmp_working_dir = "_tmp"
     inputs = [] + ctx.files.srcs
 
@@ -57,6 +58,7 @@ def _helm_chart_impl(ctx):
             if srcfile.path.endswith("Chart.yaml"):
                 tmp_chart_root = out.dirname
                 tmp_chart_manifest_path = out.path
+                tmp_chart_dirname = srcfile.dirname
 
             # extract location of values file in the new directory
             # TODO: Support values.dev|sta|*.yaml
@@ -72,18 +74,15 @@ def _helm_chart_impl(ctx):
 
     # move additional templates to temporal helm chart directory
     for i, tplfile in enumerate(ctx.files.templates):
-        out = ctx.actions.declare_file(tmp_chart_root + "/templates/" + srcfile.basename)
+        out = ctx.actions.declare_file(tmp_working_dir + "/" + tmp_chart_dirname + "/templates/" + tplfile.basename)
         inputs.append(out)
 
-        # extract location of values file in the new directory
-        # TODO: Support values.dev|sta|*.yaml
-        if srcfile.path.endswith(".yaml"):
-            tmp_chart_values_path = out.path
+        print("OUT PATH: ", out.path)
 
         ctx.actions.run_shell(
             outputs = [out],
-            inputs = [srcfile],
-            arguments = [srcfile.path, out.path],
+            inputs = [tplfile],
+            arguments = [tplfile.path, out.path],
             command = "cp $1 $2",
         )
 
