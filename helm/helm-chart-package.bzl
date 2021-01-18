@@ -49,26 +49,25 @@ def _helm_chart_impl(ctx):
 
     # move chart files to temporal directory in order to manipulate necessary files
     for i, srcfile in enumerate(ctx.files.srcs):
-        if srcfile.path.startswith(chart_root_path):
-            out = ctx.actions.declare_file(tmp_working_dir + "/" + srcfile.path)
-            inputs.append(out)
+        out = ctx.actions.declare_file(tmp_working_dir + "/" + srcfile.path)
+        inputs.append(out)
 
-            # extract location of the chart in the new directory
-            if srcfile.path.endswith("Chart.yaml"):
-                tmp_chart_root = out.dirname
-                tmp_chart_manifest_path = out.path
+        # extract location of the chart in the new directory
+        if srcfile.path.endswith("Chart.yaml"):
+            tmp_chart_root = out.dirname
+            tmp_chart_manifest_path = out.path
 
-            # extract location of values file in the new directory
-            # TODO: Support values.dev|sta|*.yaml
-            if srcfile.path.endswith("values.yaml"):
-                tmp_chart_values_path = out.path
+        # extract location of values file in the new directory
+        # TODO: Support values.dev|sta|*.yaml
+        if srcfile.path.endswith("values.yaml"):
+            tmp_chart_values_path = out.path
 
-            ctx.actions.run_shell(
-                outputs = [out],
-                inputs = [srcfile],
-                arguments = [srcfile.path, out.path],
-                command = "cp $1 $2",
-            )
+        ctx.actions.run_shell(
+            outputs = [out],
+            inputs = [srcfile],
+            arguments = [srcfile.path, out.path],
+            command = "cp $1 $2",
+        )
 
     if tmp_chart_root == "":
         print("Chart.yaml not Found !!!!!!!!@@@@@@@")
