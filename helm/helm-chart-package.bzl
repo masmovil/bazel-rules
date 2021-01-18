@@ -49,17 +49,35 @@ def _helm_chart_impl(ctx):
 
     # move chart files to temporal directory in order to manipulate necessary files
     for i, srcfile in enumerate(ctx.files.srcs):
-        out = ctx.actions.declare_file(tmp_working_dir + "/" + srcfile.path)
-        inputs.append(out)
+        if srcfile.path.startswith(chart_root_path):
+            out = ctx.actions.declare_file(tmp_working_dir + "/" + srcfile.path)
+            inputs.append(out)
 
-        # extract location of the chart in the new directory
-        if srcfile.path.endswith("Chart.yaml"):
-            tmp_chart_root = out.dirname
-            tmp_chart_manifest_path = out.path
+            # extract location of the chart in the new directory
+            if srcfile.path.endswith("Chart.yaml"):
+                tmp_chart_root = out.dirname
+                tmp_chart_manifest_path = out.path
+
+            # extract location of values file in the new directory
+            # TODO: Support values.dev|sta|*.yaml
+            if srcfile.path.endswith("values.yaml"):
+                tmp_chart_values_path = out.path
+
+            ctx.actions.run_shell(
+                outputs = [out],
+                inputs = [srcfile],
+                arguments = [srcfile.path, out.path],
+                command = "cp $1 $2",
+            )
+
+    # move additional templates to temporal helm chart directory
+    for i, tplfile in enumerate(ctx.files.templates):
+        out = ctx.actions.declare_file(tmp_chart_root + "/templates/" + srcfile.basename)
+        inputs.append(out)
 
         # extract location of values file in the new directory
         # TODO: Support values.dev|sta|*.yaml
-        if srcfile.path.endswith("values.yaml"):
+        if srcfile.path.endswith(".yaml"):
             tmp_chart_values_path = out.path
 
         ctx.actions.run_shell(
@@ -148,6 +166,7 @@ helm_chart = rule(
     implementation = _helm_chart_impl,
     attrs = {
       "srcs": attr.label_list(allow_files = True, mandatory = True),
+      "templates": attr.label_list(allow_files = True, mandatory = False),
       "image": attr.label(allow_single_file = True, mandatory = False),
       "image_tag": attr.string(mandatory = False),
       "package_name": attr.string(mandatory = True),
