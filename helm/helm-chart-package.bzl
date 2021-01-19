@@ -140,6 +140,9 @@ def _helm_chart_impl(ctx):
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % f.path
               for f in stamp_files]),
+            "%{value_files}": "\n".join([
+              "\merge_values %s" % f.path
+              for f in ctx.files.values]),
         }
     )
 
@@ -166,6 +169,7 @@ helm_chart = rule(
     attrs = {
       "srcs": attr.label_list(allow_files = True, mandatory = True),
       "templates": attr.label_list(allow_files = True, mandatory = False),
+      "values": attr.label_list(allow_files = True, mandatory = False),
       "image": attr.label(allow_single_file = True, mandatory = False),
       "image_tag": attr.string(mandatory = False),
       "package_name": attr.string(mandatory = True),

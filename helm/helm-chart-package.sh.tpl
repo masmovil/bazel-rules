@@ -23,15 +23,18 @@ function read_variables() {
     source ${new_file}
 }
 
+function merge_values() {
+    {YQ_PATH} m {CHART_VALUES_PATH} $1
+}
+
 %{stamp_statements}
+%{value_files}
 
 export HELM_CHART_VERSION={HELM_CHART_VERSION}
 
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
 IMAGE_TAG={IMAGE_TAG}
-
-chmod 777 {CHART_VALUES_PATH}
 
 # Application docker image is not provided by other docker bazel rule
 if  [ -z $DIGEST_PATH ]; then
