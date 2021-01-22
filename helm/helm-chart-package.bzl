@@ -36,11 +36,12 @@ def _helm_chart_impl(ctx):
     helm_cache_path = helm_toolchain.helm_xdg_cache_home
     helm_config_path = helm_toolchain.helm_xdg_config_home
     helm_data_path = helm_toolchain.helm_xdg_data_home
+    values = ctx.files.values or []
 
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + ".tgz")
 
-    inputs += [helm, yq] + ctx.files.values
+    inputs += [helm, yq] + values
 
     # locate chart root path trying to find Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
@@ -142,7 +143,7 @@ def _helm_chart_impl(ctx):
               for f in stamp_files]),
             "%{value_files}": "\n".join([
               "\merge_values %s" % f.path
-              for f in ctx.files.values]),
+              for f in values]),
         }
     )
 
