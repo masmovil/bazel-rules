@@ -24,8 +24,8 @@ function read_variables() {
 }
 
 function merge_values() {
-    echo "[helm] [yq] Merging {CHART_VALUES_PATH} with $1"
-    {YQ_PATH} m {CHART_VALUES_PATH} $1
+    echo "[helm] [yq] Merging {CHART_VALUES_PATH} with $1" 
+    {YQ_PATH} m -i {CHART_VALUES_PATH} $1
 }
 
 %{stamp_statements}
