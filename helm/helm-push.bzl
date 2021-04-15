@@ -64,7 +64,15 @@ helm_push = rule(
       "repository_url": attr.string(mandatory = True),
       "repository_username": attr.string(mandatory = True),
       "repository_password": attr.string(mandatory = True),
-      "repo_type": attr.string(values = ["museum", "nexus"], default = "museum")
+      "repo_type": attr.string(
+        values = ["museum", "nexus"],
+        default = "museum",
+        doc = """
+        Repository type to deploy to. Now supports:
+        * Helm Chart Museum: https://github.com/helm/chartmuseum
+        * Sonatype Nexus Helm: https://help.sonatype.com/repomanager3/formats/helm-repositories
+        """,
+      )
     },
     doc = "Push helm chart to a helm repository",
     toolchains = [],
