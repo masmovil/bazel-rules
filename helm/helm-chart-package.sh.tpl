@@ -78,6 +78,10 @@ fi
 
 {HELM_PATH} env
 
+if [ -d {PACKAGE_OUTPUT_PATH}/charts/{HELM_CHART_NAME}/tmpcharts ]; then
+    rm -rf {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}/tmpcharts
+fi
+
 # {HELM_PATH} repo list
 {HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION 1>>/dev/null
 
