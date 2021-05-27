@@ -19,5 +19,5 @@ helm_release(
   chart = ":base_package",
   namespace = "examples",
   release_name = "base-release",
-  gcp_gke_project = "mm-k8s-dev-02"
+  kubernetes_context = "gke_mm-k8s-dev-02_europe-west2_mm-k8s-dev-02"
 )
