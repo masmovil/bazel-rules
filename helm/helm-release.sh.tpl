@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 set -o pipefail
 
@@ -38,14 +40,14 @@ if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [
 
     {HELM_PATH} init -c
 
-    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --kube-context {KUBECONTEXT} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
-
+    echo "{HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --kube-context {KUBERNETES_CONTEXT} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}"
+    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} --kube-context {KUBERNETES_CONTEXT} --namespace {NAMESPACE} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
 else
     # tiller pods were not found, we will use helm 3 to make the release
     echo "Using helm v3 to deploy the {RELEASE_NAME} release"
 
     {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
 
-    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install --kube-context {KUBECONTEXT} --namespace {NAMESPACE} {VALUES_YAML}"
-    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install --kube-context {KUBECONTEXT} --namespace {NAMESPACE} {VALUES_YAML}
+    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install --kube-context {KUBERNETES_CONTEXT} --namespace {NAMESPACE} {VALUES_YAML}"
+    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install --kube-context {KUBERNETES_CONTEXT} --namespace {NAMESPACE} {VALUES_YAML}
 fi

@@ -37,12 +37,8 @@ def _helm_release_impl(ctx):
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
     helm_version = ctx.attr.helm_version or ""
+    kubernetes_context = ctx.attr.kubernetes_context
     stamp_files = [ctx.info_file, ctx.version_file]
-
-    if ctx.attr.gcp_gke_project[7:] == 'dev-02':
-      kubecontext = "gke_mm-k8s-dev-02_europe-west2_mm-k8s-dev-02"
-    else:
-      kubecontext = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"
 
     values_yaml = ""
     for i, values_yaml_file in enumerate(ctx.files.values_yaml):
@@ -57,8 +53,6 @@ def _helm_release_impl(ctx):
             namespace = ctx.attr.namespace
         else:
             namespace = "default"
-
-    print(namespace)
 
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
@@ -75,7 +69,7 @@ def _helm_release_impl(ctx):
             "{HELM3_PATH}": helm3_path,
             "{KUBECTL_PATH}": kubectl_path,
             "{FORCE_HELM_VERSION}": helm_version,
-            "{KUBECONTEXT}": kubecontext,
+            "{KUBERNETES_CONTEXT}": kubernetes_context,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -107,7 +101,7 @@ helm_release = rule(
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
       "helm_version": attr.string(mandatory = False),
-      "gcp_gke_project": attr.string(mandatory = False, default = "mm-k8s-dev-01"),
+      "kubernetes_context": attr.string(mandatory = False, default = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
