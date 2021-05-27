@@ -28,7 +28,7 @@ def _k8s_namespace_impl(ctx):
     gcp_sa = ctx.attr.gcp_sa
     gcp_gke_project = ctx.attr.gcp_gke_project
     workload_identity_namespace = ctx.attr.workload_identity_namespace
-	kubernetes_context = ctx.attr.kubernetes_context
+    kubernetes_context = ctx.attr.kubernetes_context
 
     if gcp_sa != "":
         if kubernetes_sa == "":
