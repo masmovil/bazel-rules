@@ -210,6 +210,7 @@ helm_release(
     namespace_dep = ":test-namespace",
     tiller_namespace = "tiller-system",
     release_name = "release-name",
+    kube_context = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01",
     values_yaml = glob(["charts/myapp/values.yaml"]),
 )
 ```
@@ -223,6 +224,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | namespace_dep | false | - | Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace |
 | tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
+| kube_context | no | - | Value for `--kube-context` for helm binary (defaults to `gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01`)|
 | values_yaml | no | - | Several values files can be passed when installing release |
 | helm_version | no | "" | Force the use of helm v2 or v3 to deploy the release. The attribute can be set to **v2** or **v3** |
 
