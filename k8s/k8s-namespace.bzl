@@ -39,8 +39,12 @@ def _k8s_namespace_impl(ctx):
         if workload_identity_namespace == "":
              fail(msg='ERROR: workload_identity_namespace must be provided if gcp_sa is set')
 
-    stamp_files = [ctx.info_file, ctx.version_file]
+    if ctx.attr.gcp_gke_project[7:] == 'dev-02':
+      kubecontext = "gke_mm-k8s-dev-02_europe-west2_mm-k8s-dev-02"
+    else:
+      kubecontext = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"
 
+    stamp_files = [ctx.info_file, ctx.version_file]
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_k8s_bash")
 
@@ -56,6 +60,7 @@ def _k8s_namespace_impl(ctx):
             "{GCP_SA_PROJECT}": gcp_sa_project,
             "{GCP_SA}": gcp_sa,
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
+            "{KUBECONTEXT}": kubecontext,
             "%{stamp_statements}": "\n".join([
               "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
