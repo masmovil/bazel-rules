@@ -28,6 +28,7 @@ def _k8s_namespace_impl(ctx):
     gcp_sa = ctx.attr.gcp_sa
     gcp_gke_project = ctx.attr.gcp_gke_project
     workload_identity_namespace = ctx.attr.workload_identity_namespace
+    kubernetes_context = ctx.attr.kubernetes_context
 
     if gcp_sa != "":
         if kubernetes_sa == "":
@@ -40,7 +41,6 @@ def _k8s_namespace_impl(ctx):
              fail(msg='ERROR: workload_identity_namespace must be provided if gcp_sa is set')
 
     stamp_files = [ctx.info_file, ctx.version_file]
-
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_k8s_bash")
 
@@ -56,6 +56,7 @@ def _k8s_namespace_impl(ctx):
             "{GCP_SA_PROJECT}": gcp_sa_project,
             "{GCP_SA}": gcp_sa,
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
+            "{KUBERNETES_CONTEXT}": kubernetes_context,
             "%{stamp_statements}": "\n".join([
               "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -83,8 +84,8 @@ k8s_namespace = rule(
       "gcp_sa": attr.string(mandatory = False),
       "gcp_gke_project": attr.string(mandatory = False),
       "workload_identity_namespace": attr.string(mandatory = False),
+      "kubernetes_context": attr.string(mandatory = False),
       "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl"),
-
     },
     doc = "Creates a new kubernetes namespace and annotates it with workload identity",
     toolchains = [],

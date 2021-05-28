@@ -194,6 +194,7 @@ helm_release(
     tiller_namespace = "tiller-system",
     release_name = "release-name",
     values_yaml = glob(["charts/myapp/values.yaml"]),
+    kubernetes_context = "mm-k8s-context",
 )
 ```
 
@@ -202,7 +203,8 @@ Example of use with k8s_namespace:
 k8s_namespace(
   name = "test-namespace",
   namespace_name = "test-namespace",
-  kubernetes_sa = "test-kubernetes-sa"
+  kubernetes_sa = "test-kubernetes-sa",
+  kubernetes_context = "mm-k8s-context",
 )
 helm_release(
     name = "chart_install",
@@ -211,6 +213,7 @@ helm_release(
     tiller_namespace = "tiller-system",
     release_name = "release-name",
     values_yaml = glob(["charts/myapp/values.yaml"]),
+    kubernetes_context = "mm-k8s-context",
 )
 ```
 
@@ -225,7 +228,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
 | values_yaml | no | - | Several values files can be passed when installing release |
 | helm_version | no | "" | Force the use of helm v2 or v3 to deploy the release. The attribute can be set to **v2** or **v3** |
-
+| kubernetes_context | no | "" | Context of kubernetes cluster |
 
 ## Sops rules
 Decrypting secrets using [sops](https://github.com/mozilla/sops) is now supported.
@@ -277,7 +280,8 @@ helm_release(
     namespace = "myapp",
     tiller_namespace = "tiller-system",
     release_name = "release-name",
-    values_yaml = glob(["charts/myapp/values.yaml"]) + [":decrypt_secret_files"]
+    values_yaml = glob(["charts/myapp/values.yaml"]) + [":decrypt_secret_files"],
+    kubernetes_context = "mm-k8s-context",
 )
 ```
 
@@ -319,7 +323,7 @@ k8s_namespace(
     gcp_sa = "odissey-dev@mm-odissey-dev.iam.gserviceaccount.com",
     gcp_gke_project = "mm-k8s-dev-01",
     workload_identity_namespace = "mm-k8s-dev-01.svc.id.goog",
-
+    kubernetes_context = "mm-k8s-context",
 )
 ```
 
@@ -330,7 +334,8 @@ Example of use with helm_release:
 k8s_namespace(
   name = "test-namespace",
   namespace_name = "test-namespace",
-  kubernetes_sa = "test-kubernetes-sa"
+  kubernetes_sa = "test-kubernetes-sa",
+  kubernetes_context = "mm-k8s-context",
 )
 helm_release(
     name = "chart_install",
@@ -339,6 +344,7 @@ helm_release(
     tiller_namespace = "tiller-system",
     release_name = "release-name",
     values_yaml = glob(["charts/myapp/values.yaml"]),
+    kubernetes_context = "mm-k8s-context",
 )
 ```
 
@@ -353,6 +359,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | gcp_sa | no | - | GCP Service Account. I.E.  `my-account@my-project.iam.gserviceaccount.com`|
 | gcp_gke_project | no | - | GKE Project |
 | workload_identity_namespace | no | - | Workload Identity Namespace. I.E. `mm-k8s-dev-01.svc.id.goog` |
+| kubernetes_context | no | "" | Context of kubernetes cluster |
 
 
 ## GCS rules

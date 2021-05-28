@@ -37,7 +37,7 @@ def _helm_release_impl(ctx):
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
     helm_version = ctx.attr.helm_version or ""
-
+    kubernetes_context = ctx.attr.kubernetes_context
     stamp_files = [ctx.info_file, ctx.version_file]
 
     values_yaml = ""
@@ -54,8 +54,6 @@ def _helm_release_impl(ctx):
         else:
             namespace = "default"
 
-    print(namespace)
-
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
         template = ctx.file._script_template,
@@ -71,6 +69,7 @@ def _helm_release_impl(ctx):
             "{HELM3_PATH}": helm3_path,
             "{KUBECTL_PATH}": kubectl_path,
             "{FORCE_HELM_VERSION}": helm_version,
+            "{KUBERNETES_CONTEXT}": kubernetes_context,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -102,6 +101,7 @@ helm_release = rule(
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
       "helm_version": attr.string(mandatory = False),
+      "kubernetes_context": attr.string(mandatory = False),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
