@@ -84,7 +84,7 @@ k8s_namespace = rule(
       "gcp_sa": attr.string(mandatory = False),
       "gcp_gke_project": attr.string(mandatory = False),
       "workload_identity_namespace": attr.string(mandatory = False),
-      "kubernetes_context": attr.string(mandatory = False, default = "gke_mm-k8s-dev-01_europe-west1_mm-k8s-dev-01"),
+      "kubernetes_context": attr.string(mandatory = False),
       "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl"),
     },
     doc = "Creates a new kubernetes namespace and annotates it with workload identity",
