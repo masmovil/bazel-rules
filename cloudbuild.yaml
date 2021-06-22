@@ -3,7 +3,6 @@ steps:
   entrypoint: /bin/bash
   args:
   - |
-    ./tests/create-k8s-cluster.sh
-    ./tests/setup-k8s-tools.sh
-    kubectx kind-bazel-tillerless
-    go test tests/rules/* -v
+    ./tests/setup.sh \
+    && kubectx kind-bazel-tillerless \
+    && go test tests/rules/* -v

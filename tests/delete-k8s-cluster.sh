@@ -1,1 +1,0 @@
-kind delete cluster kind-bazel-tillerless
