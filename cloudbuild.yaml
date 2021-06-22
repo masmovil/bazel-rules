@@ -1,15 +1,15 @@
 steps:
-- name: 'setup k8s tools'
+- name: 'setup-k8s-tools'
   entrypoint: /bin/bash
   args:
   - |
     ./tests/setup-k8s-tools.sh
-- name: 'create k8s cluster'
+- name: 'create-k8s-cluster'
   entrypoint: /bin/bash
   args:
   - |
     /tests/create-k8s-cluster.sh
-- name: 'Integration tests'
+- name: 'integration-tests'
   entrypoint: /bin/bash
   args:
   - |
