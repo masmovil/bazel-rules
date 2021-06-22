@@ -19,10 +19,12 @@ def _sops_decrypt_impl(ctx):
     inputs = [ctx.file.sops_yaml] + ctx.files.srcs
     outputs = []
 
-    sops = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type"].sopsinfo.tool.files.to_list()[0].path
+    sops = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/sops:toolchain_type"].sopsinfo.tool.files.to_list()[0]
     sops_yaml = ctx.file.sops_yaml.path
 
-    gpg = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/gpg:toolchain_type"].gpginfo.tool.files.to_list()[0].path
+    gpg = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/gpg:toolchain_type"].gpginfo.tool.files.to_list()[0]
+
+    inputs += [gpg, sops]
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
@@ -35,10 +37,10 @@ def _sops_decrypt_impl(ctx):
             "{DECRYPT_FILES}": "\n".join([
               "\tdecrypt_file %s %s" % (sopfiles(ctx, f), declare_output(ctx, f, outputs))
               for f in ctx.files.srcs]),
-            "{SOPS_BINARY_PATH}": sops,
+            "{SOPS_BINARY_PATH}": sops.path,
             "{SOPS_CONFIG_FILE}": sops_yaml,
             "{SOPS_PROVIDER}": ctx.attr.provider,
-            "{GPG_BINARY}": gpg
+            "{GPG_BINARY}": gpg.path
         }
     )
 
@@ -50,6 +52,7 @@ def _sops_decrypt_impl(ctx):
         execution_requirements = {
             "local": "1",
         },
+        use_default_shell_env = True
     )
 
     return [

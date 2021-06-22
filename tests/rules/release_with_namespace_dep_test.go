@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+
 	"time"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -13,19 +14,17 @@ import (
 )
 
 // Test suite for testing release of chart basic package
-func TestBasicChartRelease(t *testing.T) {
+func TestChartReleaseWithNamespaceDep(t *testing.T) {
 	var helmVersion string = "3"
 
-	namespaceName := "test-nginx"
-	releaseName := "test-nginx"
+	namespaceName := "test-namespace"
+	releaseName := "test-nginx-namespace"
 
 	k8sOptions := k8s.NewKubectlOptions("", "", namespaceName)
 
-	k8s.CreateNamespace(t, k8sOptions, namespaceName)
-
 	shell.RunCommand(t, shell.Command{
 		Command:    "bazel",
-		Args:       []string{"run", "//tests/charts/nginx:nginx_helm_release", "--spawn_strategy=standalone"},
+		Args:       []string{"run", "//tests/charts/nginx:nginx_helm_release_namespace", "--spawn_strategy=standalone"},
 		WorkingDir: ".",
 		Env:        map[string]string{},
 	})
@@ -56,11 +55,11 @@ func TestBasicChartRelease(t *testing.T) {
 
 	require.Equal(t, len(pods), 1)
 
-	podName := pods[0].Name
+	podsName := pods[0].Name
 
-	k8s.WaitUntilPodAvailable(t, k8sOptions, podName, 10, 1*time.Second)
+	k8s.WaitUntilPodAvailable(t, k8sOptions, podsName, 10, 1*time.Second)
 
-	pod := k8s.GetPod(t, k8sOptions, podName)
+	pod := k8s.GetPod(t, k8sOptions, podsName)
 
 	require.Equal(t, pod.Status.Phase, api.PodRunning)
 }

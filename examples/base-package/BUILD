@@ -19,4 +19,5 @@ helm_release(
   chart = ":base_package",
   namespace = "examples",
   release_name = "base-release",
+  kubernetes_context = "put_your_k8s_cluster_context"
 )

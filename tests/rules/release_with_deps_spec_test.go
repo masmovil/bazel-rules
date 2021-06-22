@@ -25,11 +25,10 @@ func TestChartReleaseWithDeps(t *testing.T) {
 	k8s.CreateNamespace(t, k8sOptions, namespaceName)
 
 	shell.RunCommand(t, shell.Command{
-		Command:           "bazel",
-		Args:              []string{"run", "//tests/charts/nginx-with-deps:nginx_helm_release_with_deps"},
-		WorkingDir:        ".",
-		Env:               map[string]string{},
-		OutputMaxLineSize: 1024,
+		Command:    "bazel",
+		Args:       []string{"run", "//tests/charts/nginx-with-deps:nginx_helm_release_with_deps", "--spawn_strategy=standalone"},
+		WorkingDir: ".",
+		Env:        map[string]string{},
 	})
 
 	defer k8s.DeleteNamespace(t, k8sOptions, namespaceName)
