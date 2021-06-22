@@ -1,4 +1,4 @@
-kind create cluster --name bazel-tillerless
+kind create cluster --name bazel-rules
 kubectl create namespace system-chartmuseum
 helm repo add stable https://charts.helm.sh/stable
 helm repo update
