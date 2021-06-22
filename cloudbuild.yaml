@@ -1,17 +1,9 @@
 steps:
-- name: 'setup-k8s-tools'
+- name: golang
   entrypoint: /bin/bash
   args:
   - |
+    ./tests/create-k8s-cluster.sh
     ./tests/setup-k8s-tools.sh
-- name: 'create-k8s-cluster'
-  entrypoint: /bin/bash
-  args:
-  - |
-    /tests/create-k8s-cluster.sh
-- name: 'integration-tests'
-  entrypoint: /bin/bash
-  args:
-  - |
     kubectx kind-bazel-tillerless
     go test tests/rules/* -v
