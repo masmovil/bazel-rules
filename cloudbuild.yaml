@@ -4,4 +4,4 @@ steps:
   args: ["./tests/k8s-setup.sh", "&&", "kubectx kind-bazel-tillerless"]
 - name: "gcr.io/mm-opensource-cloudbuild/bazel-rules-testing-environment"
   entrypoint: /bin/bash
-  args: ["go", "test", "tests/rules/*", "-v"]g
+  args: ["go", "test", "tests/rules/*", "-v"]
