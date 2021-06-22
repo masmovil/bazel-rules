@@ -14,10 +14,3 @@ wget https://github.com/ahmetb/kubectx/archive/v0.9.3.tar.gz -O ./kubectx.tar.gz
 tar -zxvf kubectx.tar.gz
 sudo mv kubectx-0.9.3/kubectx /usr/local/bin/kubectx
 gpg --import tests/resources/pgp/sops_test_key.asc
-
-# Create kind cluster and install chartmuseum
-kind create cluster --name bazel-rules
-kubectl create namespace system-chartmuseum
-helm repo add stable https://charts.helm.sh/stable
-helm repo update
-helm install chartmuseum --namespace system-chartmuseum -f tests/resources/chartmuseum/values.yaml stable/chartmuseum
