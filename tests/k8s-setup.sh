@@ -1,3 +1,5 @@
+ls .
+pwd
 kind create cluster --config=./cluster.yaml
 docker ps
 kubectl cluster-info --context kind-bazel-rules
