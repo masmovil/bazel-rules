@@ -34,7 +34,8 @@ RUN chmod +x /usr/local/bin/kubectx
 
 # Configure gpg
 COPY ./tests/resources/pgp/sops_test_key.asc .
-COPY ./tests/cluster.yaml .
+RUN mkdir -p tests
+COPY ./tests/cluster.yaml ./tests/cluster.yaml
 RUN gpg --import ./sops_test_key.asc
 
 ARG DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial
