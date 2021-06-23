@@ -1,4 +1,4 @@
-kind create cluster --name bazel-rules
+kind create cluster --name bazel-rules --wait 60s
 kubectl cluster-info --context kind-bazel-rules
 kubectl create namespace system-chartmuseum
 helm repo add stable https://charts.helm.sh/stable
