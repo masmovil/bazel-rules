@@ -2,7 +2,7 @@ steps:
 - name: "gcr.io/mm-opensource-cloudbuild/bazel-rules-testing-environment"
   id: "setup"
   entrypoint: /bin/bash
-  args: ["./tests/k8s-setup.sh", "&&", "kubectx kind-bazel-tillerless"]
+  args: ["./tests/k8s-setup.sh"]
 # - name: "istionightly/kind:latest"
 #   id: "k8s"
 #   entrypoint: kind
