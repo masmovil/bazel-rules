@@ -1,4 +1,4 @@
-kind create cluster --name bazel-rules --wait 60s
+kind create cluster --config=./custer.yaml
 docker ps
 kubectl cluster-info --context kind-bazel-rules
 kubectl create namespace system-chartmuseum
