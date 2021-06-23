@@ -1,6 +1,6 @@
 ls .
 pwd
-kind create cluster --config=./cluster.yaml
+kind create cluster --config=./tests/cluster.yaml
 docker ps
 kubectl cluster-info --context kind-bazel-rules
 kubectl create namespace system-chartmuseum
