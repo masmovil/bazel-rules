@@ -11,5 +11,5 @@ steps:
   id: "tests"
   entrypoint: /bin/bash
   waitFor:
-  - "k8s"
+  - "setup"
   args: ["go", "test", "tests/rules/*", "-v"]
