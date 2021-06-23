@@ -13,20 +13,24 @@ RUN dpkg -i bazel_4.1.0-linux-x86_64.deb
 
 # Install kubectl
 RUN curl -Lo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl
+RUN chmod +x /usr/local/bin/kubectl
 
 # Install kind
 RUN curl -Lo /usr/local/bin/kind https://github.com/kubernetes-sigs/kind/releases/download/v0.11.1/kind-$(uname)-amd64
+RUN chmod +x /usr/local/bin/kind
 
 
 # Install helm
 RUN wget https://get.helm.sh/helm-v3.6.0-linux-amd64.tar.gz
 RUN tar -zxvf helm-v3.6.0-linux-amd64.tar.gz
 RUN mv linux-amd64/helm /usr/local/bin/helm
+RUN chmod +x /usr/local/bin/helm
 
 # Install kubectx
 RUN wget https://github.com/ahmetb/kubectx/archive/v0.9.3.tar.gz -O ./kubectx.tar.gz
 RUN tar -zxvf kubectx.tar.gz
 RUN mv kubectx-0.9.3/kubectx /usr/local/bin/kubectx
+RUN chmod +x /usr/local/bin/kubectx
 
 # Configure gpg
 COPY ./tests/resources/pgp/sops_test_key.asc .
