@@ -1,6 +1,6 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get -y install curl wget g++ zlib1g-dev unzip gpg
+RUN apt-get update && apt-get -y install curl wget g++ zlib1g-dev unzip gpg nmap
 
 # Install golang
 RUN wget https://golang.org/dl/go1.16.5.linux-amd64.tar.gz

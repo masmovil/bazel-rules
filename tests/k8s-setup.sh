@@ -1,5 +1,4 @@
-ls .
-pwd
+nmap -p- 127.0.0.1
 kind create cluster --config=./tests/cluster.yaml
 docker ps
 kubectl cluster-info --context kind-bazel-rules
