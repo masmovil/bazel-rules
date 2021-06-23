@@ -35,3 +35,21 @@ RUN chmod +x /usr/local/bin/kubectx
 # Configure gpg
 COPY ./tests/resources/pgp/sops_test_key.asc .
 RUN gpg --import ./sops_test_key.asc
+
+ARG DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial
+
+# Install docker
+RUN apt-get -y update && \
+    apt-get -y install \
+        apt-transport-https \
+        ca-certificates \
+        make \
+        software-properties-common && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    apt-key fingerprint 0EBFCD88 && \
+    add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+       xenial \
+       edge" && \
+    apt-get -y update && \
+    apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION}
