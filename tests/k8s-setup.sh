@@ -1,4 +1,4 @@
-kind create cluster --config=./custer.yaml
+kind create cluster --config=./cluster.yaml
 docker ps
 kubectl cluster-info --context kind-bazel-rules
 kubectl create namespace system-chartmuseum
