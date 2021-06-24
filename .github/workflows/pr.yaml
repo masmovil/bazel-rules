@@ -19,13 +19,11 @@ jobs:
         helm repo add stable https://charts.helm.sh/stable
         helm repo update
         helm install chartmuseum --namespace system-chartmuseum -f tests/resources/chartmuseum/values.yaml stable/chartmuseum
-    - name: Import gpg
-      run: |
-        gpg --import ./tests/resources/pgp/sops_test_key.asc
     - name: Setup Bazel
       uses: abhinavsingh/setup-bazel@v3
       with:
         version: 4.1.0
     - name: Run integration tests
       run: |
+        gpg --import ./tests/resources/pgp/sops_test_key.asc
         go test tests/rules/* -v
