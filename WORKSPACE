@@ -11,7 +11,7 @@ http_archive(
 )
 
 load(
-    "@io_bazel_rules_docke//repositories:repositories.bzl",
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
     container_repositories = "repositories",
 )
 container_repositories()
