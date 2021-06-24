@@ -26,4 +26,5 @@ jobs:
     - name: Run integration tests
       run: |
         gpg --import ./tests/resources/pgp/sops_test_key.asc
+        gpgconf --reload gpg-agent
         go test tests/rules/* -v
