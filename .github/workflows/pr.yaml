@@ -1,8 +1,8 @@
 name: Kind
 on: [pull_request]
 jobs:
-  test-unit:
-    name: Create a Kind cluster
+  tests:
+    name: Integration tests
     runs-on: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v1
