@@ -25,7 +25,5 @@ jobs:
         version: 4.1.0
     - name: Run integration tests
       run: |
-        GPG_TTY=$(tty)
-        export GPG_TTY
-        gpg --import ./tests/resources/pgp/sops_test_key.asc
-        go test tests/rules/* -v
+        GPG_TTY=$(tty) gpg --import ./tests/resources/pgp/sops_test_key.asc
+        GPG_TTY=$(tty) go test tests/rules/* -v
