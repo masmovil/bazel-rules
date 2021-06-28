@@ -1,6 +1,6 @@
 # bazel rules
 
-[![Build Status](https://travis-ci.com/masmovil/bazel-rules.svg?branch=master)](https://travis-ci.com/masmovil/bazel-rules)
+![Build Status](https://github.com/masmovil/bazel-rules/actions/workflows/integration-tests.yaml/badge.svg)
 
 This repository contains Bazel rules to install and manipulate Helm charts with Bazel.
 
