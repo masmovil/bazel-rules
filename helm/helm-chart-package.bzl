@@ -28,6 +28,7 @@ def _helm_chart_impl(ctx):
     digest_path = ""
     image_tag = ""
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
+    app_version = get_make_value_or_default(ctx, ctx.attr.app_version or helm_chart_version)
     yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
     stamp_files = [ctx.info_file, ctx.version_file]
     helm_toolchain = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo
@@ -113,6 +114,7 @@ def _helm_chart_impl(ctx):
             "{PACKAGE_OUTPUT_PATH}": targz.dirname,
             "{IMAGE_REPOSITORY}": ctx.attr.image_repository,
             "{HELM_CHART_VERSION}": helm_chart_version,
+            "{APP_VERSION}": app_version,
             "{HELM_CHART_NAME}": ctx.attr.package_name,
             "{HELM_PATH}": helm.path,
             "{HELM_CACHE_PATH}": helm_cache_path,
@@ -153,6 +155,7 @@ helm_chart = rule(
       "image_tag": attr.string(mandatory = False),
       "package_name": attr.string(mandatory = True),
       "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
+      "app_version": attr.string(mandatory = False),
       "image_repository": attr.string(),
       "values_repo_yaml_path": attr.string(default = "image.repository"),
       "values_tag_yaml_path": attr.string(default = "image.tag"),
