@@ -26,6 +26,7 @@ function read_variables() {
 %{stamp_statements}
 
 export HELM_CHART_VERSION={HELM_CHART_VERSION}
+export APP_VERSION={APP_VERSION}
 
 DIGEST_PATH={DIGEST_PATH}
 IMAGE_REPOSITORY={IMAGE_REPOSITORY}
@@ -79,7 +80,7 @@ fi
 {HELM_PATH} env
 
 # {HELM_PATH} repo list
-{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version $HELM_CHART_VERSION --version $HELM_CHART_VERSION 1>>/dev/null
+{HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {APP_VERSION} --version $HELM_CHART_VERSION 1>>/dev/null
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
 
