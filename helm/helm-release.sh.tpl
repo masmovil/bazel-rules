@@ -54,6 +54,6 @@ else
 
     {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
 
-    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS --namespace {NAMESPACE}  --create-namespace --wait {VALUES_YAML}"
+    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS --namespace {NAMESPACE} --create-namespace --wait {VALUES_YAML}"
     {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS --namespace {NAMESPACE} {VALUES_YAML}
 fi
