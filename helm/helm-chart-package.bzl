@@ -96,6 +96,20 @@ def _helm_chart_impl(ctx):
             command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
         )
 
+    additional_templates = ctx.attr.additional_templates or []
+
+    for template in additional_templates:
+        for file in template.files.to_list():
+            out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/templates/" + file.basename)
+            inputs.append(out)
+
+            ctx.actions.run_shell(
+                outputs = [out],
+                inputs = [file],
+                arguments = [file.path, out.path],
+                command = "cp $1 $2",
+            )
+
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
     # Generates the exec bash file with the provided substitutions
@@ -161,6 +175,7 @@ helm_chart = rule(
         "values_tag_yaml_path": attr.string(default = "image.tag"),
         "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
         "chart_deps": attr.label_list(allow_files = True, mandatory = False),
+        "additional_templates": attr.label_list(allow_files = True, mandatory = False),
     },
     toolchains = [
         "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
