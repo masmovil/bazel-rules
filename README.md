@@ -115,6 +115,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | values_repo_yaml_path | no | `image.repository` | The yaml path (expressed in dot notation) of values.yaml where the key of the image repository is defined in the values.yaml. |
 | values_tag_yaml_path | no | `image.tag` | The yaml path (expressed in dot notation) of values.yaml where the key of the image tag is defined in the values.yaml |
 | chart_deps | no | - | Helm chart dependencies of this rules. Defined as a list of dependencies of other helm_chart rules (bazel targets). |
+| additional_templates | no | [] | List of labels or files to be added to the `templates/` folder of the chart. Useful for centralizing common templates and pass them around different charts. |
 
 
 #### Use of make_variables
