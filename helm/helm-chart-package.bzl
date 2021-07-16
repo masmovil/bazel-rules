@@ -4,8 +4,7 @@ load(
     "ImageInfo",
     "LayerInfo",
 )
-
-load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
+load("//helpers:helpers.bzl", "get_make_value_or_default", "write_sh")
 
 ChartInfo = provider(fields = [
     "chart",
@@ -124,9 +123,10 @@ def _helm_chart_impl(ctx):
             "{VALUES_REPO_YAML_PATH}": ctx.attr.values_repo_yaml_path,
             "{VALUES_TAG_YAML_PATH}": ctx.attr.values_tag_yaml_path,
             "%{stamp_statements}": "\n".join([
-              "\tread_variables %s" % f.path
-              for f in stamp_files]),
-        }
+                "\tread_variables %s" % f.path
+                for f in stamp_files
+            ]),
+        },
     )
 
     ctx.actions.run(
@@ -137,30 +137,30 @@ def _helm_chart_impl(ctx):
         execution_requirements = {
             "local": "1",
             "no-remote-exec": "1",
-            "no-remote": "1"
+            "no-remote": "1",
         },
     )
 
     return [
         DefaultInfo(
-            files = depset([targz])
-        )
+            files = depset([targz]),
+        ),
     ]
 
 helm_chart = rule(
     implementation = _helm_chart_impl,
     attrs = {
-      "srcs": attr.label_list(allow_files = True, mandatory = True),
-      "image": attr.label(allow_single_file = True, mandatory = False),
-      "image_tag": attr.string(mandatory = False),
-      "package_name": attr.string(mandatory = True),
-      "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
-      "app_version": attr.string(mandatory = False),
-      "image_repository": attr.string(),
-      "values_repo_yaml_path": attr.string(default = "image.repository"),
-      "values_tag_yaml_path": attr.string(default = "image.tag"),
-      "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
-      "chart_deps": attr.label_list(allow_files = True, mandatory = False),
+        "srcs": attr.label_list(allow_files = True, mandatory = True),
+        "image": attr.label(allow_single_file = True, mandatory = False),
+        "image_tag": attr.string(mandatory = False),
+        "package_name": attr.string(mandatory = True),
+        "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
+        "app_version": attr.string(mandatory = False),
+        "image_repository": attr.string(),
+        "values_repo_yaml_path": attr.string(default = "image.repository"),
+        "values_tag_yaml_path": attr.string(default = "image.tag"),
+        "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
+        "chart_deps": attr.label_list(allow_files = True, mandatory = False),
     },
     toolchains = [
         "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
