@@ -98,6 +98,8 @@ def _helm_chart_impl(ctx):
 
     additional_templates = ctx.attr.additional_templates or []
 
+    # Copy additional templates to the "templates/" folder of the chart being assembled.
+    # This is useful for centralizing common templates and pass them to multiple charts.
     for template in additional_templates:
         for file in template.files.to_list():
             out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/templates/" + file.basename)
