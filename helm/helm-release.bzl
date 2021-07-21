@@ -70,6 +70,8 @@ def _helm_release_impl(ctx):
             "{KUBECTL_PATH}": kubectl_path,
             "{FORCE_HELM_VERSION}": helm_version,
             "{KUBERNETES_CONTEXT}": kubernetes_context,
+            "{CREATE_NAMESPACE}": create_namespace,
+            "{WAIT}": wait,
             "%{stamp_statements}": "\n".join([
               "\tread_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
@@ -102,6 +104,8 @@ helm_release = rule(
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
       "helm_version": attr.string(mandatory = False),
       "kubernetes_context": attr.string(mandatory = False),
+      "create_namespace": attr.string(mandatory = False, default = ""),
+      "wait": attr.string(mandatory = False, default = ""),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
