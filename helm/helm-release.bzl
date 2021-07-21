@@ -38,6 +38,8 @@ def _helm_release_impl(ctx):
     release_name = ctx.attr.release_name
     helm_version = ctx.attr.helm_version or ""
     kubernetes_context = ctx.attr.kubernetes_context
+    create_namespace = ctx.attr.create_namespace
+    wait = ctx.attr.wait
     stamp_files = [ctx.info_file, ctx.version_file]
 
     values_yaml = ""
