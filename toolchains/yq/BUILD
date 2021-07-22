@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:private"])
-
 load(":yq_toolchain.bzl", "yq_toolchain")
+
+package(default_visibility = ["//visibility:private"])
 
 toolchain_type(name = "toolchain_type")
 
@@ -8,13 +8,13 @@ toolchain_type(name = "toolchain_type")
 # to be in the PATH.
 yq_toolchain(
     name = "yq_linux",
-    tool = "@yq_v2.4.1_linux//file",
+    tool = "@yq_linux//file",
     visibility = ["//visibility:public"],
 )
 
 yq_toolchain(
     name = "yq_osx",
-    tool = "@yq_v2.4.1_darwin//file",
+    tool = "@yq_darwin//file",
     visibility = ["//visibility:public"],
 )
 
