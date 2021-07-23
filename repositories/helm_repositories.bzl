@@ -16,15 +16,15 @@ def helm_repositories():
   )
 
   http_archive(
-    name = "helm_v3.4.1_darwin",
-    sha256 = "71d213d63e1b727d6640c4420aee769316f0a93168b96073d166edcd3a425b3d",
-    urls = ["https://get.helm.sh/helm-v3.4.1-darwin-amd64.tar.gz"],
+    name = "helm_v3.6.2_darwin",
+    sha256 = "81a94d2877326012b99ac0737517501e5ed69bb4987884e7f2d0887ad27895a9",
+    urls = ["https://get.helm.sh/helm-v3.6.2-darwin-amd64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",
   )
 
   http_archive(
-    name = "helm_v3.4.1_linux",
-    sha256 = "538f85b4b73ac6160b30fd0ab4b510441aa3fa326593466e8bf7084a9c288420",
-    urls = ["https://get.helm.sh/helm-v3.4.1-linux-amd64.tar.gz"],
+    name = "helm_v3.6.2_linux",
+    sha256 = "f3a4be96b8a3b61b14eec1a35072e1d6e695352e7a08751775abf77861a0bf54",
+    urls = ["https://get.helm.sh/helm-v3.6.2-linux-amd64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",
   )
