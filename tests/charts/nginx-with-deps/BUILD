@@ -10,8 +10,8 @@ helm_chart(
   image_repository  = "nginx",
   helm_chart_version = "1.0.0",
   package_name = "nginx-with-deps",
-  values_tag_yaml_path = "image.tag",
-  values_repo_yaml_path = "image.repository",
+  values_tag_yaml_path = ".image.tag",
+  values_repo_yaml_path = ".image.repository",
   chart_deps = ["//tests/charts/nginx:nginx_chart"]
 )
 

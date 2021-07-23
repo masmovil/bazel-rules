@@ -11,8 +11,8 @@ helm_chart(
   image_repository  = "nginx",
   helm_chart_version = "1.0.0",
   package_name = "nginx",
-  values_tag_yaml_path = "image.tag",
-  values_repo_yaml_path = "image.repository"
+  values_tag_yaml_path = ".image.tag",
+  values_repo_yaml_path = ".image.repository"
 )
 
 helm_chart(
@@ -22,8 +22,8 @@ helm_chart(
   image_repository  = "nginx",
   helm_chart_version = "2.0.0",
   package_name = "nginx",
-  values_tag_yaml_path = "image.tag",
-  values_repo_yaml_path = "image.repository"
+  values_tag_yaml_path = ".image.tag",
+  values_repo_yaml_path = ".image.repository"
 )
 
 helm_chart(
@@ -33,8 +33,8 @@ helm_chart(
   image_repository  = "nginx",
   helm_chart_version = "1.0.0",
   package_name = "nginx",
-  values_tag_yaml_path = "image.tag",
-  values_repo_yaml_path = "image.repository"
+  values_tag_yaml_path = ".image.tag",
+  values_repo_yaml_path = ".image.repository"
 )
 
 helm_chart(
@@ -44,8 +44,8 @@ helm_chart(
   image_repository  = "nginx",
   helm_chart_version = "{TEST_VERSION}",
   package_name = "nginx",
-  values_tag_yaml_path = "image.tag",
-  values_repo_yaml_path = "image.repository"
+  values_tag_yaml_path = ".image.tag",
+  values_repo_yaml_path = ".image.repository"
 )
 
 helm_chart(

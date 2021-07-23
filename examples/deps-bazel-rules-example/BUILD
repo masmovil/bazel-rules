@@ -9,7 +9,7 @@ helm_chart(
   image_repository  = "gcr.io/lab/package-image-url",
   helm_chart_version = "1.0.0",
   package_name = "deps-bazel-rules-example",
-  values_tag_yaml_path = "image.tag",
-  values_repo_yaml_path = "image.repository",
+  values_tag_yaml_path = ".image.tag",
+  values_repo_yaml_path = ".image.repository",
   chart_deps = ["//examples/base-package:base_package"]
 )
