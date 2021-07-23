@@ -83,7 +83,7 @@ helm_chart(
   srcs = glob(["**"]),
   image  = "//docker/flex:flex", // Reference to the docker image rule to extract the digest sha256 from
   package_name = "flex", // name of the helm package. This will be the name of the generated tar.gz helm package
-  values_tag_yaml_path = "base.k8s.deployment.image.tag", // yaml Path of the image tag in the values.yaml files
+  values_tag_yaml_path = ".base.k8s.deployment.image.tag", // yaml Path of the image tag in the values.yaml files
   helm_chart_version = "0.1.1"
 )
 ```
