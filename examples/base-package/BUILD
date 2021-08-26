@@ -11,7 +11,7 @@ helm_chart(
   helm_chart_version = "1.0.0",
   package_name = "base-package",
   values_tag_yaml_path = ".image.tag",
-  values_repo_yaml_path = "limage.repository",
+  values_repo_yaml_path = ".image.repository",
 )
 
 helm_release(
