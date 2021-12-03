@@ -1,10 +1,10 @@
 def sopfiles(ctx, f):
   """Return the sop file relative path of f."""
-  return f.short_path
+  return f.path
 
 def declare_output(ctx, f, outputs):
   """Declare sop decrypted outputs"""
-  out = ctx.actions.declare_file(f.basename + ".dec")
+  out = ctx.actions.declare_file("dec." + f.basename)
   outputs.append(out)
   return out.path
 
