@@ -41,6 +41,7 @@ toolchain(
     name = "sops_osx_toolchain",
     target_compatible_with = [
         "@bazel_tools//platforms:osx",
+        "@platforms//cpu:x86_64",
     ],
     toolchain = ":sops_darwin",
     toolchain_type = ":toolchain_type",
