@@ -4,6 +4,7 @@ def yq_repositories():
   http_file(
     name = "yq_v2.4.1_linux",
     urls = ["https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64"],
+    sha256 = "754c6e6a7ef92b00ef73b8b0bb1d76d651e04d26aa6c6625e272201afa889f8b",
     executable = True
   )
 
