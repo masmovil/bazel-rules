@@ -40,13 +40,11 @@ if  [ -z $DIGEST_PATH ]; then
     # Image repository is provided as a static value
     if [ "$IMAGE_REPOSITORY" != "" ] && [ -n $IMAGE_REPOSITORY ]; then
         {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_REPO_YAML_PATH} $IMAGE_REPOSITORY
-        echo "Replaced image repository in chart values.yaml with: $IMAGE_REPOSITORY"
     fi
 
     # Image tag is provided as a static value
     if [ "$IMAGE_TAG" != "" ] && [ -n $IMAGE_TAG ]; then
         {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} $IMAGE_TAG
-        echo "Replaced image tag in chart values.yaml with: $IMAGE_TAG"
     fi
 
 fi
@@ -59,8 +57,6 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     DIGEST_SHA=${digest_split[1]}
 
     {YQ_PATH} w -i {CHART_VALUES_PATH} {VALUES_TAG_YAML_PATH} $DIGEST_SHA
-
-    echo "Replaced image tag in chart values.yaml with: $DIGEST_SHA"
 
     REPO_SUFIX="@sha256"
 
@@ -77,13 +73,8 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     fi
 fi
 
-{HELM_PATH} env
-
-# {HELM_PATH} repo list
 {HELM_PATH} package {CHART_PATH} --dependency-update --destination {PACKAGE_OUTPUT_PATH} --app-version {APP_VERSION} --version $HELM_CHART_VERSION 1>>/dev/null
 
 mv {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}-$HELM_CHART_VERSION.tgz {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz
 
 rm -rf {CHART_PATH}
-
-echo "Successfully packaged chart and saved it to: {PACKAGE_OUTPUT_PATH}/{HELM_CHART_NAME}.tgz"
