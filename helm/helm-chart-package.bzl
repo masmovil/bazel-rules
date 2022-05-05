@@ -35,6 +35,7 @@ def _helm_chart_impl(ctx):
     helm_cache_path = helm_toolchain.helm_xdg_cache_home
     helm_config_path = helm_toolchain.helm_xdg_config_home
     helm_data_path = helm_toolchain.helm_xdg_data_home
+    skip_chart_root_path_check = not ctx.attr.filter_chart_files
 
     # declare rule output
     targz = ctx.actions.declare_file(ctx.attr.package_name + ".tgz")
@@ -49,7 +50,7 @@ def _helm_chart_impl(ctx):
 
     # move chart files to temporal directory in order to manipulate necessary files
     for i, srcfile in enumerate(ctx.files.srcs):
-        if srcfile.path.startswith(chart_root_path):
+        if srcfile.path.startswith(chart_root_path) or skip_chart_root_path_check:
             out = ctx.actions.declare_file(tmp_working_dir + "/" + srcfile.path)
             inputs.append(out)
 
@@ -178,6 +179,10 @@ helm_chart = rule(
         "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
         "chart_deps": attr.label_list(allow_files = True, mandatory = False),
         "additional_templates": attr.label_list(allow_files = True, mandatory = False),
+        "filter_chart_files": attr.bool(
+            default = True, mandatory = False,  # retain the traditional behavior by default
+            doc = "Normally, helmchart files are filtered to only those in the same dir as Chart.yaml; optionally skip this requirement",
+        ),
     },
     toolchains = [
         "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
