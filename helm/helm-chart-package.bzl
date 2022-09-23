@@ -94,7 +94,7 @@ def _helm_chart_impl(ctx):
         ctx.actions.run_shell(
             outputs = [out, out_dir],
             inputs = dep[DefaultInfo].files,
-            arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
+            arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path, out_dir.path],
             command = "rm -rf $3; cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
         )
 
