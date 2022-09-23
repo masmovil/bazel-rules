@@ -95,7 +95,7 @@ def _helm_chart_impl(ctx):
             outputs = [out, out_dir],
             inputs = dep[DefaultInfo].files,
             arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
-            command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
+            command = "rm -rf $3; cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
         )
 
     additional_templates = ctx.attr.additional_templates or []
