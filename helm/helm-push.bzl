@@ -1,4 +1,4 @@
-load("@masmovil_bazel_rules//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
+load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 def _helm_push_impl(ctx):
