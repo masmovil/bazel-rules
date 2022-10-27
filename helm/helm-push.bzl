@@ -60,8 +60,8 @@ def _helm_push_impl(ctx):
 
     if ctx.attr.repo_type == "gcp_artifact_registry":
         chart_path = chart.short_path
-        helm_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.binary
-        gcloud_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud
+        helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.binary
+        gcloud_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud
         yq_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
 
         inputs = [helm_binary, gcloud_binary, yq_binary]
