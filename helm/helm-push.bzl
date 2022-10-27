@@ -171,8 +171,8 @@ helm_push = rule(
     },
     doc = "Push helm chart to a helm repository",
     toolchains = [
-        "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
-        "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type",
+        "@com_github_masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
         "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
     ],
     executable = True,
