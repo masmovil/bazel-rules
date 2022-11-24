@@ -34,12 +34,14 @@ def _helm_release_impl(ctx):
     kubectl_path = kubectl_binary[0].path
 
     chart = ctx.file.chart
+    force = ctx.attr.force
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
     helm_version = ctx.attr.helm_version or ""
     kubernetes_context = ctx.attr.kubernetes_context
     create_namespace = ctx.attr.create_namespace
     wait = ctx.attr.wait
+    wait_timeout = ctx.attr.wait_timeout
     stamp_files = [ctx.info_file, ctx.version_file]
 
     values_yaml = ""
@@ -63,8 +65,10 @@ def _helm_release_impl(ctx):
         is_executable = True,
         substitutions = {
             "{CHART_PATH}": chart.short_path,
+            "{FORCE}": force,
             "{NAMESPACE}": namespace,
             "{TILLER_NAMESPACE}": tiller_namespace,
+            "{TIMEOUT}": wait_timeout,
             "{RELEASE_NAME}": release_name,
             "{VALUES_YAML}": values_yaml,
             "{HELM_PATH}": helm_path,
@@ -97,6 +101,7 @@ helm_release = rule(
     implementation = _helm_release_impl,
     attrs = {
       "chart": attr.label(allow_single_file = True, mandatory = True),
+      "force": attr.string(mandatory = False, default = ""),  # could actually be a boolean
       "namespace_dep": attr.label(mandatory = False),
       "namespace": attr.string(mandatory = False),
       "tiller_namespace": attr.string(mandatory = False, default = "tiller-system"),
@@ -107,7 +112,8 @@ helm_release = rule(
       "helm_version": attr.string(mandatory = False),
       "kubernetes_context": attr.string(mandatory = False),
       "create_namespace": attr.string(mandatory = False, default = ""),
-      "wait": attr.string(mandatory = False, default = ""),
+      "wait": attr.string(mandatory = False, default = ""),  # could actually be a boolean
+      "wait_timeout": attr.string(mandatory = False, default = ""),
       "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
