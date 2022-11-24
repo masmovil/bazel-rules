@@ -87,13 +87,15 @@ def _helm_chart_impl(ctx):
     # copy generated charts by other rules into temporal chart_root/charts directory (treated as a helm dependency)
     for i, dep in enumerate(deps):
         dep_files = dep[DefaultInfo].files.to_list()
-        out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + dep[DefaultInfo].files.to_list()[0].basename)
+        tgz = dep[DefaultInfo].files.to_list()[0]
+        out = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + tgz.basename)
+        out_dir = ctx.actions.declare_file(tmp_working_dir + "/" + chart_root_path + "/charts/" + tgz.basename[:-len(tgz.extension) - 1])
         inputs = inputs + dep_files + [out]
         ctx.actions.run_shell(
-            outputs = [out],
+            outputs = [out, out_dir],
             inputs = dep[DefaultInfo].files,
-            arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
-            command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
+            arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path, out_dir.path],
+            command = "rm -rf $3; cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
         )
 
     additional_templates = ctx.attr.additional_templates or []
