@@ -13,7 +13,7 @@ go_library(
         "flags.go",
         "main.go",
     ],
-    importpath = "github.com/masmovil/mm-monorepo/sops/private/decrypt",
+    importpath = "github.com/masmovil/bazel-rules/sops/private/decrypt",
     deps = [
         "@com_github_sirupsen_logrus//:go_default_library",
         "@com_github_spf13_pflag//:go_default_library",

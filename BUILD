@@ -1,7 +1,7 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
 # gazelle:proto disable_global
-# gazelle:prefix github.com/masmovil/mm-monorepo
+# gazelle:prefix github.com/masmovil/bazel-rules
 # gazelle:go_naming_convention go_default_library
 # gazelle:exclude node_modules
 gazelle(
@@ -9,7 +9,7 @@ gazelle(
 )
 
 # gazelle:proto disable_global
-# gazelle:prefix github.com/masmovil/mm-monorepo
+# gazelle:prefix github.com/masmovil/bazel-rules
 # gazelle:go_naming_convention go_default_library
 gazelle(
     name = "gazelle_go_update_repos",

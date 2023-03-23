@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/masmovil/mm-monorepo/helm/lib/chart"
+	"github.com/masmovil/bazel-rules/helm/lib/chart"
 
 	log "github.com/sirupsen/logrus"
 )

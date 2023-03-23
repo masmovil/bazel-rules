@@ -14,7 +14,7 @@ go_library(
         "image.go",
         "package.go",
     ],
-    importpath = "github.com/masmovil/mm-monorepo/helm/private/package",
+    importpath = "github.com/masmovil/bazel-rules/helm/private/package",
     deps = [
         "@com_github_pkg_errors//:go_default_library",
         "@com_github_sirupsen_logrus//:go_default_library",

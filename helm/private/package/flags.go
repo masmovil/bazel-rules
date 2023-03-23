@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/masmovil/mm-monorepo/helm/lib/chart"
+	"github.com/masmovil/bazel-rules/helm/lib/chart"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 )
