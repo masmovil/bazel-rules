@@ -1,0 +1,11 @@
+istio:
+  annotations:
+    some-test-annotation: "test1"
+    some-test-annotation-to-override: "test1"
+
+k8s:
+  deployment:
+    labels: label-test
+
+  services:
+    randomid: true

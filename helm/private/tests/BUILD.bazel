@@ -1,0 +1,207 @@
+load(":helm_chart_validation.bzl", "helm_chart_validation_test")
+load(
+    "@com_github_masmovil_bazel_rules//helm:def.bzl",
+    "helm_chart",
+)
+
+# Needed just once, to expose the template. Could have also used export_files(),
+# and made the _script attribute set allow_files=True.
+filegroup(
+    name = "helm_chart_validation_template",
+    srcs = [":helm_chart_validation.sh.template"],
+)
+
+helm_chart(
+    name = "image_chart",
+    chart_name = "image",
+    image_repository = "eu.gcr.io/mm-cloudbuild/mas-stack/test-helm-chart",
+    image_tag = "randomtag",
+    values_repo_yaml_path = "image.repository",
+    values_tag_yaml_path = "image.tag",
+    version = "0.0.1",
+)
+
+helm_chart_validation_test(
+    name = "validate_image_chart",
+    chart = ":image_chart",
+    expected_chart_files = [
+        "Chart.yaml",
+        "values.yaml",
+    ],
+    expected_values = """
+image:
+  repository: eu.gcr.io/mm-cloudbuild/mas-stack/test-helm-chart
+  tag: randomtag
+""",
+)
+
+helm_chart(
+    name = "declarative_chart",
+    app_version = "v1.1.2",
+    chart_name = "declarative",
+    description = "Test chart all declarative",
+    values =
+        """
+k8s:
+  deployment:
+    labels: label-test
+istio:
+  nooverride: "please"
+  baseUrl: "test2override"
+""",
+    version = "v1.0.0",
+)
+
+helm_chart_validation_test(
+    name = "validate_declarative_chart",
+    chart = ":declarative_chart",
+    expected_chart_files = [
+        "Chart.yaml",
+        "values.yaml",
+    ],
+    expected_values = """
+istio:
+  baseUrl: test2override
+  nooverride: please
+k8s:
+  deployment:
+    labels: label-test
+    """,
+)
+
+helm_chart(
+    name = "hybrid_chart",
+    app_version = "v1.1.2",
+    chart_name = "hybrid",
+    description = "Test hybrid chart",
+    templates = [
+        "testdata/templates/test-sa-template.yaml",
+        "testdata/charts/basic/templates/deployment.yaml",
+    ],
+    value_files = [
+        "testdata/values/random-values.yaml",
+        "testdata/values/random-values-2.yaml",
+    ],
+    values =
+        """
+k8s:
+  deployment:
+    labels: override-label-by-declarative-value
+istio:
+  baseUrl: "test2override"
+""",
+    version = "v0.2.1",
+)
+
+helm_chart_validation_test(
+    name = "validate_hybrid_chart",
+    chart = ":hybrid_chart",
+    expected_chart_files = [
+        "Chart.yaml",
+        "values.yaml",
+        "templates/test-sa-template.yaml",
+        "templates/deployment.yaml",
+    ],
+    expected_values = """
+istio:
+  annotations:
+    some-test-annotation: "test1"
+    some-test-annotation-to-override: overrided-value-by-file-values-2
+  baseUrl: "test2override"
+k8s:
+  deployment:
+    labels: override-label-by-declarative-value
+  services:
+    randomid: true
+""",
+)
+
+helm_chart(
+    name = "deps_chart",
+    app_version = "0.1.2",
+    chart_name = "dependencies",
+    description = "Test chart with chart dependencies",
+    version = "2.0.0",
+    deps = [
+        ":declarative_chart",
+    ],
+)
+
+helm_chart_validation_test(
+    name = "validate_deps_chart",
+    chart = ":deps_chart",
+    expected_chart_deps = [
+        "declarative",
+    ],
+    expected_chart_files = [
+        "Chart.yaml",
+    ],
+)
+
+helm_chart(
+    name = "basic",
+    srcs = glob(["testdata/charts/basic/**"]),
+    app_version = "0.1.2",
+    chart_name = "basic",
+    description = "Test chart with source files",
+    version = "0.0.1",
+)
+
+helm_chart_validation_test(
+    name = "validate_basic_chart",
+    chart = ":basic",
+    expected_chart_files = [
+        "Chart.yaml",
+        "values.yaml",
+        "templates/deployment.yaml",
+        "templates/rs.yaml",
+        "LICENSE",
+    ],
+    expected_values = """
+image:
+  tag: sha256
+  repo: repo
+
+ingress:
+  dns:
+    - 1
+    - 2
+""",
+)
+
+helm_chart(
+    name = "ext_deps_chart",
+    srcs = glob(["testdata/charts/external-deps/**"]),
+    app_version = "0.1.2",
+    chart_name = "external-deps",
+    description = "Test chart with source files and deps",
+    version = "0.0.1",
+    deps = [
+        "@redis//:chart",
+    ],
+)
+
+helm_chart_validation_test(
+    name = "validate_dependencies_chart",
+    chart = ":ext_deps_chart",
+    expected_chart_deps = [
+        "redis",
+    ],
+    expected_chart_files = [
+        "Chart.yaml",
+        "values.yaml",
+        "templates/deployment.yaml",
+        "LICENSE",
+        "README.md",
+    ],
+    expected_values = """
+image:
+  tag: faketag
+  repository: fakerepository
+  testData: remainhere
+otherobj:
+  should:
+    still:
+      be: here
+""",
+)

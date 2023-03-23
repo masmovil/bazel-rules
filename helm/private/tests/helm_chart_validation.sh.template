@@ -1,0 +1,78 @@
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US.UTF-8"
+
+fail_expected_vs_result_with_msg() {
+    echo "----TEST ASSERTION FAILED----"
+    echo "                     "
+    echo "$1"
+    echo "---------------------"
+    echo "Got:"
+    echo "$2"
+    echo "Expected:"
+    echo "$3"
+    echo "---------------------"
+    exit 1
+}
+
+DEBUG=$(echo "%DEBUG%"| tr '[:upper:]' '[:lower:]')
+
+CHART_OUT_PATH="%CHART%"
+CHART_OUT_DIR_PATH=$(dirname $CHART_OUT_PATH)
+CHART_OUT_FILE_NAME=$(basename $CHART_OUT_PATH)
+
+CHART_NAME="%CHART_NAME%"
+CHART_VERSION="%CHART_VERSION%"
+
+EXPECTED_CHART_OUTPUT_NAME="$CHART_NAME-$CHART_VERSION.tgz"
+
+# ASSERT CHART NAME
+if [ "$CHART_OUT_FILE_NAME" != $EXPECTED_CHART_OUTPUT_NAME ]; then
+    fail_expected_vs_result_with_msg "Chart output does not have expected name-version format." $CHART_OUT_FILE_NAME $EXPECTED_CHART_OUTPUT_NAME
+fi
+
+tar -xzf $CHART_OUT_PATH
+
+if [[ $DEBUG == "true" ]]; then
+    tree .
+fi
+
+EXPECTED_FILES="%EXPECTED_FILES%"
+
+EXPECTED_NUM_FILES=$(echo "$EXPECTED_FILES" |wc -l)
+NUM_FILES=$(find $CHART_NAME -type f -not -path "*/charts/*" | wc -l)
+
+# ASSERT NUMBER OF CHART FILES OUTPUT
+if [ "$EXPECTED_NUM_FILES" != "$NUM_FILES" ]; then
+    fail_expected_vs_result_with_msg "Expected number of chart output files does not match." $NUM_FILES $EXPECTED_NUM_FILES
+fi
+
+# ASSERT OUTPUT FILES
+for out in $EXPECTED_FILES
+do
+    if [ ! -f "$CHART_NAME/$out" ]; then
+        fail_expected_vs_result_with_msg "Expected output file not found"  "" "$out"
+    fi
+done
+
+if [[ $DEBUG == "true" ]]; then
+    echo "$CHART_NAME/values.yaml"
+    cat "$CHART_NAME/values.yaml"
+fi
+
+ACTUAL_VALUES=$(cat "$CHART_NAME/values.yaml" |awk NF)
+EXPECTED_VALUES=$(echo -e "%EXPECTED_VALUES%" |awk NF)
+
+# ASSERT OUTPUT FILES
+if [[ "$EXPECTED_VALUES" != "" && "$EXPECTED_VALUES" != "$ACTUAL_VALUES" ]]; then
+    fail_expected_vs_result_with_msg "Provided values does not match with output chart default values." "$ACTUAL_VALUES" "$EXPECTED_VALUES"
+fi
+
+EXPECTED_CHARTS_DEPS="%EXPECTED_DEPS%"
+
+for out in $EXPECTED_CHARTS_DEPS
+do
+    if [ ! -d "$CHART_NAME/charts/$out" ]; then
+        fail_expected_vs_result_with_msg "Expected chart dependency not found"  "" "$out"
+    fi
+done

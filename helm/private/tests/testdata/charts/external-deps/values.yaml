@@ -1,0 +1,9 @@
+image:
+  tag: faketag
+  repository: fakerepository
+  testData: remainhere
+
+otherobj:
+  should:
+    still:
+      be: here

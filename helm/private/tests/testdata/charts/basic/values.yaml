@@ -1,0 +1,8 @@
+image:
+  tag: sha256
+  repo: repo
+
+ingress:
+  dns:
+    - 1
+    - 2

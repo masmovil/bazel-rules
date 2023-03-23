@@ -1,0 +1,3 @@
+istio:
+  annotations:
+    some-test-annotation-to-override: "overrided-value-by-file-values-2"

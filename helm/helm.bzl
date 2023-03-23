@@ -1,10 +1,17 @@
-"""Rules for manipulation helm packages."""
+"""DEPRECATED: public definitions for helm_rules.
+These definitions are marked as deprecated. Instead, def.bzl should be used.
+"""
 
-load("//helm:helm-chart-package.bzl", _helm_chart = "helm_chart")
-load("//helm:helm-push.bzl", _helm_push = "helm_push")
-load("//helm:helm-release.bzl", _helm_release = "helm_release")
+load(
+    ":def.bzl",
+    _helm_package = "helm_package",
+    _ChartInfo = "ChartInfo",
+    _helm_chart_dependency = "helm_chart_dependency",
+    _helm_push= "helm_push",
+)
 
-# Explicitly re-export the functions
-helm_chart = _helm_chart
+helm_chart = _helm_package
+helm_package = _helm_package
+ChartInfo = _ChartInfo
+helm_chart_dependency = _helm_chart_dependency
 helm_push = _helm_push
-helm_release = _helm_release

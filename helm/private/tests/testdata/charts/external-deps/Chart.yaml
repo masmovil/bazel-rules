@@ -1,0 +1,4 @@
+apiVersion: v1
+description: test helm chart for testing helm rules
+name: external-deps
+version: 0.0.1
