@@ -2,20 +2,23 @@ package(default_visibility = ["//visibility:private"])
 
 load(":helm_toolchain.bzl", "helm_toolchain")
 
-toolchain_type(name = "toolchain_type", visibility = ["//visibility:public"])
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
 
 # Helm toolchain that points to helm binary version 2.17.0
 helm_toolchain(
     name = "helm_v2.17.0_darwin",
-    tool = "@helm_v2.17.0_darwin//:helm",
     helm_version = "2.17.0",
+    tool = "@helm_v2.17.0_darwin//:helm",
     visibility = ["//visibility:public"],
 )
 
 helm_toolchain(
     name = "helm_v2.17.0_linux",
-    tool = "@helm_v2.17.0_linux//:helm",
     helm_version = "2.17.0",
+    tool = "@helm_v2.17.0_linux//:helm",
     visibility = ["//visibility:public"],
 )
 
@@ -36,7 +39,7 @@ toolchain(
 toolchain(
     name = "helm_v2.17.0_osx_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
     ],
     toolchain = ":helm_v2.17.0_darwin",
     toolchain_type = ":toolchain_type",
