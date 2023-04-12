@@ -2,10 +2,17 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 def sops_repositories():
   http_file(
-    name = "sops_darwin",
-    # sha256 = "795f03364ed8499d169505021b443226b5a9ee9e8a58f560188a133870d194c9",
-    urls = ["https://github.com/mozilla/sops/releases/download/v3.7.1/sops-v3.7.1.darwin"],
-    executable = True
+    name = "sops_darwin_amd64",
+    sha256 = "",
+    urls = ["https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.amd64"],
+    executable = True,
+  )
+
+  http_file(
+    name = "sops_darwin_arm64",
+    sha256 = "",
+    urls = ["https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.arm64"],
+    executable = True,
   )
 
   http_file(

@@ -35,7 +35,8 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/kubectl:kubectl_osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/sops:sops_linux_toolchain",
-    "@com_github_masmovil_bazel_rules//toolchains/sops:sops_osx_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/sops:sops_osx_amd64_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/sops:sops_osx_arm64_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/sops:sops_windows_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/gpg:gpg_osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/gpg:gpg_linux_toolchain"

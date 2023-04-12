@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:private"])
 
 load(":kubectl_toolchain.bzl", "kubectl_toolchain")
 
-toolchain_type(name = "toolchain_type", visibility = ["//visibility:public"])
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
 
 # Helm toolchain that points to helm binary version 2.13.0
 kubectl_toolchain(
@@ -34,7 +37,7 @@ toolchain(
 toolchain(
     name = "kubectl_osx_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
     ],
     toolchain = ":kubectl_darwin",
     toolchain_type = ":toolchain_type",
