@@ -41,7 +41,7 @@ toolchain(
 toolchain(
     name = "yq_osx_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
     ],
     toolchain = ":yq_osx",
     toolchain_type = ":toolchain_type",
