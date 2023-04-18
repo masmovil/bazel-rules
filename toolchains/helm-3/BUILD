@@ -21,7 +21,7 @@ toolchain(
 toolchain(
     name = "helm_v3.8.0_osx_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
     ],
     toolchain = "@helm_toolchain_configure//:helm_v3.8.0_darwin",
     toolchain_type = ":toolchain_type",
