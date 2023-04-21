@@ -7,6 +7,8 @@ This repository contains Bazel rules to install and manipulate Helm charts with 
 This repo implements the following bazel rules:
  `helm_chart`
  `helm_push`
+ `helm_diff`
+ `helm_lint`
  `helm_release`
  `sops_decrypt`
  `k8s_namespace`
@@ -47,11 +49,18 @@ mm_repositories()
 After the intial setup, you can use the rules including them in your BUILD files:
 
 ```python
-load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push", "helm_release")
+load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_diff", "helm_lint", "helm_push", "helm_release")
 
 helm_chart(
     name = "my_chart",
     srcs = glob(["**"]),
+    ...
+)
+
+helm_lint(
+    name = "my_lint",
+    chart = ":mychart",
+    release_name = "awesome",
     ...
 )
 
@@ -62,9 +71,17 @@ helm_push(
 )
 
 helm_release(
-    name = "my_chart_push",
+    name = "my_chart_release",
+    release_name = "awesome",
     ...
 )
+
+# I diff after the first release
+helm_diff(
+    name = "my_diff",
+    chart = ":mychart",
+    release_name = "awesome",
+    ...
 ```
 
 These rules use [yq library](https://yq.readthedocs.io/en/latest/) to perform substitions in helm YAML templates. The binaries are preloaded by this rule using bazel toolchains, so you don't need have yq available in your path.
@@ -145,6 +162,159 @@ helm_chart(
 )
 ```
 These variables have to be "exported" by the `status.sh` file defined in your project root dir.
+
+### helm_diff
+
+`helm_diff` is used to build and compare the new chart with the currently-running service; this can help determine the actual difference to the running service after making some changes in code: either checking for impact, or confirming that a refactor has an expected level of change to the service.
+
+`Helm 3` is supported; `Helm 2` is not tested.
+
+This rule is an executable. It needs `run` instead of `build` to be invoked.
+
+It relies in existing local kubernetes config (`~/.kube/config`).
+
+Example of use:
+```python
+# partial sample of chart with matching values
+helm_chart(
+    name = "dogchart",
+    ...
+)
+
+sops_decrypt(
+    name = "dogpark_secrets",
+
+    srcs = [":secrets.yaml"],
+    sops_yaml = ":sops-dogpark.yaml",
+
+    tags = ["manual"],
+)
+
+
+# partial sample of release with matching values
+helm_release(
+    name="release",
+
+    chart = ":dogchart",
+    helm_version="v3",
+    release_name = "dogparkservice",
+    values_yaml = [ ":dogpark_secrets", ":values.yaml" ],
+    kubernetes_context = "prod",
+    ...
+)
+
+# full example of diff
+helm_diff(
+    name = "dogdiff",
+    chart = ":dogchart",
+    helm_version="v3",
+    release_name = "dogparkservice",
+    secrets_yaml = ":secrets.yaml",
+    sops_yaml = ":sops-dogpark.yaml",
+    values_yaml = [ ":dogpark_secrets", ":values.yaml" ],
+    kubernetes_context = "prod",
+
+    tags = ["manual"],
+)
+```
+
+This markup would allow a fictional `bazel run //path/prod:release` before a change to be followed
+by a `bazel run //path/prod:dogdiff` (although in practice I just use "diff" here, but I've expanded
+that to be more explicit).  Notice that many of the `helm_release()` attributes are echoed to
+`helm_diff()` and that both `helm_diff` and `helm_release` may need a `--action_env=HOME` so that
+the underlying `helm` can find your ${HOME}/.kube/config to find the target cluster.
+
+The following attributes are accepted by the rule (some of them are mandatory).  Note that some
+will mark these `tags = ["manual"]` to cause the rule to only be used when explicitly stated rather
+than a wildcard.  This can be especially helpful when some developers lack SOPS permission on
+sensitive enviroments (ie prod).
+
+|  Attribute | Mandatory| Default | Notes |
+| ---------- | --- | ------ | -------------- |
+| chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
+| namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. |
+| release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
+| values_yaml | no | - | Several values files can be passed similar to a `helm_release()` -- for an accurate comparison, the same values files as the `helm_release()`. |
+| helm_version | no | "" | Force the use of helm v3 to deploy the release. Can be used to try v2. |
+| kubernetes_context | no | "" | Context of kubernetes cluster |
+
+
+### helm_lint
+
+`helm_lint` is a convenience function to stage the given chart for a `helm lint`; this simply makes it easier to do the "helm lint" of a chart, with the goal of reducing the burden to linting charts.  This is useful to avoid certain basic errors.
+
+`Helm 3` is supported; `Helm 2` is not tested.
+
+This rule is an executable. It needs `run` instead of `build` to be invoked.
+
+It relies in existing local kubernetes config (`~/.kube/config`).
+
+Example of use:
+```python
+# partial sample of chart with matching values
+helm_chart(
+    name = "dogchart",
+    ...
+)
+
+sops_decrypt(
+    name = "dogpark_secrets",
+
+    srcs = [":secrets.yaml"],
+    sops_yaml = ":sops-dogpark.yaml",
+
+    tags = ["manual"],
+)
+
+
+# partial sample of release with matching values
+helm_release(
+    name="release",
+
+    chart = ":dogchart",
+    helm_version="v3",
+    release_name = "dogparkservice",
+    values_yaml = [ ":dogpark_secrets", ":values.yaml" ],
+    kubernetes_context = "prod",
+    ...
+)
+
+# full example of lint
+helm_lint(
+    name = "doglint",
+    chart = ":dogchart",
+    helm_version="v3",
+    release_name = "dogparkservice",
+    secrets_yaml = ":secrets.yaml",
+    sops_yaml = ":sops-dogpark.yaml",
+    values_yaml = [ ":dogpark_secrets", ":values.yaml" ],
+    kubernetes_context = "prod",
+
+    tags = ["manual"],
+)
+```
+
+This markup would allow a fictional `bazel run //path/prod:release` before a change to be followed
+by a `bazel run //path/prod:doglint` (although in practice I just use "lint" here, but I've expanded
+that to be more explicit).  Notice that many of the `helm_release()` attributes are echoed to
+`helm_lint()` and that both `helm_lint` and `helm_release` may need a `--action_env=HOME` so that
+the underlying `helm` can find your ${HOME}/.kube/config to find the target cluster.
+
+This is intentionally very similar to both `helm_release` and `helm_diff`.
+
+The following attributes are accepted by the rule (some of them are mandatory).  Note that some
+will mark these `tags = ["manual"]` to cause the rule to only be used when explicitly stated rather
+than a wildcard.  This can be especially helpful when some developers lack SOPS permission on
+sensitive enviroments (ie prod).
+
+|  Attribute | Mandatory| Default | Notes |
+| ---------- | --- | ------ | -------------- |
+| chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
+| release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
+| values_yaml | no | - | Several values files can be passed similar to a `helm_release()` -- for an accurate comparison, the same values files as the `helm_release()`. |
+| helm_version | no | "" | Force the use of helm v3 to deploy the release. Can be used to try v2. |
+| kubernetes_context | no | "" | Context of kubernetes cluster |
+
 
 ### helm_push
 
@@ -231,6 +401,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 | values_yaml | no | - | Several values files can be passed when installing release |
 | helm_version | no | "" | Force the use of helm v2 or v3 to deploy the release. The attribute can be set to **v2** or **v3** |
 | kubernetes_context | no | "" | Context of kubernetes cluster |
+
 
 ## Sops rules
 Decrypting secrets using [sops](https://github.com/mozilla/sops) is now supported.
