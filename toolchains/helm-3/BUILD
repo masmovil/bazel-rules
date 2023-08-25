@@ -19,7 +19,7 @@ toolchain(
 )
 
 toolchain(
-    name = "helm_v3.12.2_linux_arm_toolchain",
+    name = "helm_v3.12.2_linux_arm64_toolchain",
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
@@ -28,7 +28,7 @@ toolchain(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
-    toolchain = "@helm_toolchain_configure//:helm_v3.12.2_linux_arm",
+    toolchain = "@helm_toolchain_configure//:helm_v3.12.2_linux_arm64",
     toolchain_type = ":toolchain_type",
 )
 
@@ -42,10 +42,10 @@ toolchain(
 )
 
 toolchain(
-    name = "helm_v3.12.2_osx_arm_toolchain",
+    name = "helm_v3.12.2_osx_arm64_toolchain",
     target_compatible_with = [
         "@platforms//os:osx",
     ],
-    toolchain = "@helm_toolchain_configure//:helm_v3.12.2_darwin_arm",
+    toolchain = "@helm_toolchain_configure//:helm_v3.12.2_darwin_arm64",
     toolchain_type = ":toolchain_type",
 )

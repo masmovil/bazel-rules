@@ -23,7 +23,7 @@ def helm_repositories():
   )
 
   http_archive(
-    name = "helm_v3.12.2_darwin_arm",
+    name = "helm_v3.12.2_darwin_arm64",
     sha256 = "b60ee16847e28879ae298a20ba4672fc84f741410f438e645277205824ddbf55",
     urls = ["https://get.helm.sh/helm-v3.12.2-darwin-arm64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",
@@ -37,7 +37,7 @@ def helm_repositories():
   )
 
   http_archive(
-    name = "helm_v3.12.2_linux_arm",
+    name = "helm_v3.12.2_linux_arm64",
     sha256 = "cfafbae85c31afde88c69f0e5053610c8c455826081c1b2d665d9b44c31b3759",
     urls = ["https://get.helm.sh/helm-v3.12.2-linux-arm64.tar.gz"],
     build_file = "@com_github_masmovil_bazel_rules//:helm.BUILD",

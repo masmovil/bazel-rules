@@ -16,7 +16,7 @@ helm_toolchain(
 )
 
 helm_toolchain(
-    name = "helm_v3.12.2_darwin_arm",
+    name = "helm_v3.12.2_darwin_arm64",
     tool = "@helm_v3.12.2_darwin_arm//:helm",
     helm_version = "3.4.1",
     helm_xdg_data_home = "%{HOME}/Library",
@@ -36,7 +36,7 @@ helm_toolchain(
 )
 
 helm_toolchain(
-    name = "helm_v3.12.2_linux_arm",
+    name = "helm_v3.12.2_linux_arm64",
     tool = "@helm_v3.12.2_linux_arm//:helm",
     helm_version = "3.4.1",
     helm_xdg_data_home = "%{HOME}/.local/share",

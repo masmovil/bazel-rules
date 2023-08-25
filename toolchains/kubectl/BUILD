@@ -32,7 +32,7 @@ toolchain(
 )
 
 toolchain(
-    name = "kubectl_linux_arm_toolchain",
+    name = "kubectl_linux_arm64_toolchain",
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
@@ -41,7 +41,7 @@ toolchain(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
-    toolchain = ":kubectl_linux_arm",
+    toolchain = ":kubectl_linux_arm64",
     toolchain_type = ":toolchain_type",
 )
 
@@ -55,10 +55,10 @@ toolchain(
 )
 
 toolchain(
-    name = "kubectl_osx_toolchain_arm",
+    name = "kubectl_osx_arm64_toolchain",
     target_compatible_with = [
         "@platforms//os:osx",
     ],
-    toolchain = ":kubectl_darwin_arm",
+    toolchain = ":kubectl_darwin_arm64",
     toolchain_type = ":toolchain_type",
 )
