@@ -26,7 +26,9 @@ def repositories():
     # Register the default docker toolchain that expects the 'docker'
     # executable to be in the PATH
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_linux_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/yq:yq_linux_arm64_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_osx_toolchain",
+    "@com_github_masmovil_bazel_rules//toolchains/yq:yq_osx_arm64_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_windows_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm:helm_v2.17.0_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm:helm_v2.17.0_osx_toolchain",
