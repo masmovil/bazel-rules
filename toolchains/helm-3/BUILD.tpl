@@ -37,7 +37,7 @@ helm_toolchain(
 
 helm_toolchain(
     name = "helm_v3.12.2_linux_arm64",
-    tool = "@helm_v3.12.2_linux_arm//:helm",
+    tool = "@helm_v3.12.2_linux_arm64//:helm",
     helm_version = "3.4.1",
     helm_xdg_data_home = "%{HOME}/.local/share",
     helm_xdg_config_home = "%{HOME}/.config",
