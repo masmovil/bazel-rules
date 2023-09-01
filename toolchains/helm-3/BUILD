@@ -36,7 +36,6 @@ toolchain(
     name = "helm_v3.12.2_osx_toolchain",
     target_compatible_with = [
         "@platforms//os:osx",
-        "@platforms//cpu:x86_64",
     ],
     toolchain = "@helm_toolchain_configure//:helm_v3.12.2_darwin",
     toolchain_type = ":toolchain_type",
