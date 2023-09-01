@@ -73,7 +73,7 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
 
     # appends @sha256 suffix to image repo url value if the repository value does not already contains it
     if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
-        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = "${REPO_URL}${REPO_SUFIX}"' {CHART_VALUES_PATH}
+        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = ${REPO_URL}${REPO_SUFIX}' {CHART_VALUES_PATH}
     fi
 fi
 
