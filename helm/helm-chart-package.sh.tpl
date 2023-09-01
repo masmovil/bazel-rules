@@ -39,13 +39,13 @@ if  [ -z $DIGEST_PATH ]; then
 
     # Image repository is provided as a static value
     if [ "$IMAGE_REPOSITORY" != "" ] && [ -n $IMAGE_REPOSITORY ]; then
-        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = "$IMAGE_REPOSITORY"' {CHART_VALUES_PATH}
+        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = $IMAGE_REPOSITORY' {CHART_VALUES_PATH}
         echo "Replaced image repository in chart values.yaml with: $IMAGE_REPOSITORY"
     fi
 
     # Image tag is provided as a static value
     if [ "$IMAGE_TAG" != "" ] && [ -n $IMAGE_TAG ]; then
-        {YQ_PATH} -i '.{VALUES_TAG_YAML_PATH} = "$IMAGE_TAG"' {CHART_VALUES_PATH}
+        {YQ_PATH} -i '.{VALUES_TAG_YAML_PATH} = $IMAGE_TAG' {CHART_VALUES_PATH}
         echo "Replaced image tag in chart values.yaml with: $IMAGE_TAG"
     fi
 
@@ -58,7 +58,7 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     IFS=':' read -ra digest_split <<< "$DIGEST"
     DIGEST_SHA=${digest_split[1]}
 
-    {YQ_PATH} -i '.{VALUES_TAG_YAML_PATH} = "$DIGEST_SHA"' {CHART_VALUES_PATH}
+    {YQ_PATH} -i '.{VALUES_TAG_YAML_PATH} = $DIGEST_SHA' {CHART_VALUES_PATH}
 
     echo "Replaced image tag in chart values.yaml with: $DIGEST_SHA"
 
@@ -73,7 +73,7 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
 
     # appends @sha256 suffix to image repo url value if the repository value does not already contains it
     if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
-        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = ${REPO_URL}${REPO_SUFIX}' {CHART_VALUES_PATH}
+        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = $REPO_URL$REPO_SUFIX' {CHART_VALUES_PATH}
     fi
 fi
 
