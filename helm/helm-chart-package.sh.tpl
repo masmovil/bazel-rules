@@ -68,12 +68,12 @@ if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
         REPO_URL="{IMAGE_REPOSITORY}"
     else
         # if image_repository attr is not provided, extract it from values.yaml
-        REPO_URL=$({YQ_PATH} "{VALUES_REPO_YAML_PATH}" {CHART_VALUES_PATH})
+        REPO_URL=$({YQ_PATH} .{VALUES_REPO_YAML_PATH} {CHART_VALUES_PATH})
     fi
 
     # appends @sha256 suffix to image repo url value if the repository value does not already contains it
     if ([ -n $REPO_URL ] || [ -n $REPO_SUFIX ]) && ([[ $REPO_URL != *"$REPO_SUFIX" ]] || [[ -z "$REPO_SUFIX" ]]); then
-        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = $REPO_URL$REPO_SUFIX' {CHART_VALUES_PATH}
+        {YQ_PATH} -i '.{VALUES_REPO_YAML_PATH} = ${REPO_URL}${REPO_SUFIX}' {CHART_VALUES_PATH}
     fi
 fi
 
