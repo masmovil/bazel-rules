@@ -30,8 +30,6 @@ def repositories():
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_osx_arm64_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/yq:yq_windows_toolchain",
-    "@com_github_masmovil_bazel_rules//toolchains/helm:helm_v2.17.0_linux_toolchain",
-    "@com_github_masmovil_bazel_rules//toolchains/helm:helm_v2.17.0_osx_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm-3:helm_v3.12.2_linux_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm-3:helm_v3.12.2_linux_arm64_toolchain",
     "@com_github_masmovil_bazel_rules//toolchains/helm-3:helm_v3.12.2_osx_toolchain",

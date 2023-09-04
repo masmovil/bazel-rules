@@ -26,8 +26,8 @@ def _helm_release_impl(ctx):
         secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
         sops_yaml = Sops file if secrets_yaml is provided
     """
-    helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()
-    helm_path = helm_binary[0].path
+    helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()
+    helm_path = helm3_binary[0].path
     helm3_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()
     helm3_path = helm3_binary[0].path
     kubectl_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.tool.files.to_list()
@@ -118,7 +118,6 @@ helm_release = rule(
     },
     doc = "Installs or upgrades a new helm release",
     toolchains = [
-        "@com_github_masmovil_bazel_rules//toolchains/helm:toolchain_type",
         "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
         "@com_github_masmovil_bazel_rules//toolchains/kubectl:toolchain_type"
     ],
