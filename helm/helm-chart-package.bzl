@@ -68,6 +68,11 @@ def _helm_chart_impl(ctx):
                 inputs = [srcfile],
                 arguments = [srcfile.path, out.path],
                 command = "cp $1 $2",
+                execution_requirements = {
+                    "local": "1",
+                    "no-remote-exec": "1",
+                    "no-remote": "1",
+                },
             )
 
     if tmp_chart_root == "":
@@ -94,6 +99,11 @@ def _helm_chart_impl(ctx):
             inputs = dep[DefaultInfo].files,
             arguments = [dep[DefaultInfo].files.to_list()[0].path, out.path],
             command = "cp -f $1 $2; tar -C $(dirname $2) -xzf $2",
+            execution_requirements = {
+                "local": "1",
+                "no-remote-exec": "1",
+                "no-remote": "1",
+            },
         )
 
     additional_templates = ctx.attr.additional_templates or []
@@ -110,6 +120,11 @@ def _helm_chart_impl(ctx):
                 inputs = [file],
                 arguments = [file.path, out.path],
                 command = "cp $1 $2",
+                execution_requirements = {
+                    "local": "1",
+                    "no-remote-exec": "1",
+                    "no-remote": "1",
+                },
             )
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
