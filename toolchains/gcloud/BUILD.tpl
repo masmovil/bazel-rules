@@ -53,7 +53,7 @@ toolchain(
 toolchain(
     name = "gcloud_osx_arm64_toolchain",
     exec_compatible_with = [
-        "@platforms//os:osx"
+        "@platforms//os:osx",
         "@platforms//cpu:arm64",
     ],
     toolchain = ":gcloud_darwin",
