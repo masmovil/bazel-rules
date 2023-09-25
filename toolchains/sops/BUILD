@@ -76,7 +76,7 @@ toolchain(
 toolchain(
     name = "sops_osx_arm64_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
         "@platforms//cpu:arm64",
     ],
     toolchain = ":sops_darwin_arm64",
