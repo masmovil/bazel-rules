@@ -1,0 +1,24 @@
+load("//repositories:repositories.bzl", "repositories")
+
+module(name = "masmovil_bazel_rules", version = "1.0")
+
+bazel_dep(name = "platforms", version = "0.0.7")
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
+
+# BEGIN: oci docker images
+bazel_dep(name = "rules_oci", version = "1.4.0")
+
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+
+oci.pull(
+    name = "nginx",
+    image = "europe-docker.pkg.dev/mm-mysim-prod/container-images/php_base",
+    digest = "sha256:df32dc3db450e6af0adfc3cec3670f8d1a7f85bb8abb68c15865299984c1bb5a",
+)
+
+# For each oci.pull call, repeat the "name" here to expose them as dependencies.
+use_repo(oci, "nginx")
+# END: oci docker images
+
+
+repositories()
