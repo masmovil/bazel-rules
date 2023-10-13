@@ -1,6 +1,5 @@
-load("//repositories:repositories.bzl", "repositories")
 
-module(name = "masmovil_bazel_rules", version = "1.0")
+module(name = "masmovil_bazel_rules", version = "2.0")
 
 bazel_dep(name = "platforms", version = "0.0.7")
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
@@ -19,6 +18,3 @@ oci.pull(
 # For each oci.pull call, repeat the "name" here to expose them as dependencies.
 use_repo(oci, "nginx")
 # END: oci docker images
-
-
-repositories()
