@@ -2,38 +2,33 @@ workspace(name = "com_github_masmovil_bazel_rules")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Download the rules_docker repository at release v0.9.0
 http_archive(
-    name = "io_bazel_rules_docker",
-    sha256 = "b1e80761a8a8243d03ebca8845e9cc1ba6c82ce7c5179ce2b295cd36f7e394bf",
-    strip_prefix = "rules_docker-0.16.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.16.0/rules_docker-v0.16.0.tar.gz"],
+    name = "rules_oci",
+    sha256 = "21a7d14f6ddfcb8ca7c5fc9ffa667c937ce4622c7d2b3e17aea1ffbc90c96bed",
+    strip_prefix = "rules_oci-1.4.0",
+    url = "https://github.com/bazel-contrib/rules_oci/releases/download/v1.4.0/rules_oci-v1.4.0.tar.gz",
 )
 
-load(
-    "@io_bazel_rules_docker//repositories:repositories.bzl",
-    container_repositories = "repositories",
+load("@rules_oci//oci:dependencies.bzl", "rules_oci_dependencies")
+
+rules_oci_dependencies()
+
+load("@rules_oci//oci:repositories.bzl", "LATEST_CRANE_VERSION", "LATEST_ZOT_VERSION", "oci_register_toolchains")
+
+oci_register_toolchains(
+    name = "oci",
+    crane_version = LATEST_CRANE_VERSION,
 )
-container_repositories()
 
-# This is NOT needed when going through the language lang_image
-# "repositories" function(s).
-load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+load("@rules_oci//oci:pull.bzl", "oci_pull")
 
-container_deps()
+oci_pull(
+    name = "nginx",
+    image = "europe-docker.pkg.dev/mm-mysim-prod/container-images/php_base",
+    digest = "sha256:df32dc3db450e6af0adfc3cec3670f8d1a7f85bb8abb68c15865299984c1bb5a",
+)
+
 
 load("//repositories:repositories.bzl", "repositories")
 
 repositories()
-
-load(
-    "@io_bazel_rules_docker//container:container.bzl",
-    "container_pull",
-)
-
-container_pull(
-  name = "nginx",
-  registry = "eu.gcr.io",
-  repository = "mm-cloudbuild/mysim/tomcat",
-  digest = "sha256:b72b782acb1069b5ac5eda64251faa4879bd4a17e9364d8688ec0570f06ae3ff"
-)

@@ -1,0 +1,4 @@
+
+load("//repositories:repositories.bzl", "repositories")
+
+repositories()
