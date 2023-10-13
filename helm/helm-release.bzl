@@ -1,10 +1,3 @@
-# Load docker image providers
-load(
-    "@io_bazel_rules_docker//container:providers.bzl",
-    "ImageInfo",
-    "LayerInfo",
-)
-
 load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 load("//k8s:k8s.bzl", "NamespaceDataInfo")
 

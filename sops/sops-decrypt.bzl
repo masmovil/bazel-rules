@@ -8,7 +8,6 @@ def declare_output(ctx, f, outputs):
   outputs.append(out)
   return out.path
 
-# Load docker image providers
 def _sops_decrypt_impl(ctx):
     """This impl. allows reference and decrypt secrets.yaml files using mozilla sops
     Args:

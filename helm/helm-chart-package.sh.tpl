@@ -51,7 +51,7 @@ if  [ -z $DIGEST_PATH ]; then
 
 fi
 
-# Application docker image is provided by other docker bazel rule
+# Application docker image is provided by an oci_image bazel rule
 if [ -n $DIGEST_PATH ] && [ "$DIGEST_PATH" != "" ]; then
     # extracts the digest sha and removes 'sha256' text from it
     DIGEST=$(cat {DIGEST_PATH})

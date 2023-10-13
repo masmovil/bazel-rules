@@ -1,9 +1,3 @@
-# Load docker image providers
-load(
-    "@io_bazel_rules_docker//container:providers.bzl",
-    "ImageInfo",
-    "LayerInfo",
-)
 load("//helpers:helpers.bzl", "get_make_value_or_default", "write_sh")
 
 ChartInfo = provider(fields = [
@@ -75,9 +69,9 @@ def _helm_chart_impl(ctx):
 
     # extract docker image info from dependency rule
     if ctx.attr.image:
-        digest_file = ctx.attr.image[ImageInfo].container_parts["digest"]
+        digest_file = ctx.file.image
         digest_path = digest_file.path
-        inputs = inputs + [ctx.file.image, digest_file]
+        inputs = inputs + [digest_file]
     else:
         # extract docker image info from make variable or from rule attribute
         image_tag = get_make_value_or_default(ctx, ctx.attr.image_tag)

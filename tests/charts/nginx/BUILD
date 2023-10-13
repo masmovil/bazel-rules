@@ -3,12 +3,29 @@ package(default_visibility = ["//visibility:public"])
 load("//helm:helm.bzl", "helm_chart", "helm_release", "helm_push")
 load("//k8s:k8s.bzl", "k8s_namespace")
 load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push")
+
+oci_image(
+  name = "nginx",
+  base = "@nginx"
+)
+
 
 helm_chart(
   name = "nginx_chart",
   srcs = glob(["**"]),
   image_tag  = "latest",
   image_repository  = "nginx",
+  helm_chart_version = "1.0.0",
+  package_name = "nginx",
+  values_tag_yaml_path = "image.tag",
+  values_repo_yaml_path = "image.repository"
+)
+
+helm_chart(
+  name = "nginx_chart_image",
+  srcs = glob(["**"]),
+  image  = ":nginx",
   helm_chart_version = "1.0.0",
   package_name = "nginx",
   values_tag_yaml_path = "image.tag",
