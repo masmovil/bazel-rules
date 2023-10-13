@@ -22,9 +22,9 @@ def _helm_chart_impl(ctx):
     image_tag = ""
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
     app_version = get_make_value_or_default(ctx, ctx.attr.app_version or helm_chart_version)
-    yq = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
+    yq = ctx.toolchains["@masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
     stamp_files = [ctx.info_file, ctx.version_file]
-    helm_toolchain = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo
+    helm_toolchain = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo
     helm = helm_toolchain.tool.files.to_list()[0]
     helm_cache_path = helm_toolchain.helm_xdg_cache_home
     helm_config_path = helm_toolchain.helm_xdg_config_home
@@ -174,8 +174,8 @@ helm_chart = rule(
         "additional_templates": attr.label_list(allow_files = True, mandatory = False),
     },
     toolchains = [
-        "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
-        "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
+        "@masmovil_bazel_rules//toolchains/yq:toolchain_type",
+        "@masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
     ],
     doc = "Runs helm packaging updating the image tag on it",
 )

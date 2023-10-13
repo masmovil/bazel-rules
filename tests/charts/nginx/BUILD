@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("//helm:helm.bzl", "helm_chart", "helm_release", "helm_push")
 load("//k8s:k8s.bzl", "k8s_namespace")
-load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
+load("@masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push")
 
 oci_image(

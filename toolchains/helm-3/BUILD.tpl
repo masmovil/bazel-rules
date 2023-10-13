@@ -3,7 +3,7 @@ This BUILD file is auto-generated from toolchains/helm-3/BUILD.tpl
 """
 package(default_visibility = ["//visibility:public"])
 
-load("@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain.bzl", "helm_toolchain")
+load("@masmovil_bazel_rules//toolchains/helm-3:toolchain.bzl", "helm_toolchain")
 
 helm_toolchain(
     name = "helm_v3.8.0_darwin",

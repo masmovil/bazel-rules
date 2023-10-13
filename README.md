@@ -31,14 +31,14 @@ In your Bazel `WORKSPACE` file, after the [rules_docker](https://github.com/baze
 
 ```python
 git_repository(
-    name = "com_github_masmovil_bazel_rules",
+    name = "masmovil_bazel_rules",
     # tag = "0.2.2",
     commit = "commit-ref",
     remote = "https://github.com/masmovil/bazel-rules.git",
 )
 
 load(
-    "@com_github_masmovil_bazel_rules//repositories:repositories.bzl",
+    "@masmovil_bazel_rules//repositories:repositories.bzl",
     mm_repositories = "repositories",
 )
 mm_repositories()
@@ -47,7 +47,7 @@ mm_repositories()
 After the intial setup, you can use the rules including them in your BUILD files:
 
 ```python
-load("@com_github_masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push", "helm_release")
+load("@masmovil_bazel_rules//helm:helm.bzl", "helm_chart", "helm_push", "helm_release")
 
 helm_chart(
     name = "my_chart",
@@ -238,7 +238,7 @@ Decrypting secrets using [sops](https://github.com/mozilla/sops) is now supporte
 To install `sops_decrypt` rule, import in your `BUILD.bazel`
 
 ```python
-load("@com_github_masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
+load("@masmovil_bazel_rules//sops:sops.bzl", "sops_decrypt")
 ```
 
 ### sops_decrypt
@@ -305,7 +305,7 @@ bazel build :decrypt_secret_files --action_env=GOOGLE_APPLICATION_CREDENTIALS=${
 Import in your `BUILD.bazel`
 
 ```python
-load("@com_github_masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
+load("@masmovil_bazel_rules//k8s:k8s.bzl", "k8s_namespace")
 
 ```
 
@@ -369,7 +369,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 Import in your `BUILD.bazel`
 
 ```python
-load("@com_github_masmovil_bazel_rules//gcs:gcs.bzl", "gcs_upload")
+load("@masmovil_bazel_rules//gcs:gcs.bzl", "gcs_upload")
 
 ```
 

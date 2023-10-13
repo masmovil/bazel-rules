@@ -6,7 +6,7 @@ def _gcloud_toolchain_configure_impl(repository_ctx):
 
     repository_ctx.template(
         "BUILD.bazel",
-        Label("@com_github_masmovil_bazel_rules//toolchains/gcloud:BUILD.tpl"),
+        Label("@masmovil_bazel_rules//toolchains/gcloud:BUILD.tpl"),
         {
             "%{VERSION}": gcloud_version,
         },
@@ -33,28 +33,28 @@ def gcloud_configure(version, linux_sha, darwin_sha, windows_sha, darwin_arm64_s
         name = "gcloud_linux",
         sha256 = linux_sha,
         urls = ["https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-{version}-linux-x86_64.tar.gz".format(version = version)],
-        build_file = "@com_github_masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
+        build_file = "@masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
     )
 
     http_archive(
         name = "gcloud_darwin",
         sha256 = darwin_sha,
         urls = ["https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-{version}-darwin-x86_64.tar.gz".format(version = version)],
-        build_file = "@com_github_masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
+        build_file = "@masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
     )
 
     http_archive(
         name = "gcloud_darwin_arm64",
         sha256 = darwin_arm64_sha,
         urls = ["https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-{version}-darwin-arm.tar.gz".format(version = version)],
-        build_file = "@com_github_masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
+        build_file = "@masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
     )
 
     http_archive(
         name = "gcloud_windows",
         sha256 = windows_sha,
         urls = ["https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-{version}-windows-x86_64.zip".format(version = version)],
-        build_file = "@com_github_masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
+        build_file = "@masmovil_bazel_rules//toolchains/gcloud:gcloud.BUILD",
     )
 
     native.register_toolchains(

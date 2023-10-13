@@ -60,9 +60,9 @@ def _helm_push_impl(ctx):
 
     if ctx.attr.repo_type == "gcp_artifact_registry":
         chart_path = chart.short_path
-        helm_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()[0]
-        gcloud_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud
-        yq_binary = ctx.toolchains["@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
+        helm_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()[0]
+        gcloud_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud
+        yq_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
 
         inputs = [helm_binary, gcloud_binary, yq_binary]
         #sets up values for the Artifact Registry API call
@@ -171,9 +171,9 @@ helm_push = rule(
     },
     doc = "Push helm chart to a helm repository",
     toolchains = [
-        "@com_github_masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
-        "@com_github_masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
-        "@com_github_masmovil_bazel_rules//toolchains/yq:toolchain_type",
+        "@masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
+        "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
+        "@masmovil_bazel_rules//toolchains/yq:toolchain_type",
     ],
     executable = True,
 )

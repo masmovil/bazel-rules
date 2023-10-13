@@ -5,7 +5,7 @@ Internal definitions may change without notice.
 """
 
 load(
-    "@com_github_masmovil_bazel_rules//toolchains/gcloud:repositories.bzl",
+    "@masmovil_bazel_rules//toolchains/gcloud:repositories.bzl",
     _gcloud_configure = "gcloud_configure",
 )
 
