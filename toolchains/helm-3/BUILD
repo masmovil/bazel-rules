@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:private"])
 
 load(":toolchain.bzl", "helm_toolchain")
 
-toolchain_type(name = "toolchain_type")
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"]
+)
 
 toolchain(
     name = "helm_v3.6.2_linux_toolchain",
