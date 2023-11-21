@@ -60,11 +60,11 @@ def _helm_push_impl(ctx):
 
     if ctx.attr.repo_type == "gcp_artifact_registry":
         chart_path = chart.short_path
-        helm_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()[0]
-        gcloud_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud
-        yq_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/yq:toolchain_type"].yqinfo.tool.files.to_list()[0]
+        helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
+        gcloud_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud_bin
+        yq_bin = ctx.toolchains["@aspect_bazel_lib//lib:yq_toolchain_type"].yqinfo.bin
 
-        inputs = [helm_binary, gcloud_binary, yq_binary]
+        inputs = [helm_bin, gcloud_bin, yq_bin]
         #sets up values for the Artifact Registry API call
         #splits the repo_name as passed to this rule ("mm-provision-dev/charts"), to extract the GCP project - index 0 and the Artifact Registry repo name - index 1
         gcp_project = repo_name.split("/")[0]
@@ -99,7 +99,7 @@ def _helm_push_impl(ctx):
             fi
 
             # Read package name
-            PACKAGE_NAME=$({YQ_BINARY} r $CHART_YAML name)
+            PACKAGE_NAME=$({YQ_BIN} r $CHART_YAML name)
             YQ_EXIT_CODE=$?
             if [ $YQ_EXIT_CODE != 0 ]; then
                 echo "Could not detect package name. Not pushing ... Exiting with code: $YQ_EXIT_CODE (from YQ)"
@@ -107,7 +107,7 @@ def _helm_push_impl(ctx):
             fi
 
             # Read package version
-            DETECTED_PACKAGE_VERSION=$({YQ_BINARY} r $CHART_YAML version)
+            DETECTED_PACKAGE_VERSION=$({YQ_BIN} r $CHART_YAML version)
             YQ_EXIT_CODE=$?
             if [ $YQ_EXIT_CODE != 0 ]; then
                 echo "Could not detect package version. Not pushing ... Exiting with code: $YQ_EXIT_CODE (from YQ)"
@@ -131,9 +131,9 @@ def _helm_push_impl(ctx):
             "{CHART_PATH}": chart_path,
             "{REPOSITORY_URL}": repo_url,
             "{REPOSITORY_NAME}": repo_name,
-            "{HELM_BINARY}": helm_binary.path,
-            "{GCLOUD_BINARY}": gcloud_binary.path,
-            "{YQ_BINARY}": yq_binary.path,
+            "{HELM_BINARY}": helm_bin.path,
+            "{GCLOUD_BINARY}": gcloud_bin.path,
+            "{YQ_BIN}": yq_bin.path,
             "{GCP_PROJECT}": gcp_project,
             "{GCP_LOCATION}": gcp_location,
             "{REPO_NAME_INSIDE_GCP_PROJECT}": repo_name_inside_gcp_project,
@@ -171,9 +171,9 @@ helm_push = rule(
     },
     doc = "Push helm chart to a helm repository",
     toolchains = [
-        "@masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
+        "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
         "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
-        "@masmovil_bazel_rules//toolchains/yq:toolchain_type",
+        "@aspect_bazel_lib//lib:yq_toolchain_type",
     ],
     executable = True,
 )

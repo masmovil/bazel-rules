@@ -19,21 +19,16 @@ def _helm_release_impl(ctx):
         secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
         sops_yaml = Sops file if secrets_yaml is provided
     """
-    helm_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.tool.files.to_list()
-    helm_path = helm_binary[0].path
-    helm3_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm-3:toolchain_type"].helminfo.tool.files.to_list()
-    helm3_path = helm3_binary[0].path
-    kubectl_binary = ctx.toolchains["@masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.tool.files.to_list()
-    kubectl_path = kubectl_binary[0].path
+    helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
 
     chart = ctx.file.chart
     tiller_namespace = ctx.attr.tiller_namespace
     release_name = ctx.attr.release_name
-    helm_version = ctx.attr.helm_version or ""
     kubernetes_context = ctx.attr.kubernetes_context
     create_namespace = ctx.attr.create_namespace
     wait = ctx.attr.wait
     stamp_files = [ctx.info_file, ctx.version_file]
+    namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
 
     values_yaml = ""
     for i, values_yaml_file in enumerate(ctx.files.values_yaml):
@@ -41,13 +36,6 @@ def _helm_release_impl(ctx):
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
 
-    if ctx.attr.namespace_dep:
-        namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace
-    else:
-        if ctx.attr.namespace:
-            namespace = ctx.attr.namespace
-        else:
-            namespace = "default"
 
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
@@ -57,13 +45,9 @@ def _helm_release_impl(ctx):
         substitutions = {
             "{CHART_PATH}": chart.short_path,
             "{NAMESPACE}": namespace,
-            "{TILLER_NAMESPACE}": tiller_namespace,
             "{RELEASE_NAME}": release_name,
             "{VALUES_YAML}": values_yaml,
-            "{HELM_PATH}": helm_path,
-            "{HELM3_PATH}": helm3_path,
-            "{KUBECTL_PATH}": kubectl_path,
-            "{FORCE_HELM_VERSION}": helm_version,
+            "{HELM_PATH}": helm_bin.path,
             "{KUBERNETES_CONTEXT}": kubernetes_context,
             "{CREATE_NAMESPACE}": create_namespace,
             "{WAIT}": wait,
@@ -78,7 +62,7 @@ def _helm_release_impl(ctx):
             chart,
             ctx.info_file,
             ctx.version_file
-        ] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_binary + helm3_binary + kubectl_binary
+        ] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_bin
     )
 
     return [DefaultInfo(
@@ -91,13 +75,11 @@ helm_release = rule(
     attrs = {
       "chart": attr.label(allow_single_file = True, mandatory = True),
       "namespace_dep": attr.label(mandatory = False),
-      "namespace": attr.string(mandatory = False),
-      "tiller_namespace": attr.string(mandatory = False, default = "tiller-system"),
+      "namespace": attr.string(mandatory = False, default = "default"),
       "release_name": attr.string(mandatory = True),
       "values_yaml": attr.label_list(allow_files = True, mandatory = False),
       "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
       "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
-      "helm_version": attr.string(mandatory = False),
       "kubernetes_context": attr.string(mandatory = False),
       "create_namespace": attr.string(mandatory = False, default = ""),
       "wait": attr.string(mandatory = False, default = ""),
@@ -106,8 +88,6 @@ helm_release = rule(
     doc = "Installs or upgrades a new helm release",
     toolchains = [
         "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
-        "@masmovil_bazel_rules//toolchains/helm-3:toolchain_type",
-        "@masmovil_bazel_rules//toolchains/kubectl:toolchain_type"
     ],
     executable = True,
 )
