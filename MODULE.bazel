@@ -1,20 +1,15 @@
 
-module(name = "masmovil_bazel_rules", version = "2.0")
+module(name = "masmovil_bazel_rules", version = "2.0.0", bazel_compatibility = [">=6.0.0"])
 
+bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
 bazel_dep(name = "platforms", version = "0.0.7")
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 
-# BEGIN: oci docker images
 bazel_dep(name = "rules_oci", version = "1.4.0")
 
-oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+toolchains = use_extension("@masmovil_bazel_rules//:extensions.bzl", "toolchains")
+toolchains.helm()
 
-oci.pull(
-    name = "nginx",
-    image = "europe-docker.pkg.dev/mm-mysim-prod/container-images/php_base",
-    digest = "sha256:df32dc3db450e6af0adfc3cec3670f8d1a7f85bb8abb68c15865299984c1bb5a",
-)
+use_repo(toolchains, "helm_toolchains")
 
-# For each oci.pull call, repeat the "name" here to expose them as dependencies.
-use_repo(oci, "nginx")
-# END: oci docker images
+register_toolchains("@helm_toolchains//:all")

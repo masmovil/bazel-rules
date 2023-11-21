@@ -1,4 +1,11 @@
-workspace(name = "masmovil_bazel_rules")
+workspace(
+    name = "masmovil_bazel_rules",
+)
+
+load(":internal_deps.bzl", "masmovil_bazel_rules_internal_deps")
+
+# Fetch deps needed only locally for development
+masmovil_bazel_rules_internal_deps()
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -18,17 +25,20 @@ load("@rules_oci//oci:repositories.bzl", "LATEST_CRANE_VERSION", "LATEST_ZOT_VER
 oci_register_toolchains(
     name = "oci",
     crane_version = LATEST_CRANE_VERSION,
+    # Uncommenting the zot toolchain will cause it to be used instead of crane for some tasks.
+    # Note that it does not support docker-format images.
+    # zot_version = LATEST_ZOT_VERSION,
 )
 
+# You can pull your base images using oci_pull like this:
 load("@rules_oci//oci:pull.bzl", "oci_pull")
 
 oci_pull(
-    name = "nginx",
-    image = "europe-docker.pkg.dev/mm-mysim-prod/container-images/php_base",
-    digest = "sha256:df32dc3db450e6af0adfc3cec3670f8d1a7f85bb8abb68c15865299984c1bb5a",
+    name = "distroless_base",
+    digest = "sha256:ccaef5ee2f1850270d453fdf700a5392534f8d1a8ca2acda391fbb6a06b81c86",
+    image = "gcr.io/distroless/base",
+    platforms = [
+        "linux/amd64",
+        "linux/arm64",
+    ],
 )
-
-
-load("//repositories:repositories.bzl", "repositories")
-
-repositories()
