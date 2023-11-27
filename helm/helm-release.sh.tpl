@@ -71,14 +71,16 @@ if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [
 
     {HELM_PATH} init -c
 
-    echo "{HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS ${NAMESPACE} ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}"
-    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS ${NAMESPACE} ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
+    echo "{HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS $NAMESPACE ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}"
+    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS $NAMESPACE ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
 else
     # tiller pods were not found, we will use helm 3 to make the release
     echo "Using helm v3 to deploy the {RELEASE_NAME} release"
 
-    {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
+    if [ "$NAMESPACE" != "" ]; then
+        {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
+    fi
 
-    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS ${NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}"
-    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS ${NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}
+    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS $NAMESPACE $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}"
+    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS $NAMESPACE $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}
 fi
