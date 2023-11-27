@@ -56,7 +56,7 @@ def _helm_release_impl(ctx):
         if ctx.attr.namespace:
             namespace = ctx.attr.namespace
         else:
-            namespace = "default"
+            namespace = ""
 
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
