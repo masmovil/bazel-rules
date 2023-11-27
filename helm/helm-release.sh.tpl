@@ -38,7 +38,7 @@ FORCE=""
 HELM_OPTIONS=""
 TIMEOUT=""
 WAIT=""
-HELM_NAMESPACE=""
+NAMESPACE=""
 
 if [ "{FORCE}" != "" ]; then
     FORCE="--force"
@@ -65,7 +65,7 @@ if [ "{NAMESPACE}" != "" ]; then
 fi
 
 # Check if tiller is running inside the cluster to guess which version of helm have to run
-if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ] ); then
+if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ] ); then
     # tiller pods were found, we will use helm 2 to make the release
     echo "Using helm v2 to deploy the {RELEASE_NAME} release"
 
@@ -80,5 +80,5 @@ else
     {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
 
     echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS ${NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}"
-    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS ${NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}
+    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS ${HELM_NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}
 fi
