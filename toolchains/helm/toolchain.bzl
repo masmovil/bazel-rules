@@ -1,6 +1,15 @@
-HELM_DEFAULT_VERSION = "v3.13.1"
+HELM_DEFAULT_VERSION = "v3.13.2"
 
 HELM_VERSIONS = {
+    "v3.13.2": {
+        "linux_amd64": "55a8e6dce87a1e52c61e0ce7a89bf85b38725ba3e8deb51d4a08ade8a2c70b2d",
+        "linux_arm64": "f5654aaed63a0da72852776e1d3f851b2ea9529cb5696337202703c2e1ed2321",
+        # "linux_arm": "a9c188c1a79d2eb1721aece7c4e7cfcd56fa76d1e37bd7c9c05d3969bb0499b4",
+        "linux_i386": "7d1307e708d4eb043686c8635df567773221397d5d0151d37000b7c472170b3a",
+        "darwin_amd64": "977c2faa49993aa8baa2c727f8f35a357576d6278d4d8618a5a010a56ad2dbee",
+        "darwin_arm64": "00f00c66165ba0dcd9efdbef66a5508fb4fe4425991c0e599e0710f8ff7aa02e",
+        "windows_amd64": "1ef931cb40bfa049fa5ee337ec16181345d7d0c8ab863fe9b04abe320fa2ae6e",
+    },
     "v3.13.1": {
         "linux_amd64": "98c363564d00afd0cc3088e8f830f2a0eeb5f28755b3d8c48df89866374a1ed0",
         "linux_arm64": "8c4a0777218b266a7b977394aaf0e9cef30ed2df6e742d683e523d75508d6efe",
@@ -60,14 +69,13 @@ HelmToolchainInfo = provider(
     doc = "Helm toolchain",
     fields = {
         "bin": "Helm executable binary",
-        # "helm_xdg_data_home": "Helm data home path",
-        # "helm_xdg_config_home": "Helm config home path",
-        # "helm_xdg_cache_home": "Helm cache home path"
     },
 )
 
 def _helm_toolchain_impl(ctx):
-    binary = ctx.attr.bin.files.to_list()[0]
+    files = ctx.attr.bin.files.to_list()
+
+    binary = files[0]
 
     template_variables = platform_common.TemplateVariableInfo({
         "HELM_BIN": binary.path,
@@ -76,9 +84,6 @@ def _helm_toolchain_impl(ctx):
     toolchain_info = platform_common.ToolchainInfo(
         helminfo = HelmToolchainInfo(
             bin = binary,
-            # helm_xdg_data_home = ctx.attr.helm_xdg_data_home,
-            # helm_xdg_config_home = ctx.attr.helm_xdg_config_home,
-            # helm_xdg_cache_home = ctx.attr.helm_xdg_cache_home
         ),
     )
     return [toolchain_info, template_variables]
@@ -87,9 +92,6 @@ helm_toolchain = rule(
     implementation = _helm_toolchain_impl,
     attrs = {
         "bin": attr.label(mandatory = True, allow_single_file = True),
-        # "helm_xdg_data_home": attr.string(),
-        # "helm_xdg_config_home": attr.string(),
-        # "helm_xdg_cache_home": attr.string()
     },
 )
 
@@ -112,8 +114,6 @@ def _helm_repo_impl(rctx):
             platform=processed_platform,
         ),
         sha256 = sha,
-        output = "helm",
-        # executable = True,
         stripPrefix = processed_platform,
     )
 
@@ -123,8 +123,7 @@ load("@masmovil_bazel_rules//toolchains/helm:toolchain.bzl", "helm_toolchain")
 exports_files(["{0}"])
 
 helm_toolchain(name = "helm_toolchain", bin = "{0}", visibility = ["//visibility:public"])
-""".format("helm")
-    # .format("helm.exe" if is_windows else "helm")
+""".format("helm.exe" if is_windows else "helm")
 
     # Base BUILD file for this repository
     rctx.file("BUILD.bazel", build_content)
