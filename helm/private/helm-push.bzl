@@ -60,6 +60,7 @@ fi
         is_executable = True,
         substitutions = {
             "{IS_OCI}": str(is_oci),
+            # We use short_path because it's a runfile
             "{CHART_PATH}": chart.short_path,
             "{CHART_NAME}": chart_name,
             "{HELM_BINARY}": helm_bin.path,
