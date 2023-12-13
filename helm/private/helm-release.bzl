@@ -14,55 +14,55 @@ def _helm_release_impl(ctx):
         name: A unique name for this rule.
         chart: Chart to install
         namespace: Namespace where release is installed to
+        namespace_dep: Namespace from k8s rule
         release_name: Name of the helm release
-        values_yaml: Specify values yaml to override default
-        secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
-        sops_yaml = Sops file if secrets_yaml is provided
+        values: Specify values yaml to override default
+        set: Specify key value set config
     """
     helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
 
-    chart = ctx.file.chart
-    tiller_namespace = ctx.attr.tiller_namespace
-    release_name = ctx.attr.release_name
-    kubernetes_context = ctx.attr.kubernetes_context
-    create_namespace = ctx.attr.create_namespace
-    wait = ctx.attr.wait
-    stamp_files = [ctx.info_file, ctx.version_file]
     namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
 
-    values_yaml = ""
-    for i, values_yaml_file in enumerate(ctx.files.values_yaml):
-        values_yaml = values_yaml + " -f " + values_yaml_file.short_path
+    args = ['upgrade', ctx.attr.release_name, ctx.file.chart.short_path, "--install", "--namespace", namespace]
 
-    exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
+    if ctx.attr.create_namespace:
+      args.append('--create-namespace')
 
+    if ctx.attr.kubernetes_context:
+      args.append('--kube-context', ctx.attr.file.kubernetes_context.short_path)
 
-    # Generates the exec bash file with the provided substitutions
-    ctx.actions.expand_template(
-        template = ctx.file._script_template,
+    if ctx.attr.wait:
+      args.append('--wait')
+
+    for values in ctx.files.values:
+      args = args + ['-f', values.short_path]
+
+    if ctx.attr.values_yaml:
+      print("WARN: values_yaml attr is marked as DEPRECATED in helm_release bazel rule. Use values attr instead")
+
+    for values in ctx.files.values_yaml:
+      args = args + ['-f', values.short_path]
+
+    for key, value in ctx.attr.set.items():
+      args = args + ['--set', key + '=' + value]
+
+    exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_release.sh")
+
+    ctx.actions.write(
         output = exec_file,
-        is_executable = True,
-        substitutions = {
-            "{CHART_PATH}": chart.short_path,
-            "{NAMESPACE}": namespace,
-            "{RELEASE_NAME}": release_name,
-            "{VALUES_YAML}": values_yaml,
-            "{HELM_PATH}": helm_bin.path,
-            "{KUBERNETES_CONTEXT}": kubernetes_context,
-            "{CREATE_NAMESPACE}": create_namespace,
-            "{WAIT}": wait,
-            "%{stamp_statements}": "\n".join([
-              "\tread_variables %s" % runfile(ctx, f)
-              for f in stamp_files]),
-        }
+        content = """
+          {helm} {args}
+        """.format(helm=helm_bin.path, args=" ".join(args)),
+        is_executable = True
     )
 
     runfiles = ctx.runfiles(
         files = [
-            chart,
+            ctx.file.chart,
             ctx.info_file,
-            ctx.version_file
-        ] + ctx.files.values_yaml + ctx.files.secrets_yaml + ctx.files.sops_yaml + helm_bin
+            ctx.version_file,
+            helm_bin,
+        ] + ctx.files.values_yaml + ctx.files.values
     )
 
     return [DefaultInfo(
@@ -74,16 +74,17 @@ helm_release = rule(
     implementation = _helm_release_impl,
     attrs = {
       "chart": attr.label(allow_single_file = True, mandatory = True),
+      "namespace": attr.string(default = "default"),
       "namespace_dep": attr.label(mandatory = False),
-      "namespace": attr.string(mandatory = False, default = "default"),
+      "values": attr.label_list(allow_files = True, mandatory = False),
       "release_name": attr.string(mandatory = True),
+      "kubernetes_context": attr.label(mandatory = False, allow_single_file = True),
+      "create_namespace": attr.bool(default = True),
+      "wait": attr.bool(default = True),
+      "set": attr.string_dict(),
+      # "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
+      # deprecated
       "values_yaml": attr.label_list(allow_files = True, mandatory = False),
-      "secrets_yaml": attr.label_list(allow_files = True, mandatory = False),
-      "sops_yaml": attr.label(allow_single_file = True, mandatory = False),
-      "kubernetes_context": attr.string(mandatory = False),
-      "create_namespace": attr.string(mandatory = False, default = ""),
-      "wait": attr.string(mandatory = False, default = ""),
-      "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
     },
     doc = "Installs or upgrades a new helm release",
     toolchains = [
