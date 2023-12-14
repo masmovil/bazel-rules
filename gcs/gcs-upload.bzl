@@ -1,12 +1,3 @@
-load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
-
-def runfile(ctx, f):
-  """Return the runfiles relative path of f."""
-  if ctx.workspace_name:
-    return ctx.workspace_name + "/" + f.short_path
-  else:
-    return f.short_path
-
 def _gcs_upload_impl(ctx):
     """Push an artifact to Google Cloud Storage
     Args:
@@ -14,35 +5,34 @@ def _gcs_upload_impl(ctx):
         src: Source file to upload.
         destination: Destination. Example: gs://my-bucket/file
     """
+    gsutil_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gsutil_bin
 
     src_file = ctx.file.src
 
-    # get chart museum basic auth credentials
     destination = ctx.attr.destination
 
-    exec_file = ctx.actions.declare_file(ctx.label.name + "_gcs_upload_bash")
+    gcs_sh_tpl = ctx.actions.declare_file(ctx.attr.name + "_gcs_upload.tpl")
+    exec_file = ctx.actions.declare_file(ctx.label.name + "_gcs_upload.sh")
 
-    stamp_files = [ctx.info_file, ctx.version_file]
+    ctx.actions.write(
+      output = gcs_sh_tpl,
+      content = "{GSUTIL} cp {SRC} {DESTINATION}"
+    )
 
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
-        template = ctx.file._script_template,
+        template = gcs_sh_tpl,
         output = exec_file,
         is_executable = True,
         substitutions = {
-            "{SRC_FILE}": src_file.short_path,
+            "{SRC}": src_file.short_path,
             "{DESTINATION}": destination,
-            "%{stamp_statements}": "\n".join([
-              "read_variables %s" % runfile(ctx, f)
-              for f in stamp_files]),
+            "{GSUTIL}": gsutil_bin.short_path,
         }
     )
 
-    
-
-
     runfiles = ctx.runfiles(
-        files = [ctx.info_file, ctx.version_file, src_file]
+        files = [src_file, gsutil_bin]
     )
 
     return [DefaultInfo(
@@ -55,9 +45,10 @@ gcs_upload = rule(
     attrs = {
       "src": attr.label(allow_single_file = True, mandatory = True),
       "destination": attr.string(mandatory = True),
-      "_script_template": attr.label(allow_single_file = True, default = ":gcs-upload.sh.tpl"),
     },
     doc = "Upload a file to a Google Cloud Storage Bucket",
-    toolchains = [],
+    toolchains = [
+      "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
+    ],
     executable = True,
 )
