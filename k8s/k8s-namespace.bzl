@@ -22,6 +22,10 @@ def _k8s_namespace_impl(ctx):
 
     """
 
+    kubectl_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.bin
+    gcloud_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud_bin
+
+
     namespace_name = ctx.attr.namespace_name
     kubernetes_sa = ctx.attr.kubernetes_sa
     gcp_sa_project = ctx.attr.gcp_sa_project
@@ -55,6 +59,8 @@ def _k8s_namespace_impl(ctx):
             "{GCP_GKE_PROJECT}": gcp_gke_project,
             "{GCP_SA_PROJECT}": gcp_sa_project,
             "{GCP_SA}": gcp_sa,
+            "{KUBECTL}": kubectl_bin.short_path,
+            "{GCLOUD}": gcloud_bin.short_path,
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
             "{KUBERNETES_CONTEXT}": kubernetes_context,
             "%{stamp_statements}": "\n".join([
@@ -64,7 +70,7 @@ def _k8s_namespace_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = [ctx.info_file, ctx.version_file]
+        files = [ctx.info_file, ctx.version_file, kubectl_bin, gcloud_bin]
     )
 
     return [DefaultInfo(
@@ -79,7 +85,7 @@ k8s_namespace = rule(
     implementation = _k8s_namespace_impl,
     attrs = {
       "namespace_name": attr.string(mandatory = True),
-      "kubernetes_sa": attr.string(mandatory = True, default = "default"),
+      "kubernetes_sa": attr.string(mandatory = False),
       "gcp_sa_project": attr.string(mandatory = False),
       "gcp_sa": attr.string(mandatory = False),
       "gcp_gke_project": attr.string(mandatory = False),
@@ -88,6 +94,9 @@ k8s_namespace = rule(
       "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl"),
     },
     doc = "Creates a new kubernetes namespace and annotates it with workload identity",
-    toolchains = [],
+    toolchains = [
+      "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
+      "@masmovil_bazel_rules//toolchains/kubectl:toolchain_type",
+    ],
     executable = True,
 )
