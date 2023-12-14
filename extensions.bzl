@@ -1,4 +1,4 @@
-load("@masmovil_bazel_rules//toolchains:register.bzl", "register_helm_toolchains")
+load("@masmovil_bazel_rules//toolchains:register.bzl", "register_helm_toolchains", "register_sops_toolchains", "register_gcloud_toolchains", "register_kubectl_toolchains")
 load("@masmovil_bazel_rules//toolchains/helm:toolchain.bzl", "HELM_DEFAULT_VERSION")
 load("@masmovil_bazel_rules//toolchains/sops:toolchain.bzl", "SOPS_DEFAULT_VERSION")
 load("@masmovil_bazel_rules//toolchains/gcloud:toolchain.bzl", "GCLOUD_DEFAULT_VERSION")
@@ -8,6 +8,15 @@ def _toolchains_extension_impl(mctx):
     for mod in mctx.modules:
         for attr in mod.tags.helm:
             register_helm_toolchains(attr.name, attr.version)
+
+        for attr in mod.tags.sops:
+            register_sops_toolchains(attr.name, attr.version)
+
+        for attr in mod.tags.gcloud:
+            register_gcloud_toolchains(attr.name, attr.version)
+
+        for attr in mod.tags.kubectl:
+            register_kubectl_toolchains(attr.name, attr.version)
 
 
 toolchains = module_extension(

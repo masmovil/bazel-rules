@@ -1,41 +1,22 @@
 package(default_visibility = ["//visibility:private"])
 
-load(":kubectl_toolchain.bzl", "kubectl_toolchain")
+load(":toolchain.bzl", "kubectl_toolchain", "KUBECTL_PLATFORMS")
 
 toolchain_type(name = "toolchain_type", visibility = ["//visibility:public"])
 
-# Helm toolchain that points to helm binary version 2.13.0
-kubectl_toolchain(
-    name = "kubectl_darwin",
-    tool = "@kubectl_darwin//file",
-    visibility = ["//visibility:public"],
-)
+[(
+    kubectl_toolchain(
+        name = "kubectl_{platform}".format(platform=platform),
+        bin = "@kubectl_{platform}//file".format(platform=platform),
+        visibility = ["//visibility:public"],
+    )
+) for platform in KUBECTL_PLATFORMS.keys()]
 
-kubectl_toolchain(
-    name = "kubectl_linux",
-    tool = "@kubectl_linux//file",
-    visibility = ["//visibility:public"],
-)
-
-toolchain(
-    name = "kubectl_linux_toolchain",
-    exec_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-    ],
-    target_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-    ],
-    toolchain = ":kubectl_linux",
-    toolchain_type = ":toolchain_type",
-)
-
-toolchain(
-    name = "kubectl_osx_toolchain",
-    target_compatible_with = [
-        "@platforms//os:osx",
-    ],
-    toolchain = ":kubectl_darwin",
-    toolchain_type = ":toolchain_type",
-)
+[(
+    toolchain(
+        name = "kubectl_{platform}_toolchain".format(platform=platform),
+        exec_compatible_with = KUBECTL_PLATFORMS[platform].compatible_with,
+        toolchain = ":kubectl_{platform}".format(platform=platform),
+        toolchain_type = ":toolchain_type",
+    )
+) for platform in KUBECTL_PLATFORMS.keys()]
