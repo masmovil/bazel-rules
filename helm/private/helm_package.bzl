@@ -21,7 +21,7 @@ def normalize_yaml_path(yaml_path):
         return "." + yaml_path
 
 
-def _helm_chart_impl(ctx):
+def _helm_package_impl(ctx):
     """Defines a helm chart (directory containing a Chart.yaml).
     Args:
         name: A unique name for this rule.
@@ -53,6 +53,10 @@ def _helm_chart_impl(ctx):
 
     if not chart_root_path:
         fail("Chart.yaml file not found. You must provide valid chart files as src to the rule")
+
+    # chart directory has to be the same as the chart name for helm
+    if not chart_name:
+        chart_name = paths.basename(chart_root_path)
 
     copy_files = []
 
@@ -225,17 +229,17 @@ def _helm_chart_impl(ctx):
         ),
     ]
 
-helm_chart = rule(
-    implementation = _helm_chart_impl,
+helm_package = rule(
+    implementation = _helm_package_impl,
     attrs = {
         "srcs": attr.label_list(allow_files = True, mandatory = True),
         "image": attr.label(allow_single_file = True, mandatory = False),
         "values_tag_yaml_path": attr.string(default = "image.tag"),
-        "chart_name": attr.string(mandatory = True),
+        "chart_name": attr.string(mandatory = False),
         "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
         "app_version": attr.string(mandatory = False),
         "version": attr.string(mandatory = False),
-        "_script_template": attr.label(allow_single_file = True, default = ":helm-chart-package.sh.tpl"),
+        "_script_template": attr.label(allow_single_file = True, default = ":helm_package.sh.tpl"),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
         "chart_deps": attr.label_list(allow_files = True, mandatory = False),
         "templates": attr.label_list(allow_files = True, mandatory = False),
