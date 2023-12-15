@@ -1,12 +1,4 @@
-load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 load("//k8s:k8s.bzl", "NamespaceDataInfo")
-
-def runfile(ctx, f):
-  """Return the runfiles relative path of f."""
-  if ctx.workspace_name:
-    return ctx.workspace_name + "/" + f.short_path
-  else:
-    return f.short_path
 
 def _helm_release_impl(ctx):
     """Installs or upgrades a helm release.
@@ -29,22 +21,22 @@ def _helm_release_impl(ctx):
       args.append('--create-namespace')
 
     if ctx.attr.kubernetes_context:
-      args.append('--kube-context', ctx.attr.file.kubernetes_context.short_path)
+      args += ['--kube-context', ctx.attr.file.kubernetes_context.short_path]
 
     if ctx.attr.wait:
       args.append('--wait')
 
     for values in ctx.files.values:
-      args = args + ['-f', values.short_path]
+      args += ['-f', values.short_path]
 
     if ctx.attr.values_yaml:
       print("WARN: values_yaml attr is marked as DEPRECATED in helm_release bazel rule. Use values attr instead")
 
     for values in ctx.files.values_yaml:
-      args = args + ['-f', values.short_path]
+      args += ['-f', values.short_path]
 
     for key, value in ctx.attr.set.items():
-      args = args + ['--set', key + '=' + value]
+      args += ['--set', key + '=' + value]
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_release.sh")
 
