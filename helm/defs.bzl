@@ -5,6 +5,7 @@ load("//helm/private:helm_push.bzl", _helm_push = "helm_push")
 load("//helm/private:helm_release.bzl", _helm_release = "helm_release")
 load("//helm/private:helm_uninstall.bzl", _helm_uninstall = "helm_uninstall")
 load("//helm/private:helm_lint_test.bzl", _helm_lint = "helm_lint_test")
+load("//helm/private:helm_chart.bzl", _helm_chart = "helm_chart")
 
 def helm_package(name, image="", **kwargs):
     args = kwargs
@@ -19,7 +20,7 @@ def helm_package(name, image="", **kwargs):
 
 
 # Explicitly re-export the functions
-helm_chart = helm_package
+helm_chart = _helm_chart
 helm_push = _helm_push
 helm_release = _helm_release
 helm_uninstall = _helm_uninstall

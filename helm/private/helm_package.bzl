@@ -1,5 +1,4 @@
 load("//helpers:helpers.bzl", "get_make_value_or_default", "write_sh")
-load("@aspect_bazel_lib//lib/private:copy_to_directory.bzl", "copy_to_directory_bin_action")
 load("@aspect_bazel_lib//lib/private:copy_to_bin.bzl", "copy_files_to_bin_actions")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -36,14 +35,12 @@ def _helm_package_impl(ctx):
     app_version = get_make_value_or_default(ctx, ctx.attr.app_version or helm_chart_version)
     yq_bin = ctx.toolchains["@aspect_bazel_lib//lib:yq_toolchain_type"].yqinfo.bin
     copy_to_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"].copy_to_directory_info.bin
-    helm_toolchain = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo
     stamp_files = [ctx.info_file, ctx.version_file]
-    helm_bin = helm_toolchain.bin
     chart_name = ctx.attr.chart_name or ctx.attr.package_name
 
     deps = ctx.attr.chart_deps or []
 
-    inputs = [helm_bin, yq_bin] + deps + ctx.files.srcs
+    inputs = [yq_bin] + deps + ctx.files.srcs
 
     # locate Chart.yaml file
     for i, srcfile in enumerate(ctx.files.srcs):
@@ -150,7 +147,7 @@ def _helm_package_impl(ctx):
     )
 
     output_values_script_yaml = ctx.actions.declare_file("subst_values.sh")
-    output_values_yaml = ctx.actions.declare_file(paths.join(chart_root_path, "values.yaml"))
+    output_values_yaml = ctx.actions.declare_file("values.yaml")
 
     ctx.actions.expand_template(
         template = ctx.file._subst_template,
@@ -176,54 +173,15 @@ def _helm_package_impl(ctx):
         mnemonic = "SubstChartValues",
     )
 
-    # Add processed values.yaml to inputs
-    inputs += [output_values_yaml]
-
-    # declare rule output
-    targz = ctx.actions.declare_file(chart_name + ".tgz")
-
-    # declare template output file
-    exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_bash")
-
-    # Generates the exec bash file with the provided substitutions
-    ctx.actions.expand_template(
-        template = ctx.file._script_template,
-        output = exec_file,
-        is_executable = True,
-        substitutions = {
-            "{CHART_PATH}": paths.join(ctx.bin_dir.path, chart_root_path),
-            "{CHART_VALUES_PATH}": chart_name + "/values.yaml", # values_yaml.path,
-            "{PACKAGE_OUTPUT_PATH}": targz.dirname,
-            "{HELM_CHART_VERSION}": helm_chart_version,
-            "{APP_VERSION}": app_version,
-            "{HELM_CHART_NAME}": chart_name,
-            "{HELM_PATH}": helm_bin.path,
-            "{STAMP_FILE}": ctx.version_file.root.path,
-            "%{stamp_statements}": "\n".join([
-                "\tread_variables %s" % f.path
-                for f in stamp_files
-            ]),
-        },
-    )
-
-    # execute helm commands
-    ctx.actions.run(
-        inputs = inputs + stamp_files,
-        outputs = [targz],
-        arguments = [],
-        executable = exec_file,
-    )
-
-    direct_deps = depset([targz])
-    transitive_deps = depset([targz], transitive = [depset(ctx.files.chart_deps)])
+    direct_deps = depset(copied_src_files + [output_values_yaml])
 
     return [
         DefaultInfo(
-            files = direct_deps
+            files = direct_deps,
         ),
         ChartInfo(
             chart = direct_deps,
-            transitive_deps = transitive_deps,
+            transitive_deps = depset(ctx.files.chart_deps),
             chart_name = chart_name,
             chart_version = ctx.attr.version,
         ),
@@ -254,8 +212,7 @@ helm_package = rule(
     },
     toolchains = [
         "@aspect_bazel_lib//lib:yq_toolchain_type",
-        "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type",
-        "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
+        "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"
     ],
     doc = "Runs helm packaging updating the image tag on it",
 )

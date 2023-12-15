@@ -11,7 +11,8 @@ load("//helm:defs.bzl",
 )
 
 # Explicitly re-export the functions
-helm_chart = helm_package
+helm_chart = _helm_chart
+helm_package = _helm_package
 helm_push = _helm_push
 helm_release = _helm_release
 helm_uninstall = _helm_uninstall
