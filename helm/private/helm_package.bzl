@@ -212,25 +212,6 @@ appVersion: {app_version}""".format(
 
     yq_expression_file = create_yq_substitution_file(ctx, ctx.attr.name + "_yq_values_subst_expression_file", all_values)
 
-    # subst_values = ""
-    #
-    # generate values substiution expressions for yq
-    # for yaml_path, value in all_values.items():
-    #     if len(subst_values) > 0:
-    #         subst_values += " |\n"
-
-    #     yaml_path = normalize_yaml_path(yaml_path)
-
-    #     subst_values += "{yaml} = \"{value}\"".format(yaml=yaml_path, value=value)
-
-    # yq_expression_file = ctx.actions.declare_file(ctx.attr.name + "_yq_values_subst_expression_file")
-
-    # ctx.actions.write(
-    #     output = yq_expression_file,
-    #     content = subst_values
-    # )
-    #
-
     output_values_script_yaml = ctx.actions.declare_file("subst_values.sh")
     output_values_yaml = ctx.actions.declare_file("values.yaml")
 
