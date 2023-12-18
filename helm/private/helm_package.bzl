@@ -266,7 +266,6 @@ helm_package = rule(
         "app_version": attr.string(default = "1.0.0"),
         "api_version": attr.string(default = "v1"),
         "description": attr.string(default = "Helm chart"),
-        "_script_template": attr.label(allow_single_file = True, default = ":helm_package.sh.tpl"),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
         "chart_deps": attr.label_list(allow_files = True, mandatory = False),
         "templates": attr.label_list(allow_files = True, mandatory = False),
