@@ -8,6 +8,7 @@ def helm_chart(name, chart_name, **kwargs):
 
     helm_package(
         name = helm_pkg_rule_name,
+        chart_name = chart_name,
         **kwargs,
     )
 

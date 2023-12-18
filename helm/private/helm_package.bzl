@@ -11,6 +11,49 @@ ChartInfo = provider(fields = [
     "transitive_deps"
 ])
 
+def get_chart_subst_args(ctx):
+    subst_args = {}
+
+    chart_name = ctx.attr.chart_name or ctx.attr.package_name
+    version = ctx.attr.version or ctx.attr.helm_chart_version
+
+    if ctx.attr.api_version:
+        subst_args["apiVersion"] = ctx.attr.api_version
+
+    subst_args["name"] = chart_name
+
+    if ctx.attr.description:
+        subst_args["description"] = ctx.attr.description
+
+    subst_args["version"] = version
+
+    if ctx.attr.app_version:
+        subst_args["appVersion"] = ctx.attr.app_version
+
+    return subst_args
+
+
+# generate a file with a write expression for yq
+def create_yq_substitution_file(ctx, output_name, substitutions):
+    out_file = ctx.actions.declare_file(output_name)
+
+    subst_values = ""
+
+    for yaml_path, value in substitutions.items():
+        if len(subst_values) > 0:
+            subst_values += " |\n"
+
+        yaml_path = normalize_yaml_path(yaml_path)
+
+        subst_values += "{yaml} = \"{value}\"".format(yaml=yaml_path, value=value)
+
+    ctx.actions.write(
+        output = out_file,
+        content = subst_values
+    )
+
+    return out_file
+
 # Utility function to normalize yaml paths for yq tool
 def normalize_yaml_path(yaml_path):
     if not yaml_path or yaml_path.startswith("."):
@@ -28,11 +71,14 @@ def _helm_package_impl(ctx):
         update_deps: Whether or not to run a helm dependency update prior to packaging.
     """
     chart_root_path = ""
+    chart_manifest_path = ""
 
     digest_path = ""
     image_tag = ""
+
     helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
     app_version = get_make_value_or_default(ctx, ctx.attr.app_version or helm_chart_version)
+    chart_yaml = None
     yq_bin = ctx.toolchains["@aspect_bazel_lib//lib:yq_toolchain_type"].yqinfo.bin
     copy_to_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"].copy_to_directory_info.bin
     stamp_files = [ctx.info_file, ctx.version_file]
@@ -41,34 +87,70 @@ def _helm_package_impl(ctx):
     deps = ctx.attr.chart_deps or []
 
     inputs = [yq_bin] + deps + ctx.files.srcs
+    outs = []
 
-    # locate Chart.yaml file
+    # locate rootpath of the chart
     for i, srcfile in enumerate(ctx.files.srcs):
         if srcfile.path.endswith("Chart.yaml"):
             chart_root_path = srcfile.dirname
+            chart_manifest_path = srcfile.path
             break
 
-    if not chart_root_path:
-        fail("Chart.yaml file not found. You must provide valid chart files as src to the rule")
-
-    # chart directory has to be the same as the chart name for helm
-    if not chart_name:
-        chart_name = paths.basename(chart_root_path)
+        if srcfile.path.endswith("values.yaml") and not chart_root_path:
+            chart_root_path = srcfile.dirname
 
     copy_files = []
 
     # copy all chart source files to the output bin directory
-    # helm does not support providing values.yaml files as command arguments
-    # (useful to provide a values.yaml file from a different directory)
-    # so values.yaml is not copied to the output dir here
+    # values.yaml are not copied to the output dir here to be able to modify the sources
     for file in ctx.files.srcs:
-        if paths.join(chart_name, "values.yaml") not in file.path:
+        if paths.join(chart_name, "values.yaml") not in file.path and paths.join(chart_name, "Chart.yaml") not in file.path:
             copy_files.append(file)
+
+        if paths.join(chart_name, "Chart.yaml") in file.path:
+            chart_yaml = file
 
     copied_src_files = copy_files_to_bin_actions(
         ctx = ctx,
         files = copy_files,
     )
+
+    out_chart_yaml = ctx.actions.declare_file("Chart.yaml")
+
+    outs += copied_src_files + [out_chart_yaml]
+
+    # if the chart has not Chart.yaml manifest file,
+    # we create one
+    if not chart_manifest_path:
+        ctx.actions.write(
+            output = out_chart_yaml,
+            content = """apiVersion: {api_version}
+description: {description}
+name: {name}
+version: {version}
+appVersion: {app_version}""".format(
+                api_version=ctx.attr.api_version,
+                description=ctx.attr.description or "",
+                name=chart_name,
+                version=ctx.attr.version or ctx.attr.helm_chart_version,
+                progress_message = "Writing Chart.yaml file to Chart...",
+                app_version=ctx.attr.app_version or "",
+            )
+        )
+    else:
+        yq_subst_expr = create_yq_substitution_file(ctx, "yq_chart_subst_expr", get_chart_subst_args(ctx))
+
+        ctx.actions.run_shell(
+            inputs = [yq_bin, chart_yaml, yq_subst_expr],
+            outputs = [out_chart_yaml],
+            command = "{yq} --from-file {expr_file} > {out_path}".format(
+                yq = yq_bin.path,
+                expr_file = yq_subst_expr.path,
+                out_path = out_chart_yaml.path,
+            ),
+            progress_message = "Writing Chart.yaml file to chart output dir...",
+            mnemonic = "SubstChartManifest",
+        )
 
     inputs += copied_src_files
 
@@ -128,26 +210,31 @@ def _helm_package_impl(ctx):
 
     all_values = dicts.add({}, ctx.attr.values, values)
 
-    subst_values = ""
+    yq_expression_file = create_yq_substitution_file(ctx, ctx.attr.name + "_yq_values_subst_expression_file", all_values)
 
+    # subst_values = ""
+    #
     # generate values substiution expressions for yq
-    for yaml_path, value in all_values.items():
-        if len(subst_values) > 0:
-            subst_values += " |\n"
+    # for yaml_path, value in all_values.items():
+    #     if len(subst_values) > 0:
+    #         subst_values += " |\n"
 
-        yaml_path = normalize_yaml_path(yaml_path)
+    #     yaml_path = normalize_yaml_path(yaml_path)
 
-        subst_values += "{yaml} = \"{value}\"".format(yaml=yaml_path, value=value)
+    #     subst_values += "{yaml} = \"{value}\"".format(yaml=yaml_path, value=value)
 
-    yq_expression_file = ctx.actions.declare_file(ctx.attr.name + "_yq_values_subst_expression_file")
+    # yq_expression_file = ctx.actions.declare_file(ctx.attr.name + "_yq_values_subst_expression_file")
 
-    ctx.actions.write(
-        output = yq_expression_file,
-        content = subst_values
-    )
+    # ctx.actions.write(
+    #     output = yq_expression_file,
+    #     content = subst_values
+    # )
+    #
 
     output_values_script_yaml = ctx.actions.declare_file("subst_values.sh")
     output_values_yaml = ctx.actions.declare_file("values.yaml")
+
+    outs += [output_values_yaml]
 
     ctx.actions.expand_template(
         template = ctx.file._subst_template,
@@ -173,7 +260,7 @@ def _helm_package_impl(ctx):
         mnemonic = "SubstChartValues",
     )
 
-    direct_deps = depset(copied_src_files + [output_values_yaml])
+    direct_deps = depset(outs)
 
     return [
         DefaultInfo(
@@ -191,12 +278,13 @@ helm_package = rule(
     implementation = _helm_package_impl,
     attrs = {
         "srcs": attr.label_list(allow_files = True, mandatory = True),
+        "chart_name": attr.string(mandatory = True),
         "image": attr.label(allow_single_file = True, mandatory = False),
         "values_tag_yaml_path": attr.string(default = "image.tag"),
-        "chart_name": attr.string(mandatory = False),
-        "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
-        "app_version": attr.string(mandatory = False),
         "version": attr.string(mandatory = False),
+        "app_version": attr.string(default = "1.0.0"),
+        "api_version": attr.string(default = "v1"),
+        "description": attr.string(default = "Helm chart"),
         "_script_template": attr.label(allow_single_file = True, default = ":helm_package.sh.tpl"),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
         "chart_deps": attr.label_list(allow_files = True, mandatory = False),
@@ -204,6 +292,7 @@ helm_package = rule(
         "values": attr.string_dict(),
         "force_append_repository": attr.bool(default = True),
         # Mark these attrs as deprecated
+        "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
         "package_name": attr.string(mandatory = False),
         "additional_templates": attr.label_list(allow_files = True, mandatory = False),
         "image_tag": attr.string(mandatory = False),
