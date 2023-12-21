@@ -192,7 +192,7 @@ Example of use:
 helm_release(
     name = "chart_install",
     chart = ":chart",
-    namespace_name = "myapp",
+    namespace = "myapp",
     tiller_namespace = "tiller-system",
     release_name = "release-name",
     values_yaml = glob(["charts/myapp/values.yaml"]),
@@ -224,13 +224,17 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
-| namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. |
+| namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. Set to `""` to use namespace from current kube context. ⚠️ Please note deprecations below |
 | namespace_dep | false | - | Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace |
-| tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluste. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
+| tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluster. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
 | values_yaml | no | - | Several values files can be passed when installing release |
 | helm_version | no | "" | Force the use of helm v2 or v3 to deploy the release. The attribute can be set to **v2** or **v3** |
 | kubernetes_context | no | "" | Context of kubernetes cluster |
+
+#### ⚠️ Deprecations
+
+The default value of the `namespace` attribute will be changing from `"default"` to `""`. `""` will use the namespace of the current kubernetes context and most users will see no change in behavour. If you are relying on charts being explicitly installed into the `default` namespace, please update your `BUILD` files to include `namespace = "default"`.
 
 ## Sops rules
 Decrypting secrets using [sops](https://github.com/mozilla/sops) is now supported.
