@@ -234,7 +234,9 @@ The following attributes are accepted by the rule (some of them are mandatory).
 
 #### ⚠️ Deprecations
 
-The default value of the `namespace` attribute will be changing from `"default"` to `""`. `""` will use the namespace of the current kubernetes context and most users will see no change in behavour. If you are relying on charts being explicitly installed into the `default` namespace, please update your `BUILD` files to include `namespace = "default"`.
+The default value of the `namespace` attribute will be changing from `"default"` to `""`. 
+
+`""` uses the namespace of the current kubernetes context and most users will see no change in behavour. If you are relying on charts being explicitly installed into the `default` namespace, please update your `BUILD` files to include `namespace = "default"`.
 
 ## Sops rules
 Decrypting secrets using [sops](https://github.com/mozilla/sops) is now supported.
