@@ -224,7 +224,7 @@ The following attributes are accepted by the rule (some of them are mandatory).
 |  Attribute | Mandatory| Default | Notes |
 | ---------- | --- | ------ | -------------- |
 | chart | yes | - | Chart package (targz). Must be a label that specifies where the helm package file (Chart.yaml) is. It accepts the path of the targz file (that bazel will resolve to the file) or the label to a target rule that generates a helm package as output (`helm_chart` rule). |
-| namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. Set to `""` to use namespace from current kube context. ⚠️ Please note deprecations below |
+| namespace | false | default | Namespace name literal where this release is installed to. It supports the use of `stamp_variables`. Set to `""` to use namespace from current kube context.<br/>⚠️ Please note deprecations below |
 | namespace_dep | false | - | Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace |
 | tiller_namespace | false | kube-system | Namespace where Tiller lives in the Kubernetes Cluster. It supports the use of `stamp_variables`. Unnecessary using helm v3 |
 | release_name | yes | - | Name of the Helm release. It supports the use of `stamp_variables`|
