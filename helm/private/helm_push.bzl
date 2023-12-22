@@ -1,5 +1,5 @@
 load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
-load(":helm_package.bzl", "ChartInfo")
+load(":helm_chart_providers.bzl", "ChartInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 

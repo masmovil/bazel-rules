@@ -1,17 +1,36 @@
 load("//helpers:helpers.bzl", "get_make_value_or_default", "write_sh")
 load("@aspect_bazel_lib//lib/private:copy_to_bin.bzl", "copy_files_to_bin_actions")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file_action")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:shell.bzl", "shell")
+load(":helm_chart_providers.bzl", "ChartInfo")
 
-ChartInfo = provider(fields = [
-    "chart",
-    "chart_name",
-    "chart_version",
-    "transitive_deps"
-])
+DEFAULT_HELM_API_VERSION = "v2"
+DEFAULT_HELM_CHART_VERSION = "1.0.0"
 
-def get_chart_subst_args(ctx):
+# filter out from chart src files the Chart.yaml manifest
+def fitler_chart_manifest(srcs, name=""):
+    chart_manifests = []
+
+    for src in srcs:
+        if src.basename == "Chart.yaml":
+            chart_manifests += [src]
+
+    if len(chart_manifests) == 0:
+        fail("Chart dependency has no Chart.yaml manifest %s" % name)
+
+    manifest = chart_manifests[0]
+
+    if len(chart_manifests) > 1:
+        for m in chart_manifests:
+            if len(m.path) < len(manifest.path):
+                manifest = m
+
+    return manifest
+
+# get a dict with the content to populate a Chart.yaml manifest with data fom the helm chart
+def get_chart_subst_args(ctx, chart_deps):
     subst_args = {}
 
     chart_name = ctx.attr.chart_name or ctx.attr.package_name
@@ -25,15 +44,21 @@ def get_chart_subst_args(ctx):
     if ctx.attr.description:
         subst_args["description"] = ctx.attr.description
 
-    subst_args["version"] = version
+    if version:
+        subst_args["version"] = version
 
     if ctx.attr.app_version:
         subst_args["appVersion"] = ctx.attr.app_version
 
+    for i, dep in enumerate(chart_deps):
+        subst_args[".dependencies[%s].name" % i] = dep.name
+        if dep.version:
+            subst_args[".dependencies[%s].version" % i] = dep.version
+
     return subst_args
 
 
-# generate a file with a write expression for yq
+# generate a file with a yq write expression
 def create_yq_substitution_file(ctx, output_name, substitutions):
     out_file = ctx.actions.declare_file(output_name)
 
@@ -84,9 +109,17 @@ def _helm_package_impl(ctx):
     stamp_files = [ctx.info_file, ctx.version_file]
     chart_name = ctx.attr.chart_name or ctx.attr.package_name
 
-    deps = ctx.attr.chart_deps or []
+    # data structure to hold info about all chart dependencies
+    # it's a tuples array with the form: (dependency_name, dependency_version, dep src_files)
+    chart_deps = [
+        struct(
+            name=chart_dep[ChartInfo].chart_name,
+            version=chart_dep[ChartInfo].chart_version,
+            srcs=chart_dep[ChartInfo].chart_srcs,
+        ) for chart_dep in ctx.attr.deps
+    ]
 
-    inputs = [yq_bin] + deps + ctx.files.srcs
+    inputs = [yq_bin] + ctx.files.srcs
     outs = []
 
     # locate rootpath of the chart
@@ -94,63 +127,52 @@ def _helm_package_impl(ctx):
         if srcfile.path.endswith("Chart.yaml"):
             chart_root_path = srcfile.dirname
             chart_manifest_path = srcfile.path
+            chart_yaml = srcfile
             break
 
         if srcfile.path.endswith("values.yaml") and not chart_root_path:
             chart_root_path = srcfile.dirname
 
-    copy_files = []
+    # copy_files = []
+    copied_src_files = []
 
     # copy all chart source files to the output bin directory
     # values.yaml are not copied to the output dir here to be able to modify the sources
     for file in ctx.files.srcs:
-        if paths.join(chart_name, "values.yaml") not in file.path and paths.join(chart_name, "Chart.yaml") not in file.path:
-            copy_files.append(file)
+        if "values.yaml" not in file.path and "Chart.yaml" not in file.path:
+            copied_file = ctx.actions.declare_file(paths.join(chart_name, file.path.replace(chart_root_path + "/", "")))
+            copied_src_files += [copied_file]
+            copy_file_action(
+                ctx=ctx,
+                src=file,
+                dst=copied_file,
+            )
 
-        if paths.join(chart_name, "Chart.yaml") in file.path:
-            chart_yaml = file
+        # TODO: Check for deps Chart.yaml
+        # TODO: Check windows paths
+        # if file.path.endswith("/Chart.yaml"):
+        #     chart_yaml = file
 
-    copied_src_files = copy_files_to_bin_actions(
-        ctx = ctx,
-        files = copy_files,
-    )
-
-    out_chart_yaml = ctx.actions.declare_file("Chart.yaml")
+    out_chart_yaml = ctx.actions.declare_file(paths.join(chart_name, "Chart.yaml"))
 
     outs += copied_src_files + [out_chart_yaml]
 
-    # if the chart has not Chart.yaml manifest file,
-    # we create one
-    if not chart_manifest_path:
-        ctx.actions.write(
-            output = out_chart_yaml,
-            content = """apiVersion: {api_version}
-description: {description}
-name: {name}
-version: {version}
-appVersion: {app_version}""".format(
-                api_version=ctx.attr.api_version,
-                description=ctx.attr.description or "",
-                name=chart_name,
-                version=ctx.attr.version or ctx.attr.helm_chart_version,
-                progress_message = "Writing Chart.yaml file to Chart...",
-                app_version=ctx.attr.app_version or "",
-            )
-        )
-    else:
-        yq_subst_expr = create_yq_substitution_file(ctx, "yq_chart_subst_expr", get_chart_subst_args(ctx))
+    chart_yaml_path = "" if not chart_manifest_path else chart_yaml.path
 
-        ctx.actions.run_shell(
-            inputs = [yq_bin, chart_yaml, yq_subst_expr],
-            outputs = [out_chart_yaml],
-            command = "{yq} --from-file {expr_file} > {out_path}".format(
-                yq = yq_bin.path,
-                expr_file = yq_subst_expr.path,
-                out_path = out_chart_yaml.path,
-            ),
-            progress_message = "Writing Chart.yaml file to chart output dir...",
-            mnemonic = "SubstChartManifest",
-        )
+    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps))
+
+    ctx.actions.run_shell(
+        inputs = [yq_bin, chart_yaml, yq_subst_expr],
+        outputs = [out_chart_yaml],
+        command = "cat {chart_manifest}| {yq} --from-file {expr_file} > {out_path}".format(
+            yq = yq_bin.path,
+            expr_file = yq_subst_expr.path,
+            out_path = out_chart_yaml.path,
+            chart_manifest = chart_yaml.path if chart_yaml else "",
+        ),
+        progress_message = "Writing Chart.yaml file to chart output dir...",
+        mnemonic = "SubstChartManifest",
+    )
 
     inputs += copied_src_files
 
@@ -210,10 +232,10 @@ appVersion: {app_version}""".format(
 
     all_values = dicts.add({}, ctx.attr.values, values)
 
-    yq_expression_file = create_yq_substitution_file(ctx, ctx.attr.name + "_yq_values_subst_expression_file", all_values)
+    yq_expression_file = create_yq_substitution_file(ctx, "%s_yq_values_subst_expression_file" % ctx.attr.name, all_values)
 
-    output_values_script_yaml = ctx.actions.declare_file("subst_values.sh")
-    output_values_yaml = ctx.actions.declare_file("values.yaml")
+    output_values_script_yaml = ctx.actions.declare_file("%s_subst_values.sh" % ctx.attr.name)
+    output_values_yaml = ctx.actions.declare_file(paths.join(chart_name, "values.yaml"))
 
     outs += [output_values_yaml]
 
@@ -241,18 +263,30 @@ appVersion: {app_version}""".format(
         mnemonic = "SubstChartValues",
     )
 
-    direct_deps = depset(outs)
+    dep_copied_files = []
+
+    for dep in chart_deps:
+
+        chart_manifest = fitler_chart_manifest(dep.srcs, dep.name)
+        chart_dep_root_path = chart_manifest.dirname
+
+        for dep_src in dep.srcs:
+            out_path = paths.join(chart_name, "charts", dep.name, dep_src.path.replace(chart_dep_root_path + "/", ""))
+
+            dep_out = ctx.actions.declare_file(out_path)
+
+            copy_file_action(
+                ctx=ctx,
+                src=dep_src,
+                dst=dep_out,
+            )
+
+            dep_copied_files += [dep_out]
 
     return [
         DefaultInfo(
-            files = direct_deps,
-        ),
-        ChartInfo(
-            chart = direct_deps,
-            transitive_deps = depset(ctx.files.chart_deps),
-            chart_name = chart_name,
-            chart_version = ctx.attr.version,
-        ),
+            files = depset(direct = outs, transitive = [depset(dep_copied_files)])
+        )
     ]
 
 helm_package = rule(
@@ -264,15 +298,16 @@ helm_package = rule(
         "values_tag_yaml_path": attr.string(default = "image.tag"),
         "version": attr.string(mandatory = False),
         "app_version": attr.string(default = "1.0.0"),
-        "api_version": attr.string(default = "v1"),
+        "api_version": attr.string(default = "v2"),
         "description": attr.string(default = "Helm chart"),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
-        "chart_deps": attr.label_list(allow_files = True, mandatory = False),
+        "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
         "templates": attr.label_list(allow_files = True, mandatory = False),
         "values": attr.string_dict(),
         "force_append_repository": attr.bool(default = True),
         # Mark these attrs as deprecated
-        "helm_chart_version": attr.string(mandatory = False, default = "1.0.0"),
+        "chart_deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
+        "helm_chart_version": attr.string(mandatory = False),
         "package_name": attr.string(mandatory = False),
         "additional_templates": attr.label_list(allow_files = True, mandatory = False),
         "image_tag": attr.string(mandatory = False),
@@ -281,7 +316,7 @@ helm_package = rule(
     },
     toolchains = [
         "@aspect_bazel_lib//lib:yq_toolchain_type",
-        "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"
+        "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type",
     ],
     doc = "Runs helm packaging updating the image tag on it",
 )
