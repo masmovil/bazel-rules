@@ -148,11 +148,6 @@ def _helm_package_impl(ctx):
                 dst=copied_file,
             )
 
-        # TODO: Check for deps Chart.yaml
-        # TODO: Check windows paths
-        # if file.path.endswith("/Chart.yaml"):
-        #     chart_yaml = file
-
     out_chart_yaml = ctx.actions.declare_file(paths.join(chart_name, "Chart.yaml"))
 
     outs += copied_src_files + [out_chart_yaml]

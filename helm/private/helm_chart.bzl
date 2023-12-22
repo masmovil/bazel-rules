@@ -47,10 +47,3 @@ def helm_chart(name, chart_name, **kwargs):
         name = "%s_lint" % name,
         chart = name,
     )
-
-    # pkg_files(
-    #     name = deps_rule_target,
-    #     srcs = chart_dependencies,
-    #     prefix = paths.join(chart_name, "charts"),
-    #     strip_prefix = strip_prefix.files_only(),
-    # )
