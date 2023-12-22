@@ -11,7 +11,6 @@ def helm_chart(name, chart_name, **kwargs):
     deps_rule_target = "%s_charts_deps" % name
     tar_target = "%s_tar" % name
 
-    # chart_dependencies = kwargs.get("deps") or kwargs.get("chart_deps", [])
     chart_version = kwargs.get("version") or kwargs.get("helm_chart_version")
 
     helm_package(
@@ -23,7 +22,6 @@ def helm_chart(name, chart_name, **kwargs):
     pkg_files(
         name = helm_pkg_out_strip_target,
         srcs = [helm_pkg_target],
-        # prefix = chart_name,
         strip_prefix = strip_prefix.from_pkg(),
     )
 
@@ -31,7 +29,6 @@ def helm_chart(name, chart_name, **kwargs):
         name = tar_target,
         out = chart_name + ".tgz",
         extension = "tgz",
-        # srcs = [helm_pkg_out_strip_target, deps_rule_target],
         srcs = [helm_pkg_out_strip_target],
     )
 
