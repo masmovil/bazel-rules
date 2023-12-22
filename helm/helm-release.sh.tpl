@@ -38,6 +38,7 @@ FORCE=""
 HELM_OPTIONS=""
 TIMEOUT=""
 WAIT=""
+NAMESPACE=""
 
 if [ "{FORCE}" != "" ]; then
     FORCE="--force"
@@ -59,21 +60,27 @@ if [ "{WAIT}" != "" ]; then
     WAIT="--wait"
 fi
 
+if [ "{NAMESPACE}" != "" ]; then
+    NAMESPACE="--namespace {NAMESPACE}"
+fi
+
 # Check if tiller is running inside the cluster to guess which version of helm have to run
-if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ] ); then
+if [ "$FORCE_HELM_VERSION" == "v2" ] || ( [ "$FORCE_HELM_VERSION" != "v3" ] && [ $({KUBECTL_PATH} get pods -n {TILLER_NAMESPACE} | grep tiller | wc -l) -ge 1 ] ); then
     # tiller pods were found, we will use helm 2 to make the release
     echo "Using helm v2 to deploy the {RELEASE_NAME} release"
 
     {HELM_PATH} init -c
 
-    echo "{HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS --namespace {NAMESPACE} ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}"
-    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS --namespace {NAMESPACE} ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
+    echo "{HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS $NAMESPACE ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}"
+    {HELM_PATH} upgrade --install --tiller-namespace {TILLER_NAMESPACE} $HELM_OPTIONS $NAMESPACE ${TIMEOUT} ${FORCE} ${WAIT} {VALUES_YAML} {RELEASE_NAME} {CHART_PATH}
 else
     # tiller pods were not found, we will use helm 3 to make the release
     echo "Using helm v3 to deploy the {RELEASE_NAME} release"
 
-    {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
+    if [ "$NAMESPACE" != "" ]; then
+        {KUBECTL_PATH} create namespace {NAMESPACE} 2> /dev/null || true
+    fi
 
-    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS --namespace {NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}"
-    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS --namespace {NAMESPACE} $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}
+    echo "{HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS $NAMESPACE $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}"
+    {HELM3_PATH} upgrade {RELEASE_NAME} {CHART_PATH} --install $HELM_OPTIONS $NAMESPACE $CREATE_NAMESPACE $TIMEOUT $FORCE $WAIT {VALUES_YAML}
 fi

@@ -20,7 +20,8 @@ def _helm_release_impl(ctx):
     Args:
         name: A unique name for this rule.
         chart: Chart to install
-        namespace: Namespace where release is installed to
+        namespace_dep: k8s_namespace label for the namesapce where release is installed
+        namespace: Namespace where release is installed to, if namespace_dep not specified. Defaults to "default" - will change to "" in a future version
         release_name: Name of the helm release
         values_yaml: Specify values yaml to override default
         secrets_yaml: Specify sops encrypted values to override defaulrt values (need to define sops_value as well)
@@ -53,10 +54,7 @@ def _helm_release_impl(ctx):
     if ctx.attr.namespace_dep:
         namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace
     else:
-        if ctx.attr.namespace:
-            namespace = ctx.attr.namespace
-        else:
-            namespace = "default"
+        namespace = ctx.attr.namespace
 
     # Generates the exec bash file with the provided substitutions
     ctx.actions.expand_template(
@@ -103,7 +101,7 @@ helm_release = rule(
       "chart": attr.label(allow_single_file = True, mandatory = True),
       "force": attr.string(mandatory = False, default = ""),  # could actually be a boolean
       "namespace_dep": attr.label(mandatory = False),
-      "namespace": attr.string(mandatory = False),
+      "namespace": attr.string(mandatory = False, default = "default"),
       "tiller_namespace": attr.string(mandatory = False, default = "tiller-system"),
       "release_name": attr.string(mandatory = True),
       "values_yaml": attr.label_list(allow_files = True, mandatory = False),
