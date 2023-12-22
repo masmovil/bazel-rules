@@ -1,0 +1,26 @@
+apiVersion: v2
+name: wholemanifest
+version: v0.9.5
+kubeVersion: ^1.10.0-0
+description: A single-sentence description of this project (optional)
+type: library
+keywords:
+  - manifest, complete
+home: https://daniel.io
+# sources:
+#   - daniel.io
+dependencies: # A list of the chart requirements (optional)
+  - name: a
+    version: 1.0.1
+    tags:
+      - a
+    alias: chart_a
+maintainers:
+  - name: Daniel
+    email: daniel@random.io
+    url: daniel.com
+icon: https://daniel.io/img/image.png
+appVersion: "v1.5.150"
+deprecated: true
+annotations:
+  example: A list of annotations keyed by name (optional).

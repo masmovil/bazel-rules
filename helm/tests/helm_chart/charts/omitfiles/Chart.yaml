@@ -1,0 +1,4 @@
+name: omitfiles
+description: Helm chart with files expected not to be present in the output chart
+version: 1.0.0
+appVersion: 1.0.0
