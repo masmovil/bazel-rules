@@ -30,22 +30,22 @@ def fitler_chart_manifest(srcs, name=""):
     return manifest
 
 # get a dict with the content to populate a Chart.yaml manifest with data fom the helm chart
-def get_chart_subst_args(ctx, chart_deps):
+def get_chart_subst_args(ctx, chart_deps, no_prev_manifest):
     subst_args = {}
 
     chart_name = ctx.attr.chart_name or ctx.attr.package_name
     version = ctx.attr.version or ctx.attr.helm_chart_version
 
-    if ctx.attr.api_version:
-        subst_args["apiVersion"] = ctx.attr.api_version
+    if ctx.attr.api_version or no_prev_manifest:
+        subst_args["apiVersion"] = ctx.attr.api_version or DEFAULT_HELM_API_VERSION
 
     subst_args["name"] = chart_name
 
     if ctx.attr.description:
         subst_args["description"] = ctx.attr.description
 
-    if version:
-        subst_args["version"] = version
+    if version or no_prev_manifest:
+        subst_args["version"] = version or DEFAULT_HELM_CHART_VERSION
 
     if ctx.attr.app_version:
         subst_args["appVersion"] = ctx.attr.app_version
@@ -154,7 +154,7 @@ def _helm_package_impl(ctx):
 
     chart_yaml_path = "" if not chart_manifest_path else chart_yaml.path
 
-    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps))
+    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps, chart_yaml_path == ""))
 
     chart_action_inputs = [yq_bin, yq_subst_expr]
 
@@ -206,7 +206,7 @@ def _helm_package_impl(ctx):
         image_digest_shell_expr = "$(cat {formatted_digest})".format(
             formatted_digest=formatted_digest.path
         )
-    else:
+    elif ctx.attr.image_tag:
         # extract docker image info from make variable or from rule attribute
         values[ctx.attr.values_tag_yaml_path] = get_make_value_or_default(ctx, ctx.attr.image_tag)
 
@@ -297,9 +297,9 @@ helm_package = rule(
         "image": attr.label(allow_single_file = True, mandatory = False),
         "values_tag_yaml_path": attr.string(default = "image.tag"),
         "version": attr.string(mandatory = False),
-        "app_version": attr.string(default = "1.0.0"),
-        "api_version": attr.string(default = "v2"),
-        "description": attr.string(default = "Helm chart"),
+        "app_version": attr.string(),
+        "api_version": attr.string(),
+        "description": attr.string(),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
         "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
         "templates": attr.label_list(allow_files = True, mandatory = False),
