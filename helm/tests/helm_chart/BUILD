@@ -7,6 +7,8 @@ load(":charts.bzl", "get_charts")
     name = "chart_%s" % chart_data.name,
     chart_name = chart_data.name,
     srcs = getattr(chart_data, "srcs", "") or glob(["charts/%s/**" % chart_data.name]),
+    deps = getattr(chart_data, "deps", []),
+    version = getattr(chart_data, "version", ""),
   ) for chart_data in get_charts()
 ]
 

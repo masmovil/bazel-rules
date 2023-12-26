@@ -156,8 +156,13 @@ def _helm_package_impl(ctx):
 
     yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps))
 
+    chart_action_inputs = [yq_bin, yq_subst_expr]
+
+    if chart_yaml:
+        chart_action_inputs += [chart_yaml]
+
     ctx.actions.run_shell(
-        inputs = [yq_bin, chart_yaml, yq_subst_expr],
+        inputs = chart_action_inputs,
         outputs = [out_chart_yaml],
         command = "cat {chart_manifest}| {yq} --from-file {expr_file} > {out_path}".format(
             yq = yq_bin.path,

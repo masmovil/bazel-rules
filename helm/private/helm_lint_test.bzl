@@ -19,5 +19,4 @@ def helm_lint_test(name, chart):
         # provided through args to allow path extension
         args = ["$(HELM_BIN)", "$(rootpath %s)" % chart],
         toolchains = ["@helm_toolchains//:resolved_toolchain"],
-        env_inherit = ["BAZEL_BIN"]
     )
