@@ -5,15 +5,15 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 def add_prefix_to_paths(prefix, files_path):
   return [paths.join(prefix, path) for path in files_path]
 
-def compare_to_yaml_file_test(name, chart_name, file_name, expected_content, chart_dep):
+def compare_to_yaml_file_test(name, yaml_file_path, explicit_yaml_to_compare, chart):
     sh_test_rulename = "_%s_diff" % name
-    expected_content_rulename = "_%s_expected" % name
+    expected_yaml_rulename = "_%s_expected" % name
     test_rulename =  "%s_diff" % name
 
     write_file(
-        name = expected_content_rulename,
+        name = expected_yaml_rulename,
         out = "%s_expected.yaml" % name,
-        content = [expected_content],
+        content = [explicit_yaml_to_compare],
     )
 
     write_file(
@@ -27,11 +27,12 @@ def compare_to_yaml_file_test(name, chart_name, file_name, expected_content, cha
     native.sh_test(
         name = test_rulename,
         srcs = [sh_test_rulename],
-        data = ["@yq_toolchains//:resolved_toolchain", expected_content_rulename, chart_dep],
+        data = ["@yq_toolchains//:resolved_toolchain", expected_yaml_rulename, chart],
         args = [
             "$(YQ_BIN)",
-            "$(location %s)/%s/%s" % (chart_dep, chart_name, file_name),
-            "$(location %s)" % expected_content_rulename
+            yaml_file_path,
+            # "$(location %s)/%s/%s" % (chart_dep, chart_name, file_name),
+            "$(location %s)" % expected_yaml_rulename
         ],
         toolchains = ["@yq_toolchains//:resolved_toolchain"],
     )
@@ -53,19 +54,17 @@ def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_va
     if expected_values != "":
         tests += [compare_to_yaml_file_test(
             name = "%s_values_test_diff" % name,
-            chart_name = chart_name,
-            file_name = "values.yaml",
-            expected_content = expected_values,
-            chart_dep = unpacked_chart_rule_name,
+            yaml_file_path = "$(location %s)/%s/values.yaml" % (unpacked_chart_rule_name, chart_name),
+            explicit_yaml_to_compare = expected_values,
+            chart = unpacked_chart_rule_name,
         )]
 
     if expected_manifest != "":
         tests += [compare_to_yaml_file_test(
             name = "%s_manifest_test_diff" % name,
-            chart_name = chart_name,
-            file_name = "Chart.yaml",
-            expected_content = expected_manifest,
-            chart_dep = unpacked_chart_rule_name,
+            yaml_file_path = "$(location %s)/%s/Chart.yaml" % (unpacked_chart_rule_name, chart_name),
+            explicit_yaml_to_compare = expected_manifest,
+            chart = unpacked_chart_rule_name,
         )]
 
     sh_diff_rulename = "_%s_src_diff.sh" % name
