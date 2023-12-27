@@ -31,7 +31,6 @@ def compare_to_yaml_file_test(name, yaml_file_path, explicit_yaml_to_compare, ch
         args = [
             "$(YQ_BIN)",
             yaml_file_path,
-            # "$(location %s)/%s/%s" % (chart_dep, chart_name, file_name),
             "$(location %s)" % expected_yaml_rulename
         ],
         toolchains = ["@yq_toolchains//:resolved_toolchain"],
