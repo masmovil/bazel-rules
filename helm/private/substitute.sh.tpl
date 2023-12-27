@@ -5,7 +5,6 @@
 export IMAGE_DIGEST={image_digest_expr}
 
 if [ ! -z "${IMAGE_DIGEST}" ]; then
-    echo "Digest: "$IMAGE_DIGEST
     {yq} -i '{image_tag_path} = strenv(IMAGE_DIGEST)' {out};
 fi;
 

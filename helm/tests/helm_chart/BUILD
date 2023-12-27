@@ -1,6 +1,7 @@
 load("//helm:defs.bzl", "helm_chart")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load(":charts.bzl", "get_charts")
+load("@rules_oci//oci:defs.bzl", "oci_image")
 load("//helm/tests/helm_chart:chart_test.bzl", "chart_test", "add_prefix_to_paths")
 
 [
@@ -104,5 +105,32 @@ description: some description with testing pourposes
 version: v2.3.4
 appVersion: v1.0.0
 """,
+)
 
+IMAGE_SHA_256 = "161a1d97d592b3f1919801578c3a47c8e932071168a96267698f4b669c24c76d"
+oci_image(
+  name = "image",
+  base = "@distroless_java",
+)
+
+helm_chart(
+  name = "chart_a_image",
+  chart_name = "a_image",
+  srcs = chart_a_srcs,
+  image = ":image",
+)
+
+chart_test(
+  name = "chart_a_image_test",
+  chart = ":chart_a_image",
+  chart_name = "a_image",
+  prefix_srcs = "charts/a",
+  expected_files = chart_a_srcs,
+  expected_values = """
+labels:
+  somelabel: labelvalue
+image:
+    tag: %s
+    repository: aio@sha256
+""" % IMAGE_SHA_256,
 )

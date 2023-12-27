@@ -210,25 +210,25 @@ def _helm_package_impl(ctx):
         # extract docker image info from make variable or from rule attribute
         values[ctx.attr.values_tag_yaml_path] = get_make_value_or_default(ctx, ctx.attr.image_tag)
 
+    if ctx.attr.image_repository:
+        values[ctx.attr.values_repo_yaml_path] = ctx.attr.image_repository
+
     # image repository substitution is extracted from values.yaml if force_append_repository attr is provided
     image_repo_shell_expr = ''
 
-    if ctx.attr.image_repository:
+    if ctx.attr.force_append_repository:
         _image_repository = ctx.attr.image_repository
 
         if is_image_from_oci:
-            if not _image_repository and ctx.attr.force_append_repository:
-                # Add @sha256 suffix to image repository
+            if not _image_repository:
+                # Add @sha256 suffix to image repository based on actual values
                 image_repo_shell_expr = "$({yq} {repo} {values})@sha256".format(
                     yq=yq_bin.path,
                     repo=ctx.attr.values_repo_yaml_path,
                     values=default_values_yaml_path,
                 )
             else:
-                _image_repository += "@sha256"
-
-        if not image_repo_shell_expr:
-            values[ctx.attr.values_repo_yaml_path] = _image_repository
+                values[ctx.attr.values_repo_yaml_path] = _image_repository + "@sha256"
 
     all_values = dicts.add({}, ctx.attr.values, values)
 
@@ -295,7 +295,7 @@ helm_package = rule(
         "srcs": attr.label_list(allow_files = True, mandatory = True),
         "chart_name": attr.string(mandatory = True),
         "image": attr.label(allow_single_file = True, mandatory = False),
-        "values_tag_yaml_path": attr.string(default = "image.tag"),
+        "values_tag_yaml_path": attr.string(default = ".image.tag"),
         "version": attr.string(mandatory = False),
         "app_version": attr.string(),
         "api_version": attr.string(),
@@ -312,7 +312,7 @@ helm_package = rule(
         "additional_templates": attr.label_list(allow_files = True, mandatory = False),
         "image_tag": attr.string(mandatory = False),
         "image_repository": attr.string(),
-        "values_repo_yaml_path": attr.string(default = "image.repository"),
+        "values_repo_yaml_path": attr.string(default = ".image.repository"),
     },
     toolchains = [
         "@aspect_bazel_lib//lib:yq_toolchain_type",
