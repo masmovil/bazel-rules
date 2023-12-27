@@ -177,7 +177,23 @@ appVersion: 1.1.1
 dependencies:
 - name: a_image_dep
 """,
-# expected_deps = [
-#   struct(name="a_image", expected_values="",expected_manifest="",),
-# ]
+expected_deps = [
+  {
+    "name": "a_image_dep",
+    "expected_values": """
+labels:
+  somelabel: labelvalue
+image:
+    tag: %s
+    repository: aio@sha256
+""" % IMAGE_SHA_256,
+    "expected_manifest": """
+apiVersion: v1
+name: a_image_dep
+description: Helm chart with v1 apiVersion
+version: 1.0.1
+appVersion: 1.5.0
+""",
+  },
+]
 )

@@ -38,7 +38,7 @@ def compare_to_yaml_file_test(name, yaml_file_path, explicit_yaml_to_compare, ch
 
     return  test_rulename
 
-def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_values="", expected_manifest="", expected_deps=None):
+def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_values="", expected_manifest="", expected_deps=[]):
     print("EXPECTED FILES: %s", expected_files)
 
     unpacked_chart_rule_name = "%s_unpacked" % name
@@ -93,6 +93,32 @@ def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_va
             ]
         )
         tests += [src_diff_test_rulename]
+
+    for dep in expected_deps:
+        dep_name = dep["name"]
+        dep_values = dep["expected_values"]
+        dep_manifest = dep["expected_manifest"]
+
+        if dep_values:
+            tests += [
+                compare_to_yaml_file_test(
+                    name = "%s_%s_values_dep_test_diff" % (dep_name, name),
+                    yaml_file_path = "$(location %s)/%s/charts/%s/values.yaml" % (unpacked_chart_rule_name, chart_name, dep_name),
+                    explicit_yaml_to_compare = dep_values,
+                    chart = unpacked_chart_rule_name,
+                )
+            ]
+
+        if dep_manifest:
+            tests += [
+                compare_to_yaml_file_test(
+                    name = "%s_%s_values_dep_test_diff" % (dep_name, name),
+                    yaml_file_path = "$(location %s)/%s/charts/%s/Chart.yaml" % (unpacked_chart_rule_name, chart_name, dep_name),
+                    explicit_yaml_to_compare = dep_manifest,
+                    chart = unpacked_chart_rule_name,
+                )
+            ]
+
 
     native.test_suite(
         name = name,
