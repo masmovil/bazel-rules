@@ -38,7 +38,9 @@ def compare_to_yaml_file_test(name, yaml_file_path, explicit_yaml_to_compare, ch
 
     return  test_rulename
 
-def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_values="", expected_manifest=""):
+def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_values="", expected_manifest="", expected_deps=None):
+    print("EXPECTED FILES: %s", expected_files)
+
     unpacked_chart_rule_name = "%s_unpacked" % name
 
     native.genrule(
@@ -78,9 +80,9 @@ def chart_test(name, chart, chart_name, prefix_srcs, expected_files, expected_va
 
     filtered_expected_files = [file_path for file_path in expected_files if not file_path.endswith("Chart.yaml") and not file_path.endswith("values.yaml")]
 
-    for expected_file in filtered_expected_files:
+    for i, expected_file in enumerate(filtered_expected_files):
         expected_file_name = paths.basename(expected_file)
-        src_diff_test_rulename = "%s_%s_src_diff_test" % (name, expected_file_name)
+        src_diff_test_rulename = "%s_%s_src_diff_test_%d" % (name, expected_file_name, i)
         native.sh_test(
             name = src_diff_test_rulename,
             srcs = [sh_diff_rulename],

@@ -3,6 +3,7 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load(":charts.bzl", "get_charts")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 load("//helm/tests/helm_chart:chart_test.bzl", "chart_test", "add_prefix_to_paths")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 [
   helm_chart(
@@ -133,4 +134,50 @@ image:
     tag: %s
     repository: aio@sha256
 """ % IMAGE_SHA_256,
+)
+
+helm_chart(
+  name = "chart_a_image_dep",
+  chart_name = "a_image_dep",
+  srcs = chart_a_srcs,
+  image = ":image",
+)
+
+helm_chart(
+  name = "chart_b_deps",
+  chart_name = "b_deps",
+  srcs = chart_b_srcs,
+  values = {
+    "labels.somelabel": "testvalue",
+  },
+  deps = [
+    ":chart_a_image_dep"
+  ]
+)
+
+chart_test(
+  name = "chart_b_deps_test",
+  chart = ":chart_b_deps",
+  chart_name = "b_deps",
+  prefix_srcs = "charts/b",
+  expected_files = chart_b_srcs,
+  expected_values = """
+labels:
+  somelabel: testvalue
+image:
+  tag: 41b9e05eac7ac512e2ec02437c7de74c1c6fc579565ced13a0d24cc6b3a1df34
+  repository: https://registry.io@sha256
+""",
+expected_manifest = """
+apiVersion: v2
+name: b_deps
+description: Helm chart with v2 apiVersion
+version: 0.5.0
+appVersion: 1.1.1
+dependencies:
+- name: a_image_dep
+""",
+# expected_deps = [
+#   struct(name="a_image", expected_values="",expected_manifest="",),
+# ]
 )
