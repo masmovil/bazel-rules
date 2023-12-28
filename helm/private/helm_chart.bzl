@@ -1,4 +1,4 @@
-load(":helm_package.bzl", "helm_package")
+load(":chart_srcs.bzl", "chart_srcs")
 load(":helm_lint_test.bzl", "helm_lint_test")
 load(":helm_chart_providers.bzl", "helm_chart_providers")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -13,7 +13,7 @@ def helm_chart(name, chart_name, **kwargs):
 
     chart_version = kwargs.get("version") or kwargs.get("helm_chart_version")
 
-    helm_package(
+    chart_srcs(
         name = helm_pkg_target,
         chart_name = chart_name,
         **kwargs,

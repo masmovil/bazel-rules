@@ -1,6 +1,5 @@
 """Rules for manipulation helm packages."""
 
-load("//helm/private:helm_package.bzl", _helm_package = "helm_package")
 load("//helm/private:helm_chart_providers.bzl", _chart_info = "ChartInfo")
 load("//helm/private:helm_push.bzl", _helm_push = "helm_push")
 load("//helm/private:helm_release.bzl", _helm_release = "helm_release")

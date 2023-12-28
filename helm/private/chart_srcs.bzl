@@ -9,25 +9,44 @@ load(":helm_chart_providers.bzl", "ChartInfo")
 DEFAULT_HELM_API_VERSION = "v2"
 DEFAULT_HELM_CHART_VERSION = "1.0.0"
 
+def find_outer_file(files):
+    file = None if len(files) == 0 else files[0]
+
+    for f in files:
+        if len(f.path) < len(file.path):
+            file = f
+
+    return file
+
+def filter_man_values_from_files(files):
+    return [f for f in files if not f.path.endswith("Chart.yaml") and not f.path.endswith("values.yaml")]
+
 # filter out from chart src files the Chart.yaml manifest
-def fitler_chart_manifest(srcs, name=""):
+def locate_chart_roots(srcs, name=""):
     chart_manifests = []
+    values = []
+    root_path = ""
 
     for src in srcs:
         if src.basename == "Chart.yaml":
             chart_manifests += [src]
 
-    if len(chart_manifests) == 0:
-        fail("Chart dependency has no Chart.yaml manifest %s" % name)
+        if src.basename == "values.yaml":
+            values += [src]
 
-    manifest = chart_manifests[0]
+    if len(chart_manifests) == 0 and len(values) == 0:
+        fail("Chart src files have neither a Chart.yaml manifest nor a values.yaml file. Root path of the chart cannot be located from src files %s" % name)
 
-    if len(chart_manifests) > 1:
-        for m in chart_manifests:
-            if len(m.path) < len(manifest.path):
-                manifest = m
+    manifest = find_outer_file(chart_manifests or [])
+    value_file = find_outer_file(values or [])
 
-    return manifest
+    root_path = manifest.dirname if manifest else value_file.dirname
+
+    return struct(
+        manifest=manifest,
+        values=value_file,
+        root=root_path,
+    )
 
 # get a dict with the content to populate a Chart.yaml manifest with data fom the helm chart
 def get_chart_subst_args(ctx, chart_deps, no_prev_manifest):
@@ -88,16 +107,13 @@ def normalize_yaml_path(yaml_path):
         return "." + yaml_path
 
 
-def _helm_package_impl(ctx):
+def _chart_srcs_impl(ctx):
     """Defines a helm chart (directory containing a Chart.yaml).
     Args:
         name: A unique name for this rule.
         srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
         update_deps: Whether or not to run a helm dependency update prior to packaging.
     """
-    chart_root_path = ""
-    chart_manifest_path = ""
-
     digest_path = ""
     image_tag = ""
 
@@ -119,53 +135,39 @@ def _helm_package_impl(ctx):
         ) for chart_dep in ctx.attr.deps
     ]
 
-    inputs = [yq_bin] + ctx.files.srcs
-    outs = []
-
     # locate rootpath of the chart
-    for i, srcfile in enumerate(ctx.files.srcs):
-        if srcfile.path.endswith("Chart.yaml"):
-            chart_root_path = srcfile.dirname
-            chart_manifest_path = srcfile.path
-            chart_yaml = srcfile
-            break
+    chart_files = locate_chart_roots(ctx.files.srcs)
+    chart_root_path = chart_files.root
+    chart_yaml = chart_files.manifest
 
-        if srcfile.path.endswith("values.yaml") and not chart_root_path:
-            chart_root_path = srcfile.dirname
-
-    if not chart_root_path:
-        fail("No chart root path has been found. You must provide a values.yaml or Chart.yaml file inside your chart sources")
-
-    # copy_files = []
     copied_src_files = []
 
     # copy all chart source files to the output bin directory
     # values.yaml are not copied to the output dir here to be able to modify the sources
-    for file in ctx.files.srcs:
-        if "values.yaml" not in file.path and "Chart.yaml" not in file.path:
-            copied_file = ctx.actions.declare_file(paths.join(chart_name, file.path.replace(chart_root_path + "/", "")))
-            copied_src_files += [copied_file]
-            copy_file_action(
-                ctx=ctx,
-                src=file,
-                dst=copied_file,
-            )
+    for file in filter_man_values_from_files(ctx.files.srcs):
+        copied_file = ctx.actions.declare_file(paths.join(chart_name, file.path.replace(chart_root_path + "/", "")))
+        copied_src_files += [copied_file]
+        copy_file_action(
+            ctx=ctx,
+            src=file,
+            dst=copied_file,
+        )
 
+    # rewrite Chart.yaml to override chart info
     out_chart_yaml = ctx.actions.declare_file(paths.join(chart_name, "Chart.yaml"))
 
-    outs += copied_src_files + [out_chart_yaml]
+    outs = copied_src_files + [out_chart_yaml]
+    inputs = [yq_bin] + ctx.files.srcs + copied_src_files
 
-    chart_yaml_path = "" if not chart_manifest_path else chart_yaml.path
+    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps, chart_yaml == None))
 
-    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps, chart_yaml_path == ""))
-
-    chart_action_inputs = [yq_bin, yq_subst_expr]
+    write_manifest_action_inputs = [yq_bin, yq_subst_expr]
 
     if chart_yaml:
-        chart_action_inputs += [chart_yaml]
+        write_manifest_action_inputs += [chart_yaml]
 
     ctx.actions.run_shell(
-        inputs = chart_action_inputs,
+        inputs = write_manifest_action_inputs,
         outputs = [out_chart_yaml],
         command = "cat {chart_manifest}| {yq} --from-file {expr_file} > {out_path}".format(
             yq = yq_bin.path,
@@ -177,13 +179,11 @@ def _helm_package_impl(ctx):
         mnemonic = "SubstChartManifest",
     )
 
-    inputs += copied_src_files
-
     # Dictionary structure to hold substitute values
     # Used to replace values.yaml chart file
     values = {}
 
-    default_values_yaml_path = paths.join(chart_root_path, "values.yaml")
+    src_values_path = paths.join(chart_root_path, "values.yaml")
 
     is_image_from_oci = ctx.attr.image
 
@@ -203,7 +203,7 @@ def _helm_package_impl(ctx):
             mnemonic = "FormatDigest",
         )
 
-        inputs = inputs + [formatted_digest]
+        inputs += [formatted_digest]
 
         # extract digest from digest formatted file
         image_digest_shell_expr = "$(cat {formatted_digest})".format(
@@ -228,7 +228,7 @@ def _helm_package_impl(ctx):
                 image_repo_shell_expr = "$({yq} {repo} {values})@sha256".format(
                     yq=yq_bin.path,
                     repo=ctx.attr.values_repo_yaml_path,
-                    values=default_values_yaml_path,
+                    values=src_values_path,
                 )
             else:
                 values[ctx.attr.values_repo_yaml_path] = _image_repository + "@sha256"
@@ -250,7 +250,7 @@ def _helm_package_impl(ctx):
             "{yq}": yq_bin.path,
             "{expression}": yq_expression_file.path,
             "{out}": output_values_yaml.path,
-            "{values}": default_values_yaml_path,
+            "{values}": src_values_path,
             "{image_digest_expr}": image_digest_shell_expr,
             "{image_tag_path}": normalize_yaml_path(ctx.attr.values_tag_yaml_path),
             "{image_repo_expr}": image_repo_shell_expr,
@@ -270,11 +270,10 @@ def _helm_package_impl(ctx):
 
     for dep in chart_deps:
 
-        chart_manifest = fitler_chart_manifest(dep.srcs, dep.name)
-        chart_dep_root_path = chart_manifest.dirname
+        dep_chart_files = locate_chart_roots(dep.srcs, dep.name)
 
         for dep_src in dep.srcs:
-            out_path = paths.join(chart_name, "charts", dep.name, dep_src.path.replace(chart_dep_root_path + "/", ""))
+            out_path = paths.join(chart_name, "charts", dep.name, dep_src.path.replace(dep_chart_files.root + "/", ""))
 
             dep_out = ctx.actions.declare_file(out_path)
 
@@ -292,8 +291,8 @@ def _helm_package_impl(ctx):
         )
     ]
 
-helm_package = rule(
-    implementation = _helm_package_impl,
+chart_srcs = rule(
+    implementation = _chart_srcs_impl,
     attrs = {
         "srcs": attr.label_list(allow_files = True, mandatory = True),
         "chart_name": attr.string(mandatory = True),
