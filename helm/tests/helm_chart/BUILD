@@ -24,18 +24,18 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
   ) for chart_data in get_charts()
 ]
 
-chart_a_srcs = add_prefix_to_paths("charts/a", [
+chart_a_srcs = [
   "Chart.yaml",
   "values.yaml",
   "templates/_helpers.tpl",
   "templates/deployment.yaml",
   "templates/svc.yaml",
-])
+]
 
 helm_chart(
   name = "chart_a_values_overrides",
   chart_name = "a_values",
-  srcs = chart_a_srcs,
+  srcs = add_prefix_to_paths("charts/a", chart_a_srcs),
   version = "0.0.0",
   values = {
     "labels.somelabel": "testvalue",
@@ -76,17 +76,17 @@ appVersion: 1.5.0
 
 )
 
-chart_b_srcs = add_prefix_to_paths("charts/b", [
+chart_b_srcs = [
   "Chart.yaml",
   "values.yaml",
   "templates/_helpers.tpl",
   "templates/deployment.yaml",
-])
+]
 
 helm_chart(
   name = "chart_b_manifest_overrides",
   chart_name = "b_manifest",
-  srcs = chart_b_srcs,
+  srcs = add_prefix_to_paths("charts/b", chart_b_srcs),
   version = "v2.3.4",
   app_version = "v1.0.0",
   api_version = "v2",
@@ -117,7 +117,7 @@ oci_image(
 helm_chart(
   name = "chart_a_image",
   chart_name = "a_image",
-  srcs = chart_a_srcs,
+  srcs = add_prefix_to_paths("charts/a", chart_a_srcs),
   image = ":image",
 )
 
@@ -139,19 +139,34 @@ image:
 helm_chart(
   name = "chart_a_image_dep",
   chart_name = "a_image_dep",
-  srcs = chart_a_srcs,
+  srcs = add_prefix_to_paths("charts/a", chart_a_srcs),
   image = ":image",
+)
+
+chart_nomanifest_srcs = [
+  "values.yaml",
+  "templates/_helpers.tpl",
+  "templates/deployment.yaml",
+  "templates/svc.yaml",
+]
+
+helm_chart(
+  name = "chart_nomanifest_dep",
+  chart_name = "nomanifest_dep",
+  version = "1.6.9",
+  srcs = add_prefix_to_paths("charts/nomanifest", chart_nomanifest_srcs),
 )
 
 helm_chart(
   name = "chart_b_deps",
   chart_name = "b_deps",
-  srcs = chart_b_srcs,
+  srcs = add_prefix_to_paths("charts/b", chart_b_srcs),
   values = {
     "labels.somelabel": "testvalue",
   },
   deps = [
-    ":chart_a_image_dep"
+    ":chart_a_image_dep",
+    ":chart_nomanifest_dep",
   ]
 )
 
@@ -176,6 +191,8 @@ version: 0.5.0
 appVersion: 1.1.1
 dependencies:
 - name: a_image_dep
+- name: nomanifest_dep
+  version: 1.6.9
 """,
 expected_deps = [
   {
@@ -194,6 +211,18 @@ description: Helm chart with v1 apiVersion
 version: 1.0.1
 appVersion: 1.5.0
 """,
+    "expected_files": chart_a_srcs,
+    "prefix_srcs": "charts/a",
+  },
+  {
+    "name": "nomanifest_dep",
+    "expected_manifest": """
+apiVersion: v2
+name: nomanifest_dep
+version: 1.6.9
+""",
+    "expected_files": chart_nomanifest_srcs,
+    "prefix_srcs": "charts/nomanifest",
   },
 ]
 )

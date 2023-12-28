@@ -133,6 +133,9 @@ def _helm_package_impl(ctx):
         if srcfile.path.endswith("values.yaml") and not chart_root_path:
             chart_root_path = srcfile.dirname
 
+    if not chart_root_path:
+        fail("No chart root path has been found. You must provide a values.yaml or Chart.yaml file inside your chart sources")
+
     # copy_files = []
     copied_src_files = []
 
