@@ -216,6 +216,11 @@ appVersion: 1.5.0
   },
   {
     "name": "nomanifest_dep",
+    "expected_values": """
+image:
+  tag: latest
+  repository: gcr
+""",
     "expected_manifest": """
 apiVersion: v2
 name: nomanifest_dep
@@ -225,4 +230,34 @@ version: 1.6.9
     "prefix_srcs": "charts/nomanifest",
   },
 ]
+)
+
+helm_chart(
+  name = "chart_nomanifest_files",
+  chart_name = "nomanifest_files",
+  srcs = add_prefix_to_paths("charts/nomanifest", chart_nomanifest_srcs),
+  values = {
+    "test.value.key": "testvalue"
+  }
+)
+
+chart_test(
+  name = "chart_nomanifest_files_test",
+  chart_name = "nomanifest_files",
+  chart = ":chart_nomanifest_files",
+  prefix_srcs = "charts/nomanifest",
+  expected_files = chart_nomanifest_srcs,
+  expected_values = """
+test:
+  value:
+    key: testvalue
+image:
+  tag: latest
+  repository: gcr
+""",
+expected_manifest = """
+apiVersion: v2
+name: nomanifest_files
+version: 1.0.0
+""",
 )

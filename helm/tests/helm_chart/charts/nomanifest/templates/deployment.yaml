@@ -19,7 +19,6 @@ spec:
         app: {{ template "base.name" . }}
         fullapp: {{ template "base.fullapp" .}}
         version: {{ .Chart.Version | replace "+" "_" }}
-        {{- toYaml .Values.labels | nindent 8 }}
     spec:
       containers:
         - name: {{ template "base.name" . }}
