@@ -1,9 +1,7 @@
-load("//helpers:helpers.bzl", "get_make_value_or_default", "write_sh")
-load("@aspect_bazel_lib//lib/private:copy_to_bin.bzl", "copy_files_to_bin_actions")
+load("//helpers:helpers.bzl", "get_make_value_or_default")
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file_action")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@bazel_skylib//lib:shell.bzl", "shell")
 load(":helm_chart_providers.bzl", "ChartInfo")
 load("@io_bazel_rules_docker//container:providers.bzl", "ImageInfo", "LayerInfo")
 
