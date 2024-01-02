@@ -12,18 +12,33 @@ extended_pull_attrs = dicts.add({
 
 def _toolchains_extension_impl(mctx):
     for mod in mctx.modules:
-        for attr in mod.tags.helm:
-            register_helm_toolchains(attr.name, attr.version)
+        for attr in mod.tags.install:
+            register_helm_toolchains(attr.helm_name, attr.helm_version)
+            register_sops_toolchains(attr.sops_name, attr.sops_version)
+            register_gcloud_toolchains(attr.gcloud_name, attr.gcloud_version)
+            register_kubectl_toolchains(attr.kubectl_name, attr.kubectl_version)
 
-        for attr in mod.tags.sops:
-            register_sops_toolchains(attr.name, attr.version)
 
-        for attr in mod.tags.gcloud:
-            register_gcloud_toolchains(attr.name, attr.version)
+toolchains = module_extension(
+    implementation = _toolchains_extension_impl,
+    tag_classes = {
+        "install": tag_class(
+            attrs = {
+                "helm_name": attr.string(default = "helm"),
+                "helm_version": attr.string(default = HELM_DEFAULT_VERSION),
+                "kubectl_name": attr.string(default = "kubectl"),
+                "kubectl_version": attr.string(default = KUBECTL_DEFAULT_VERSION),
+                "gcloud_name": attr.string(default = "gcloud"),
+                "gcloud_version": attr.string(default = GCLOUD_DEFAULT_VERSION),
+                "sops_name": attr.string(default = "sops"),
+                "sops_version": attr.string(default = SOPS_DEFAULT_VERSION),
+            }
+        ),
+    },
+)
 
-        for attr in mod.tags.kubectl:
-            register_kubectl_toolchains(attr.name, attr.version)
-
+def _utils_extension_impl(mctx):
+    for mod in mctx.modules:
         for pull in mod.tags.pull:
             helm_pull(
                 chart_name = pull.chart_name,
@@ -33,14 +48,9 @@ def _toolchains_extension_impl(mctx):
                 sha256 = pull.sha256,
             )
 
-
-toolchains = module_extension(
-    implementation = _toolchains_extension_impl,
+utils = module_extension(
+    implementation = _utils_extension_impl,
     tag_classes = {
         "pull": tag_class(attrs = extended_pull_attrs),
-        "helm": tag_class(attrs = {"name": attr.string(default = "helm"), "version": attr.string(default = HELM_DEFAULT_VERSION)}),
-        "kubectl": tag_class(attrs = {"name": attr.string(default = "kubectl"), "version": attr.string(default = KUBECTL_DEFAULT_VERSION)}),
-        "gcloud": tag_class(attrs = {"name": attr.string(default = "gcloud"), "version": attr.string(default = GCLOUD_DEFAULT_VERSION)}),
-        "sops": tag_class(attrs = {"name": attr.string(default = "sops"), "version": attr.string(default = SOPS_DEFAULT_VERSION)}),
     },
 )
