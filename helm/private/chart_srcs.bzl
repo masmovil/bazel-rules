@@ -5,6 +5,7 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:shell.bzl", "shell")
 load(":helm_chart_providers.bzl", "ChartInfo")
+load("@io_bazel_rules_docker//container:providers.bzl", "ImageInfo", "LayerInfo")
 
 DEFAULT_HELM_API_VERSION = "v2"
 DEFAULT_HELM_CHART_VERSION = "1.0.0"
@@ -107,6 +108,47 @@ def normalize_yaml_path(yaml_path):
         return "." + yaml_path
 
 
+def image_digest_processor(ctx):
+    if not ctx.attr.image:
+        return None, ""
+
+    # docker_image_provider = ctx.attr.image[ImageInfo]
+    docker_image_provider = ""
+
+    is_oci_image = False
+
+    # Check if image attr comes from a docker_rule or oci_image
+    # look for a Docker rule ImageInfo provider
+    is_oci_image = False if docker_image_provider else True
+
+    sha_file = ""
+    sha_shell_extr_expr = ""
+
+    if is_oci_image:
+        # if it's a image from oci, we get the .digest file from image_digest attr
+        digest_file = ctx.file.image_digest
+
+        sha_file = ctx.actions.declare_file("%s_image_formatted_digest.yaml" % ctx.label.name)
+        ctx.actions.run_shell(
+            tools = [],
+            inputs = [digest_file],
+            outputs = [sha_file],
+            command = "cat %s| awk -F':' '{print $2}' > %s" % (digest_file.path, sha_file.path),
+            progress_message = "Parse oci image digest sha256 file",
+            mnemonic = "FormatDigest",
+        )
+    else:
+        # if it's a docker image we get the digest file via bazel providers
+        sha_file = docker_image_provider.container_parts["digest"]
+
+    sha_shell_extr_expr = "$(cat {sha_file})".format(
+        sha_file=sha_file.path
+    )
+
+    return sha_file, sha_shell_extr_expr
+
+
+
 def _chart_srcs_impl(ctx):
     """Defines a helm chart (directory containing a Chart.yaml).
     Args:
@@ -157,7 +199,7 @@ def _chart_srcs_impl(ctx):
     out_chart_yaml = ctx.actions.declare_file(paths.join(chart_name, "Chart.yaml"))
 
     outs = copied_src_files + [out_chart_yaml]
-    inputs = [yq_bin] + ctx.files.srcs + copied_src_files
+    values_inputs = [yq_bin] + ctx.files.srcs + copied_src_files
 
     yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps, chart_yaml == None))
 
@@ -190,26 +232,12 @@ def _chart_srcs_impl(ctx):
     # image digest is extracted from a file placed in bazel out
     image_digest_shell_expr = ''
 
-    # extract iamge digest from oci bazel rule output
-    if is_image_from_oci:
-        formatted_digest = ctx.actions.declare_file("%s_image_formatted_digest.yaml" % ctx.label.name)
-        digest_file = ctx.file.image
-        ctx.actions.run_shell(
-            tools = [],
-            inputs = [digest_file],
-            outputs = [formatted_digest],
-            command = "cat %s| awk -F':' '{print $2}' > %s" % (digest_file.path, formatted_digest.path),
-            progress_message = "Reading oci image digest sha256...",
-            mnemonic = "FormatDigest",
-        )
+    sha_file, sha_extr_expr = image_digest_processor(ctx)
 
-        inputs += [formatted_digest]
+    if sha_file:
+        values_inputs += [sha_file]
 
-        # extract digest from digest formatted file
-        image_digest_shell_expr = "$(cat {formatted_digest})".format(
-            formatted_digest=formatted_digest.path
-        )
-    elif ctx.attr.image_tag:
+    if ctx.attr.image_tag:
         # extract docker image info from make variable or from rule attribute
         values[ctx.attr.values_tag_yaml_path] = get_make_value_or_default(ctx, ctx.attr.image_tag)
 
@@ -251,15 +279,17 @@ def _chart_srcs_impl(ctx):
             "{expression}": yq_expression_file.path,
             "{out}": output_values_yaml.path,
             "{values}": src_values_path,
-            "{image_digest_expr}": image_digest_shell_expr,
+            "{image_digest_expr}": sha_extr_expr,
             "{image_tag_path}": normalize_yaml_path(ctx.attr.values_tag_yaml_path),
             "{image_repo_expr}": image_repo_shell_expr,
             "{image_repo_path}": normalize_yaml_path(ctx.attr.values_repo_yaml_path),
         },
     )
 
+    values_inputs += [yq_expression_file, output_values_script_yaml]
+
     ctx.actions.run(
-        inputs = inputs + [yq_expression_file, output_values_script_yaml],
+        inputs = values_inputs,
         outputs = [output_values_yaml],
         executable = output_values_script_yaml,
         progress_message = "Writing values to chart values.yaml file...",
@@ -297,6 +327,7 @@ chart_srcs = rule(
         "srcs": attr.label_list(allow_files = True, mandatory = True),
         "chart_name": attr.string(mandatory = True),
         "image": attr.label(allow_single_file = True, mandatory = False),
+        "image_digest": attr.label(allow_single_file = True, mandatory = False),
         "values_tag_yaml_path": attr.string(default = ".image.tag"),
         "version": attr.string(mandatory = False),
         "app_version": attr.string(),

@@ -32,3 +32,7 @@ register_toolchains("@helm_toolchains//:all")
 register_toolchains("@sops_toolchains//:all")
 register_toolchains("@kubectl_toolchains//:all")
 register_toolchains("@gcloud_toolchains//:all")
+
+
+deps = use_extension("@masmovil_bazel_rules//:deps_extension.bzl", "non_module_dependencies")
+use_repo(deps, "io_bazel_rules_docker")

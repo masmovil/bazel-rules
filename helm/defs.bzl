@@ -8,20 +8,23 @@ load("//helm/private:helm_lint_test.bzl", _helm_lint = "helm_lint_test")
 load("//helm/private:helm_chart.bzl", _helm_chart = "helm_chart")
 load("//helm/private:helm_pull.bzl", _helm_pull = "helm_pull")
 
-def helm_chart(name, image="", **kwargs):
-    args = kwargs
+def helm_chart(name, **kwargs):
+    image = kwargs.get("image")
 
     if image:
-        args["image"] = image + ".digest"
-
-    _helm_chart(
-        name = name,
-        **args,
-    )
+        _helm_chart(
+            name = name,
+            image_digest = image + ".digest",
+            **kwargs,
+        )
+    else:
+        _helm_chart(
+            name = name,
+            **kwargs,
+        )
 
 
 # Explicitly re-export the functions
-# helm_chart = _helm_chart
 helm_push = _helm_push
 helm_pull = _helm_pull
 helm_release = _helm_release
