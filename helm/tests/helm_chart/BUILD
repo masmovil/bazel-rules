@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 load("//helm:defs.bzl", "helm_chart")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load(":charts.bzl", "get_charts")

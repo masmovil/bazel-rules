@@ -6,7 +6,7 @@ load("//helm/private:helm_release.bzl", _helm_release = "helm_release")
 load("//helm/private:helm_uninstall.bzl", _helm_uninstall = "helm_uninstall")
 load("//helm/private:helm_lint_test.bzl", _helm_lint = "helm_lint_test")
 load("//helm/private:helm_chart.bzl", _helm_chart = "helm_chart")
-load("//helm/private:helm_pull.bzl", _helm_pull = "helm_pull")
+load("//helm/private:helm_pull.bzl", _helm_pull = "helm_pull", _pull_attr = "pull_attrs")
 
 def helm_chart(name, **kwargs):
     image = kwargs.get("image")
@@ -26,6 +26,7 @@ def helm_chart(name, **kwargs):
 
 # Explicitly re-export the functions
 helm_push = _helm_push
+pull_attrs = _pull_attr
 helm_pull = _helm_pull
 helm_release = _helm_release
 helm_uninstall = _helm_uninstall

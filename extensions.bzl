@@ -1,17 +1,14 @@
-load("@masmovil_bazel_rules//helm:defs.bzl", "helm_pull")
+load("@masmovil_bazel_rules//helm:defs.bzl", "helm_pull", "pull_attrs")
 load("@masmovil_bazel_rules//toolchains:register.bzl", "register_helm_toolchains", "register_sops_toolchains", "register_gcloud_toolchains", "register_kubectl_toolchains")
 load("@masmovil_bazel_rules//toolchains/helm:toolchain.bzl", "HELM_DEFAULT_VERSION")
 load("@masmovil_bazel_rules//toolchains/sops:toolchain.bzl", "SOPS_DEFAULT_VERSION")
 load("@masmovil_bazel_rules//toolchains/gcloud:toolchain.bzl", "GCLOUD_DEFAULT_VERSION")
 load("@masmovil_bazel_rules//toolchains/kubectl:toolchain.bzl", "KUBECTL_DEFAULT_VERSION")
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
-pull_attrs = {
-    "chart_name": attr.string(mandatory = True),
+extended_pull_attrs = dicts.add({
     "name": attr.string(mandatory = True),
-    "url": attr.string(mandatory = True),
-    "version": attr.string(mandatory = True),
-    "sha256": attr.string(mandatory = False, doc = "Sha of the helm chart"),
-}
+}, pull_attrs)
 
 def _toolchains_extension_impl(mctx):
     for mod in mctx.modules:
@@ -31,7 +28,7 @@ def _toolchains_extension_impl(mctx):
             helm_pull(
                 chart_name = pull.chart_name,
                 name = pull.name,
-                url = pull.url,
+                repo_url = pull.repo_url,
                 version = pull.version,
                 sha256 = pull.sha256,
             )
@@ -40,7 +37,7 @@ def _toolchains_extension_impl(mctx):
 toolchains = module_extension(
     implementation = _toolchains_extension_impl,
     tag_classes = {
-        "pull": tag_class(attrs = pull_attrs),
+        "pull": tag_class(attrs = extended_pull_attrs),
         "helm": tag_class(attrs = {"name": attr.string(default = "helm"), "version": attr.string(default = HELM_DEFAULT_VERSION)}),
         "kubectl": tag_class(attrs = {"name": attr.string(default = "kubectl"), "version": attr.string(default = KUBECTL_DEFAULT_VERSION)}),
         "gcloud": tag_class(attrs = {"name": attr.string(default = "gcloud"), "version": attr.string(default = GCLOUD_DEFAULT_VERSION)}),
