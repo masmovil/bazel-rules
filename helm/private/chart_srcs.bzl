@@ -49,7 +49,7 @@ def locate_chart_roots(srcs, name=""):
     )
 
 # get a dict with the content to populate a Chart.yaml manifest with data fom the helm chart
-def get_chart_subst_args(ctx, chart_deps, no_prev_manifest):
+def get_manifest_subst_args(ctx, chart_deps, no_prev_manifest):
     subst_args = {}
 
     chart_name = ctx.attr.chart_name or ctx.attr.package_name
@@ -69,10 +69,19 @@ def get_chart_subst_args(ctx, chart_deps, no_prev_manifest):
     if ctx.attr.app_version:
         subst_args["appVersion"] = ctx.attr.app_version
 
+
+    deps_conditions = ctx.attr.deps_conditions or {}
+
     for i, dep in enumerate(chart_deps):
         subst_args[".dependencies[%s].name" % i] = dep.name
+
         if dep.version:
             subst_args[".dependencies[%s].version" % i] = dep.version
+
+        condition = deps_conditions.get(dep.name)
+
+        if condition:
+            subst_args[".dependencies[%s].condition" % i] = condition
 
     return subst_args
 
@@ -215,7 +224,7 @@ def _chart_srcs_impl(ctx):
     outs = copied_src_files + [out_chart_yaml]
     values_inputs = [yq_bin] + ctx.files.srcs + copied_src_files
 
-    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_chart_subst_args(ctx, chart_deps, chart_yaml == None))
+    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_manifest_subst_args(ctx, chart_deps, chart_yaml == None))
 
     write_manifest_action_inputs = [yq_bin, yq_subst_expr]
 
@@ -369,6 +378,7 @@ chart_srcs = rule(
         "description": attr.string(),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
         "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
+        "deps_conditions": attr.string_dict(),
         "templates": attr.label_list(allow_files = True, mandatory = False),
         "values": attr.string_dict(),
         "force_append_repository": attr.bool(default = True),

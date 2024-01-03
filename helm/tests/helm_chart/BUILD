@@ -235,6 +235,57 @@ version: 1.6.9
 )
 
 helm_chart(
+  name = "chart_b_dep_condition",
+  chart_name = "b_dep_condition",
+  srcs = add_prefix_to_paths("charts/b", chart_b_srcs),
+  values = {
+    "test.enabled": "true",
+  },
+  deps = [
+    ":chart_nomanifest_dep",
+  ],
+  deps_conditions = {
+    "nomanifest_dep": "test.enabled",
+  }
+)
+
+chart_test(
+  name = "chart_b_dep_condition_test",
+  chart = ":chart_b_dep_condition",
+  chart_name = "b_dep_condition",
+  prefix_srcs = "charts/b",
+  expected_files = chart_b_srcs,
+expected_manifest = """
+apiVersion: v2
+name: b_dep_condition
+description: Helm chart with v2 apiVersion
+version: 0.5.0
+appVersion: 1.1.1
+dependencies:
+- name: nomanifest_dep
+  version: 1.6.9
+  condition: test.enabled
+""",
+expected_deps = [
+  {
+    "name": "nomanifest_dep",
+    "expected_values": """
+image:
+  tag: latest
+  repository: gcr
+""",
+    "expected_manifest": """
+apiVersion: v2
+name: nomanifest_dep
+version: 1.6.9
+""",
+    "expected_files": chart_nomanifest_srcs,
+    "prefix_srcs": "charts/nomanifest",
+  },
+]
+)
+
+helm_chart(
   name = "chart_nomanifest_files",
   chart_name = "nomanifest_files",
   srcs = add_prefix_to_paths("charts/nomanifest", chart_nomanifest_srcs),
