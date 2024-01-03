@@ -6,9 +6,12 @@ load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", "strip_prefix")
 
 def helm_chart(name, chart_name, **kwargs):
+    """
+
+    Args:
+    """
     helm_pkg_target = "%s_package" % name
     helm_pkg_out_strip_target = "%s_src_helm_files" % name
-    deps_rule_target = "%s_charts_deps" % name
     tar_target = "%s_tar" % name
 
     chart_version = kwargs.get("version") or kwargs.get("helm_chart_version")

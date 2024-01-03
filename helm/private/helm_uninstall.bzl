@@ -1,5 +1,17 @@
 load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
+_DOC = """
+
+"""
+
+
+_ATTRS = {
+  "namespace": attr.string(mandatory = False, doc = ""),
+  "namespace_dep": attr.label(mandatory = False, doc = ""),
+  "release_name": attr.string(mandatory = True, doc = ""),
+  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = ""),
+  "wait": attr.bool(default = True, doc = ""),
+}
 def _helm_uninstall_impl(ctx):
     """Uninstall a helm release.
     Args:
@@ -46,14 +58,8 @@ def _helm_uninstall_impl(ctx):
 
 helm_uninstall = rule(
     implementation = _helm_uninstall_impl,
-    attrs = {
-      "namespace": attr.string(mandatory = False),
-      "namespace_dep": attr.label(mandatory = False),
-      "release_name": attr.string(mandatory = True),
-      "kubernetes_context": attr.label(mandatory = False, allow_single_file = True),
-      "wait": attr.bool(default = True),
-    },
-    doc = "Uninstall a helm release",
+    attrs = _ATTRS,
+    doc = _DOC,
     toolchains = [
         "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
     ],

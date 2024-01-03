@@ -1,12 +1,7 @@
-def sopfiles(ctx, f):
-  """Return the sop file relative path of f."""
-  return f.path
 
-def declare_output(ctx, f, outputs):
-  """Declare sop decrypted outputs"""
-  out = ctx.actions.declare_file("dec." + f.basename)
-  outputs.append(out)
-  return out.path
+_DOC = """
+"""
+
 
 def _sops_decrypt_impl(ctx):
     """This impl. allows reference and decrypt secrets.yaml files using mozilla sops
@@ -47,12 +42,12 @@ def _sops_decrypt_impl(ctx):
 
 sops_decrypt = rule(
     implementation = _sops_decrypt_impl,
+    doc = _DOC,
     attrs = {
-      "srcs": attr.label_list(allow_files = True, mandatory = True),
-      "sops_yaml": attr.label(allow_single_file = True, mandatory = True),
+      "srcs": attr.label_list(allow_files = True, mandatory = True, doc = ""),
+      "sops_yaml": attr.label(allow_single_file = True, mandatory = True, doc = ""),
     },
     toolchains = [
         "@masmovil_bazel_rules//toolchains/sops:toolchain_type",
     ],
-    doc = "Runs sops decrypt to decrypt secret files",
 )

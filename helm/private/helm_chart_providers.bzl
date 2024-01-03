@@ -4,12 +4,29 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:shell.bzl", "shell")
 
-ChartInfo = provider(fields = [
-    "targz",
-    "chart_name",
-    "chart_version",
-    "chart_srcs",
-])
+_PROVIDER_DOC = """
+
+"""
+
+ChartInfo = provider(
+    doc = _PROVIDER_DOC,
+    fields = {
+        "targz": "",
+        "chart_name": "",
+        "chart_version": "",
+        "chart_srcs": "",
+    }
+)
+
+_DOC = """
+"""
+
+_ATTRS = {
+    "chart_name": attr.string(mandatory = True, doc = ""),
+    "chart_targz": attr.label(allow_single_file = True, mandatory = True, doc = ""),
+    "chart_bin_srcs": attr.label(allow_files = True, mandatory = True, doc = ""),
+    "chart_version": attr.string(mandatory = False, doc = ""),
+}
 
 def _helm_chart_providers_impl(ctx):
     """Defines a helm chart (directory containing a Chart.yaml).
@@ -34,11 +51,6 @@ def _helm_chart_providers_impl(ctx):
 
 helm_chart_providers = rule(
     implementation = _helm_chart_providers_impl,
-    attrs = {
-        "chart_name": attr.string(mandatory = True),
-        "chart_targz": attr.label(allow_single_file = True, mandatory = True,),
-        "chart_bin_srcs": attr.label(allow_files = True, mandatory = True,),
-        "chart_version": attr.string(mandatory = False,),
-    },
-    doc = "",
+    doc = _DOC,
+    attrs = _ATTRS,
 )

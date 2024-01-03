@@ -1,3 +1,7 @@
+
+_DOC = """
+"""
+
 def _gcs_upload_impl(ctx):
     """Push an artifact to Google Cloud Storage
     Args:
@@ -43,10 +47,10 @@ def _gcs_upload_impl(ctx):
 gcs_upload = rule(
     implementation = _gcs_upload_impl,
     attrs = {
-      "src": attr.label(allow_single_file = True, mandatory = True),
-      "destination": attr.string(mandatory = True),
+      "src": attr.label(allow_single_file = True, mandatory = True, doc = ""),
+      "destination": attr.string(mandatory = True, doc = ""),
     },
-    doc = "Upload a file to a Google Cloud Storage Bucket",
+    doc = _DOC,
     toolchains = [
       "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
     ],

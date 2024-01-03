@@ -2,16 +2,10 @@ load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 load(":helm_chart_providers.bzl", "ChartInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+_DOC = """
+"""
 
 def _helm_push_impl(ctx):
-    """Push helm chart to a helm repository
-    Args:
-        name: A unique name for this rule.
-        chart: Reference to a helm_chart rule
-        repository_url: Url of the remote helm repository
-        repository_config: File with the config
-    """
-
     chart = ctx.file.chart
     chart_name = ctx.attr.chart[ChartInfo].chart_name
 
@@ -78,10 +72,10 @@ fi
 helm_push = rule(
     implementation = _helm_push_impl,
     attrs = {
-      "chart": attr.label(allow_single_file = True, mandatory = True, providers = [ChartInfo]),
-      "repository_url": attr.string(mandatory = True)
+      "chart": attr.label(allow_single_file = True, mandatory = True, providers = [ChartInfo], doc = ""),
+      "repository_url": attr.string(mandatory = True, doc = ""),
     },
-    doc = "Push helm chart to a helm repository",
+    doc = _DOC,
     toolchains = [
         "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
         "@aspect_bazel_lib//lib:yq_toolchain_type",

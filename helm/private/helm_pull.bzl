@@ -1,13 +1,17 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+_DOC = """
+
+"""
+
 pull_attrs = {
-    "chart_name": attr.string(mandatory = True),
-    "repo_url": attr.string(mandatory = True),
-    "repo_name": attr.string(mandatory = False),
+    "chart_name": attr.string(mandatory = True, doc=""),
+    "repo_url": attr.string(mandatory = True, doc=""),
+    "repo_name": attr.string(mandatory = False, doc=""),
     # TODO: extract latest version from repo index and mark version as an optional attr
-    "version": attr.string(mandatory = True),
+    "version": attr.string(mandatory = True, doc=""),
     "sha256": attr.string(mandatory = False, doc = "Sha of the helm chart"),
-    "repository_config": attr.label(allow_single_file = True, mandatory = False),
+    "repository_config": attr.label(allow_single_file = True, mandatory = False, doc=""),
 }
 
 def _helm_pull_impl(rctx):
@@ -70,5 +74,5 @@ helm_chart(
 helm_pull = repository_rule(
     implementation = _helm_pull_impl,
     attrs = pull_attrs,
-    doc = "Pull helm charts from external helm repositories",
+    doc = _DOC,
 )

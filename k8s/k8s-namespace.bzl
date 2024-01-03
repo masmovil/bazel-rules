@@ -3,13 +3,26 @@ load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 
 NamespaceDataInfo = provider(fields=["namespace"])
 
-def runfile(ctx, f):
-  """Return the runfiles relative path of f."""
+# Return the runfiles relative path of f
+def _runfile(ctx, f):
   if ctx.workspace_name:
     return ctx.workspace_name + "/" + f.short_path
   else:
     return f.short_path
 
+_DOC = """
+"""
+
+_ATTRS = {
+  "namespace_name": attr.string(mandatory = True, doc = ""),
+  "kubernetes_sa": attr.string(mandatory = False, doc = ""),
+  "gcp_sa_project": attr.string(mandatory = False, doc = ""),
+  "gcp_sa": attr.string(mandatory = False, doc = ""),
+  "gcp_gke_project": attr.string(mandatory = False, doc = ""),
+  "workload_identity_namespace": attr.string(mandatory = False, doc = ""),
+  "kubernetes_context": attr.string(mandatory = False, doc = ""),
+  "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl", doc = ""),
+}
 
 def _k8s_namespace_impl(ctx):
     """Installs or upgrades a helm release.
@@ -64,7 +77,7 @@ def _k8s_namespace_impl(ctx):
             "{WORKLOAD_IDENTITY_NAMESPACE}": workload_identity_namespace,
             "{KUBERNETES_CONTEXT}": kubernetes_context,
             "%{stamp_statements}": "\n".join([
-              "read_variables %s" % runfile(ctx, f)
+              "read_variables %s" % _runfile(ctx, f)
               for f in stamp_files]),
         }
     )
@@ -83,17 +96,8 @@ def _k8s_namespace_impl(ctx):
 
 k8s_namespace = rule(
     implementation = _k8s_namespace_impl,
-    attrs = {
-      "namespace_name": attr.string(mandatory = True),
-      "kubernetes_sa": attr.string(mandatory = False),
-      "gcp_sa_project": attr.string(mandatory = False),
-      "gcp_sa": attr.string(mandatory = False),
-      "gcp_gke_project": attr.string(mandatory = False),
-      "workload_identity_namespace": attr.string(mandatory = False),
-      "kubernetes_context": attr.string(mandatory = False),
-      "_script_template": attr.label(allow_single_file = True, default = ":k8s-namespace.sh.tpl"),
-    },
-    doc = "Creates a new kubernetes namespace and annotates it with workload identity",
+    attrs = _ATTRS,
+    doc = _DOC,
     toolchains = [
       "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
       "@masmovil_bazel_rules//toolchains/kubectl:toolchain_type",

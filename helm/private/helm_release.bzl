@@ -1,16 +1,33 @@
 load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
+_DOC = """
+  Installs or upgrades a helm release.
+  Args:
+      name: A unique name for this rule.
+      chart: Chart to install
+      namespace: Namespace where release is installed to
+      namespace_dep: Namespace from k8s rule
+      release_name: Name of the helm release
+      values: Specify values yaml to override default
+      set: Specify key value set config
+"""
+
+_ATTRS = {
+  "chart": attr.label(allow_single_file = True, mandatory = True, doc = ""),
+  "namespace": attr.string(default = "default", doc = ""),
+  "namespace_dep": attr.label(mandatory = False, doc = ""),
+  "values": attr.label_list(allow_files = True, mandatory = False, doc = ""),
+  "release_name": attr.string(mandatory = True, doc = ""),
+  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = ""),
+  "create_namespace": attr.bool(default = True, doc = ""),
+  "wait": attr.bool(default = True, doc = ""),
+  "set": attr.string_dict(doc = ""),
+  # "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl", doc = ""),
+  # deprecated
+  "values_yaml": attr.label_list(allow_files = True, mandatory = False, doc = ""),
+}
+
 def _helm_release_impl(ctx):
-    """Installs or upgrades a helm release.
-    Args:
-        name: A unique name for this rule.
-        chart: Chart to install
-        namespace: Namespace where release is installed to
-        namespace_dep: Namespace from k8s rule
-        release_name: Name of the helm release
-        values: Specify values yaml to override default
-        set: Specify key value set config
-    """
     helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
 
     namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
@@ -64,21 +81,8 @@ def _helm_release_impl(ctx):
 
 helm_release = rule(
     implementation = _helm_release_impl,
-    attrs = {
-      "chart": attr.label(allow_single_file = True, mandatory = True),
-      "namespace": attr.string(default = "default"),
-      "namespace_dep": attr.label(mandatory = False),
-      "values": attr.label_list(allow_files = True, mandatory = False),
-      "release_name": attr.string(mandatory = True),
-      "kubernetes_context": attr.label(mandatory = False, allow_single_file = True),
-      "create_namespace": attr.bool(default = True),
-      "wait": attr.bool(default = True),
-      "set": attr.string_dict(),
-      # "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl"),
-      # deprecated
-      "values_yaml": attr.label_list(allow_files = True, mandatory = False),
-    },
-    doc = "Installs or upgrades a new helm release",
+    attrs = _ATTRS,
+    doc = _DOC,
     toolchains = [
         "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
     ],

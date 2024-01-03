@@ -9,7 +9,7 @@ load("@aspect_bazel_lib//lib:stamping.bzl", "STAMP_ATTRS", "maybe_stamp")
 DEFAULT_HELM_API_VERSION = "v2"
 DEFAULT_HELM_CHART_VERSION = "1.0.0"
 
-def find_outer_file(files):
+def _find_outer_file(files):
     file = None if len(files) == 0 else files[0]
 
     for f in files:
@@ -18,11 +18,12 @@ def find_outer_file(files):
 
     return file
 
-def filter_man_values_from_files(files):
+# filter out from chart src files Chart.yaml manifest and values.yaml files
+def _filter_manifest_and_values_from_files(files):
     return [f for f in files if not f.path.endswith("Chart.yaml") and not f.path.endswith("values.yaml")]
 
-# filter out from chart src files the Chart.yaml manifest
-def locate_chart_roots(srcs, path_to_chart, name=""):
+# locate where the helm chart root is placed
+def _locate_chart_roots(srcs, path_to_chart, name=""):
     chart_manifests = []
     values = []
 
@@ -36,8 +37,8 @@ def locate_chart_roots(srcs, path_to_chart, name=""):
     if len(chart_manifests) == 0 and len(values) == 0 and not path_to_chart:
         fail("Chart must have a Chart.yaml manifest, a values.yaml file or use explicit attr path_to_chart. Root path of the chart %s cannot be located" % name)
 
-    manifest = find_outer_file(chart_manifests or [])
-    value_file = find_outer_file(values or [])
+    manifest = _find_outer_file(chart_manifests or [])
+    value_file = _find_outer_file(values or [])
 
     root_path = manifest.dirname if manifest else value_file.dirname if value_file else path_to_chart
 
@@ -48,7 +49,7 @@ def locate_chart_roots(srcs, path_to_chart, name=""):
     )
 
 # get a dict with the content to populate a Chart.yaml manifest with data fom the helm chart
-def get_manifest_subst_args(ctx, chart_deps, no_prev_manifest):
+def _get_manifest_subst_args(ctx, chart_deps, no_prev_manifest):
     subst_args = {}
 
     chart_name = ctx.attr.chart_name or ctx.attr.package_name
@@ -86,7 +87,7 @@ def get_manifest_subst_args(ctx, chart_deps, no_prev_manifest):
 
 
 # generate a file with a yq write expression
-def create_yq_substitution_file(ctx, output_name, substitutions):
+def _create_yq_substitution_file(ctx, output_name, substitutions):
     out_file = ctx.actions.declare_file(output_name)
 
     subst_values = ""
@@ -95,7 +96,7 @@ def create_yq_substitution_file(ctx, output_name, substitutions):
         if len(subst_values) > 0:
             subst_values += " |\n"
 
-        yaml_path = normalize_yaml_path(yaml_path)
+        yaml_path = _normalize_yaml_path(yaml_path)
 
         if value.startswith("strenv("):
             subst_values += "{yaml} = {value}".format(yaml=yaml_path, value=value)
@@ -110,8 +111,8 @@ def create_yq_substitution_file(ctx, output_name, substitutions):
 
     return out_file
 
-# Utility function to normalize yaml paths for yq tool
-def normalize_yaml_path(yaml_path):
+# utility function to normalize yaml paths for yq tool
+def _normalize_yaml_path(yaml_path):
     if not yaml_path or yaml_path.startswith("."):
         return yaml_path
 
@@ -119,7 +120,7 @@ def normalize_yaml_path(yaml_path):
         return "." + yaml_path
 
 # function to parse stamp values variables format (${}) to envvariables read from yq (env())
-def replace_stamp_values(values):
+def _replace_stamp_values(values):
     values_to_replace = {}
 
     for key, value in values.items():
@@ -130,9 +131,10 @@ def replace_stamp_values(values):
 
     return result_dict
 
-def image_digest_processor(ctx):
+
+def _image_digest_processor(ctx):
     if not ctx.attr.image:
-        return None, ""
+        return None
 
     # docker_image_provider = ctx.attr.image[ImageInfo]
     docker_image_provider = ""
@@ -167,17 +169,47 @@ def image_digest_processor(ctx):
         sha_file=sha_file.path
     )
 
-    return sha_file, sha_shell_extr_expr
+    return struct(
+        sha_file=sha_file,
+        sha_expr=sha_shell_extr_expr,
+    )
+
+_DOC = """
 
 
+
+
+
+"""
+
+_ATTRS = dict({
+        "srcs": attr.label_list(allow_files = True, mandatory = True, doc=""),
+        "chart_name": attr.string(mandatory = True, doc=""),
+        "image": attr.label(allow_single_file = True, mandatory = False, doc=""),
+        "image_digest": attr.label(allow_single_file = True, mandatory = False, doc=""),
+        "values_tag_yaml_path": attr.string(default = ".image.tag", doc=""),
+        "version": attr.string(mandatory = False, doc=""),
+        "app_version": attr.string(doc=""),
+        "api_version": attr.string(doc=""),
+        "description": attr.string(doc=""),
+        "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl", doc=""),
+        "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo], doc=""),
+        "deps_conditions": attr.string_dict(doc=""),
+        "templates": attr.label_list(allow_files = True, mandatory = False, doc=""),
+        "values": attr.string_dict(doc=""),
+        "force_append_repository": attr.bool(default = True, doc=""),
+        "path_to_chart": attr.string(doc=""),
+        # Mark these attrs as deprecated
+        "chart_deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo], doc=""),
+        "helm_chart_version": attr.string(mandatory = False, doc=""),
+        "package_name": attr.string(mandatory = False, doc=""),
+        "additional_templates": attr.label_list(allow_files = True, mandatory = False, doc=""),
+        "image_tag": attr.string(mandatory = False, doc=""),
+        "image_repository": attr.string(doc=""),
+        "values_repo_yaml_path": attr.string(default = ".image.repository", doc=""),
+}, **STAMP_ATTRS)
 
 def _chart_srcs_impl(ctx):
-    """Defines a helm chart (directory containing a Chart.yaml).
-    Args:
-        name: A unique name for this rule.
-        srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
-        update_deps: Whether or not to run a helm dependency update prior to packaging.
-    """
     digest_path = ""
     image_tag = ""
 
@@ -200,7 +232,7 @@ def _chart_srcs_impl(ctx):
     ]
 
     # locate rootpath of the chart
-    chart_files = locate_chart_roots(ctx.files.srcs, ctx.attr.path_to_chart)
+    chart_files = _locate_chart_roots(ctx.files.srcs, ctx.attr.path_to_chart)
     chart_root_path = chart_files.root
     chart_yaml = chart_files.manifest
 
@@ -208,7 +240,7 @@ def _chart_srcs_impl(ctx):
 
     # copy all chart source files to the output bin directory
     # values.yaml are not copied to the output dir here to be able to modify the sources
-    for file in filter_man_values_from_files(ctx.files.srcs):
+    for file in _filter_manifest_and_values_from_files(ctx.files.srcs):
         copied_file = ctx.actions.declare_file(paths.join(chart_name, file.path.replace(chart_root_path + "/", "")))
         copied_src_files += [copied_file]
         copy_file_action(
@@ -222,7 +254,7 @@ def _chart_srcs_impl(ctx):
 
     values_inputs_depsets = [depset([yq_bin] + ctx.files.srcs + copied_src_files)]
 
-    yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_manifest_subst_args(ctx, chart_deps, chart_yaml == None))
+    yq_subst_expr = _create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, _get_manifest_subst_args(ctx, chart_deps, chart_yaml == None))
 
     write_manifest_action_inputs = [yq_bin, yq_subst_expr]
 
@@ -251,12 +283,13 @@ def _chart_srcs_impl(ctx):
     is_image_from_oci = ctx.attr.image
 
     # image digest is extracted from a file placed in bazel out
-    image_digest_shell_expr = ''
+    sha_extr_expr = ""
 
-    sha_file, sha_extr_expr = image_digest_processor(ctx)
+    sha_info = _image_digest_processor(ctx)
 
-    if sha_file:
-        values_inputs_depsets.append(depset([sha_file]))
+    if sha_info:
+        sha_extr_expr = sha_info.sha_expr
+        values_inputs_depsets.append(depset([sha_info.sha_file]))
 
     if ctx.attr.image_tag:
         # extract docker image info from make variable or from rule attribute
@@ -287,9 +320,9 @@ def _chart_srcs_impl(ctx):
     stamp = maybe_stamp(ctx)
 
     if stamp:
-        all_values = replace_stamp_values(all_values)
+        all_values = _replace_stamp_values(all_values)
 
-    yq_expression_file = create_yq_substitution_file(ctx, "%s_yq_values_subst_expression_file" % ctx.attr.name, all_values)
+    yq_expression_file = _create_yq_substitution_file(ctx, "%s_yq_values_subst_expression_file" % ctx.attr.name, all_values)
 
     output_values_script_yaml = ctx.actions.declare_file("%s_subst_values.sh" % ctx.attr.name)
     output_values_yaml = ctx.actions.declare_file(paths.join(chart_name, "values.yaml"))
@@ -300,9 +333,9 @@ def _chart_srcs_impl(ctx):
         "{out}": output_values_yaml.path,
         "{values}": src_values_path,
         "{image_digest_expr}": sha_extr_expr,
-        "{image_tag_path}": normalize_yaml_path(ctx.attr.values_tag_yaml_path),
+        "{image_tag_path}": _normalize_yaml_path(ctx.attr.values_tag_yaml_path),
         "{image_repo_expr}": image_repo_shell_expr,
-        "{image_repo_path}": normalize_yaml_path(ctx.attr.values_repo_yaml_path)
+        "{image_repo_path}": _normalize_yaml_path(ctx.attr.values_repo_yaml_path)
     }
 
     if stamp:
@@ -339,7 +372,7 @@ def _chart_srcs_impl(ctx):
 
     for dep in chart_deps:
 
-        dep_chart_files = locate_chart_roots(dep.srcs, "", dep.name)
+        dep_chart_files = _locate_chart_roots(dep.srcs, "", dep.name)
 
         for dep_src in dep.srcs:
             out_path = paths.join(chart_name, "charts", dep.name, dep_src.path.replace(dep_chart_files.root + "/", ""))
@@ -365,35 +398,10 @@ def _chart_srcs_impl(ctx):
 
 chart_srcs = rule(
     implementation = _chart_srcs_impl,
-    attrs = dict({
-        "srcs": attr.label_list(allow_files = True, mandatory = True),
-        "chart_name": attr.string(mandatory = True),
-        "image": attr.label(allow_single_file = True, mandatory = False),
-        "image_digest": attr.label(allow_single_file = True, mandatory = False),
-        "values_tag_yaml_path": attr.string(default = ".image.tag"),
-        "version": attr.string(mandatory = False),
-        "app_version": attr.string(),
-        "api_version": attr.string(),
-        "description": attr.string(),
-        "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
-        "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
-        "deps_conditions": attr.string_dict(),
-        "templates": attr.label_list(allow_files = True, mandatory = False),
-        "values": attr.string_dict(),
-        "force_append_repository": attr.bool(default = True),
-        "path_to_chart": attr.string(),
-        # Mark these attrs as deprecated
-        "chart_deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
-        "helm_chart_version": attr.string(mandatory = False),
-        "package_name": attr.string(mandatory = False),
-        "additional_templates": attr.label_list(allow_files = True, mandatory = False),
-        "image_tag": attr.string(mandatory = False),
-        "image_repository": attr.string(),
-        "values_repo_yaml_path": attr.string(default = ".image.repository"),
-    }, **STAMP_ATTRS),
+    attrs = _ATTRS,
+    doc = _DOC,
     toolchains = [
         "@aspect_bazel_lib//lib:yq_toolchain_type",
         "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type",
     ],
-    doc = "Runs helm packaging updating the image tag on it",
 )

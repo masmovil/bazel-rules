@@ -1,6 +1,10 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 def helm_lint_test(name, chart):
+    """
+
+    Args:
+    """
     shell_file_name = "_%s_helm_lint" % name
 
     write_file(
