@@ -350,3 +350,16 @@ image:
   repository: aio
 """,
 )
+
+helm_chart(
+  name = "chart_a_templates",
+  chart_name = "a_templates",
+  srcs = add_prefix_to_paths("charts/a", chart_a_srcs),
+  version = "0.4.1",
+  templates = glob([
+    "charts/c/templates/**"
+  ]),
+  values = {
+    "labels.somelabel": "testvalue",
+  },
+)

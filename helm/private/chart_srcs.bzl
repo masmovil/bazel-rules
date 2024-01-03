@@ -343,6 +343,11 @@ def _chart_srcs_impl(ctx):
     chart_root_path = chart_files.root
     chart_yaml = chart_files.manifest
 
+    if chart_files.values:
+        values_inputs_depsets = [depset([yq_bin, chart_files.values])]
+    else:
+        values_inputs_depsets = [depset([yq_bin])]
+
     copied_src_files = []
 
     # copy all chart source files to the output bin directory
@@ -356,10 +361,21 @@ def _chart_srcs_impl(ctx):
             dst=copied_file,
         )
 
+    additional_templates = ctx.files.templates or ctx.files.additional_templates
+
+    copied_tpl_files = []
+
+    for template in additional_templates:
+        copied_tpl = ctx.actions.declare_file(paths.join(chart_name, "templates", template.basename))
+        copied_tpl_files += [copied_tpl]
+        copy_file_action(
+            ctx=ctx,
+            src=template,
+            dst=copied_tpl,
+        )
+
     # rewrite Chart.yaml to override chart info
     out_chart_yaml = ctx.actions.declare_file(paths.join(chart_name, "Chart.yaml"))
-
-    values_inputs_depsets = [depset([yq_bin] + ctx.files.srcs + copied_src_files)]
 
     yq_subst_expr = _create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, _get_manifest_subst_args(ctx, chart_deps, chart_yaml == None))
 
@@ -499,7 +515,7 @@ def _chart_srcs_impl(ctx):
     return [
         DefaultInfo(
             files = depset(
-                direct = copied_src_files + [out_chart_yaml, output_values_yaml],
+                direct = copied_src_files + copied_tpl_files + [out_chart_yaml, output_values_yaml],
                 transitive = dep_copied_files_depset
             )
         )
