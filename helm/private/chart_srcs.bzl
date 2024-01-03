@@ -22,10 +22,9 @@ def filter_man_values_from_files(files):
     return [f for f in files if not f.path.endswith("Chart.yaml") and not f.path.endswith("values.yaml")]
 
 # filter out from chart src files the Chart.yaml manifest
-def locate_chart_roots(srcs, name=""):
+def locate_chart_roots(srcs, path_to_chart, name=""):
     chart_manifests = []
     values = []
-    root_path = ""
 
     for src in srcs:
         if src.basename == "Chart.yaml":
@@ -34,13 +33,13 @@ def locate_chart_roots(srcs, name=""):
         if src.basename == "values.yaml":
             values += [src]
 
-    if len(chart_manifests) == 0 and len(values) == 0:
-        fail("Chart src files have neither a Chart.yaml manifest nor a values.yaml file. Root path of the chart cannot be located from src files %s" % name)
+    if len(chart_manifests) == 0 and len(values) == 0 and not path_to_chart:
+        fail("Chart must have a Chart.yaml manifest, a values.yaml file or use explicit attr path_to_chart. Root path of the chart %s cannot be located" % name)
 
     manifest = find_outer_file(chart_manifests or [])
     value_file = find_outer_file(values or [])
 
-    root_path = manifest.dirname if manifest else value_file.dirname
+    root_path = manifest.dirname if manifest else value_file.dirname if value_file else path_to_chart
 
     return struct(
         manifest=manifest,
@@ -201,7 +200,7 @@ def _chart_srcs_impl(ctx):
     ]
 
     # locate rootpath of the chart
-    chart_files = locate_chart_roots(ctx.files.srcs)
+    chart_files = locate_chart_roots(ctx.files.srcs, ctx.attr.path_to_chart)
     chart_root_path = chart_files.root
     chart_yaml = chart_files.manifest
 
@@ -343,7 +342,7 @@ def _chart_srcs_impl(ctx):
 
     for dep in chart_deps:
 
-        dep_chart_files = locate_chart_roots(dep.srcs, dep.name)
+        dep_chart_files = locate_chart_roots(dep.srcs, "", dep.name)
 
         for dep_src in dep.srcs:
             out_path = paths.join(chart_name, "charts", dep.name, dep_src.path.replace(dep_chart_files.root + "/", ""))
@@ -382,6 +381,7 @@ chart_srcs = rule(
         "templates": attr.label_list(allow_files = True, mandatory = False),
         "values": attr.string_dict(),
         "force_append_repository": attr.bool(default = True),
+        "path_to_chart": attr.string(),
         # Mark these attrs as deprecated
         "chart_deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo]),
         "helm_chart_version": attr.string(mandatory = False),

@@ -14,6 +14,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
     srcs = getattr(chart_data, "srcs", "") or glob(["charts/%s/**" % chart_data.name]),
     deps = getattr(chart_data, "deps", []),
     version = getattr(chart_data, "version", ""),
+    path_to_chart = getattr(chart_data, "path_to_chart", ""),
   ) for chart_data in get_charts()
 ]
 
