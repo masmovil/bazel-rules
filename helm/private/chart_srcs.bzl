@@ -4,6 +4,7 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":helm_chart_providers.bzl", "ChartInfo")
 load("@io_bazel_rules_docker//container:providers.bzl", "ImageInfo", "LayerInfo")
+load("@aspect_bazel_lib//lib:stamping.bzl", "STAMP_ATTRS", "maybe_stamp")
 
 DEFAULT_HELM_API_VERSION = "v2"
 DEFAULT_HELM_CHART_VERSION = "1.0.0"
@@ -88,7 +89,11 @@ def create_yq_substitution_file(ctx, output_name, substitutions):
 
         yaml_path = normalize_yaml_path(yaml_path)
 
-        subst_values += "{yaml} = \"{value}\"".format(yaml=yaml_path, value=value)
+        if value.startswith("strenv("):
+            subst_values += "{yaml} = {value}".format(yaml=yaml_path, value=value)
+        else:
+            subst_values += "{yaml} = \"{value}\"".format(yaml=yaml_path, value=value)
+
 
     ctx.actions.write(
         output = out_file,
@@ -105,6 +110,17 @@ def normalize_yaml_path(yaml_path):
     if yaml_path and not yaml_path.startswith("."):
         return "." + yaml_path
 
+# function to parse stamp values variables format (${}) to envvariables read from yq (env())
+def replace_stamp_values(values):
+    values_to_replace = {}
+
+    for key, value in values.items():
+        if value.startswith("${") and value.endswith("}"):
+            values_to_replace[key] = value.replace("${", "strenv(").replace("}", ")")
+
+    result_dict = dicts.add({}, values, values_to_replace)
+
+    return result_dict
 
 def image_digest_processor(ctx):
     if not ctx.attr.image:
@@ -261,6 +277,11 @@ def _chart_srcs_impl(ctx):
 
     all_values = dicts.add({}, ctx.attr.values, values)
 
+    stamp = maybe_stamp(ctx)
+
+    if stamp:
+        all_values = replace_stamp_values(all_values)
+
     yq_expression_file = create_yq_substitution_file(ctx, "%s_yq_values_subst_expression_file" % ctx.attr.name, all_values)
 
     output_values_script_yaml = ctx.actions.declare_file("%s_subst_values.sh" % ctx.attr.name)
@@ -268,20 +289,35 @@ def _chart_srcs_impl(ctx):
 
     outs += [output_values_yaml]
 
+    values_substitutions = {
+        "{yq}": yq_bin.path,
+        "{expression}": yq_expression_file.path,
+        "{out}": output_values_yaml.path,
+        "{values}": src_values_path,
+        "{image_digest_expr}": sha_extr_expr,
+        "{image_tag_path}": normalize_yaml_path(ctx.attr.values_tag_yaml_path),
+        "{image_repo_expr}": image_repo_shell_expr,
+        "{image_repo_path}": normalize_yaml_path(ctx.attr.values_repo_yaml_path)
+    }
+
+    if stamp:
+        stamp_files = [stamp.volatile_status_file, stamp.stable_status_file]
+        values_inputs += stamp_files
+        values_substitutions = dicts.add(values_substitutions, {
+            "{stable}": stamp.stable_status_file.path,
+            "{volatile}": stamp.volatile_status_file.path,
+            "{stamp}": "true",
+            "%{stamp_statements}": "\n".join([
+                "\tread_stamp_variables %s" % f.path
+                for f in stamp_files
+            ]),
+        })
+
     ctx.actions.expand_template(
         template = ctx.file._subst_template,
         output = output_values_script_yaml,
         is_executable = True,
-        substitutions = {
-            "{yq}": yq_bin.path,
-            "{expression}": yq_expression_file.path,
-            "{out}": output_values_yaml.path,
-            "{values}": src_values_path,
-            "{image_digest_expr}": sha_extr_expr,
-            "{image_tag_path}": normalize_yaml_path(ctx.attr.values_tag_yaml_path),
-            "{image_repo_expr}": image_repo_shell_expr,
-            "{image_repo_path}": normalize_yaml_path(ctx.attr.values_repo_yaml_path),
-        },
+        substitutions = values_substitutions,
     )
 
     values_inputs += [yq_expression_file, output_values_script_yaml]
@@ -321,7 +357,7 @@ def _chart_srcs_impl(ctx):
 
 chart_srcs = rule(
     implementation = _chart_srcs_impl,
-    attrs = {
+    attrs = dict({
         "srcs": attr.label_list(allow_files = True, mandatory = True),
         "chart_name": attr.string(mandatory = True),
         "image": attr.label(allow_single_file = True, mandatory = False),
@@ -344,7 +380,7 @@ chart_srcs = rule(
         "image_tag": attr.string(mandatory = False),
         "image_repository": attr.string(),
         "values_repo_yaml_path": attr.string(default = ".image.repository"),
-    },
+    }, **STAMP_ATTRS),
     toolchains = [
         "@aspect_bazel_lib//lib:yq_toolchain_type",
         "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type",

@@ -263,3 +263,38 @@ name: nomanifest_files
 version: 1.0.0
 """,
 )
+
+helm_chart(
+  name = "chart_a_stamp",
+  chart_name = "a_stamp",
+  srcs = add_prefix_to_paths("charts/a", chart_a_srcs),
+  version = "1.3.0",
+  stamp = 1,
+  values = {
+    "labels.somelabel": "testvalue",
+    "labels.data": "${STABLE_TEST_VAR}",
+    "labels.deep.data.dict.key1": "value1",
+    "labels.deep.data.dict.key2": "${TEST_VAR}",
+  },
+)
+
+chart_test(
+  name = "chart_a_stamp_test",
+  chart_name = "a_stamp",
+  chart = ":chart_a_stamp",
+  prefix_srcs = "charts/a",
+  expected_files = chart_a_srcs,
+  expected_values = """
+labels:
+  somelabel: testvalue
+  data: TEST_VALUE
+  deep:
+    data:
+      dict:
+        key1: "value1"
+        key2: "VOLATILE_TEST_VALUE"
+image:
+  tag: latest
+  repository: aio
+""",
+)
