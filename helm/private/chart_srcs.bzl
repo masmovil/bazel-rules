@@ -8,6 +8,138 @@ load("@aspect_bazel_lib//lib:stamping.bzl", "STAMP_ATTRS", "maybe_stamp")
 
 DEFAULT_HELM_API_VERSION = "v2"
 DEFAULT_HELM_CHART_VERSION = "1.0.0"
+DEFAULT_VALUES_REPO_YAML = ".image.repository"
+
+
+_DOC = """Customize helm chart values and configuration.
+
+This rule should not be used directly, users should use `helm_chart` macro instead. See [helm_chart](#helm_chart).
+
+This rule takes chart src files and write them to bazel output dir applying some modifications.
+The rule is designed to be used with a packager to produce an archived file (`pkg_tar` is used).
+
+```starlark
+chart_srcs(
+    name = "basic_chart",
+    chart_name = "example",
+    srcs = glob(["**"]),
+)
+```
+
+You can customize the values of the chart overriding them via `values` rule attribute:
+
+```starlark
+chart_srcs(
+    name = "basic_chart",
+    chart_name = "example",
+    srcs = glob(["**"]),
+    values = {
+        "override.value": "valueoverrided",
+    }
+)
+```
+
+Chart src files are not mandatory, you can specify all the chart configuration via rule attributes.
+In this case the rule will take care of generating the chart files for you (Chart.yaml, values.yaml, template files, chart deps...).
+
+```starlark
+chart_srcs(
+    name = "chart",
+    chart_name = "example",
+    version = "v1.0.0",
+    app_version = "v2.3.4",
+    api_version = "v2",
+    description = "Helm chart description placed inside Chart.yaml",
+    image = ":oci_image",
+    values = {
+        "yaml.path.to.value": "value",
+    },
+)
+```
+
+Stamp variables are supported in values attribute. To enable the use of stamp variables enable them via stamp attribute and --stamp flag in bazel.
+You can customize stamped variables using bazel workspace status. See [the Bazel workspace status docs](https://docs.bazel.build/versions/master/user-manual.html#workspace_status)
+
+All values with ${} format will be replaced by stamped variables (both volatile and stable are supported).
+
+```starlark
+chart_srcs(
+    name = "chart",
+    chart_name = "example",
+    srcs = glob(["**"]),
+    stamp = -1,
+    values = {
+        "stamped.value": "${STAMPED_VARIABLE}",
+    },
+)
+```
+
+For compatibility reasons, some attributes are still supported but marked as deprecated. Its use is discouraged.
+"""
+
+_DEPRECATED_ATTRS = {
+    "values_repo_yaml_path": attr.string(mandatory = False, doc="[Deprecated] Yaml path used to set the repo config provided by `image_repository` attribute (deprecated). %s" % DEFAULT_VALUES_REPO_YAML),
+    "chart_deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo], doc="[Deprecated] Chart dependencies. Use deps attribute instead."),
+    "helm_chart_version": attr.string(mandatory = False, doc="[Deprecated] Helm chart version. Use version instead."),
+    "package_name": attr.string(mandatory = False, doc="[Deprecated] Helm chart name. Use chart_name instead."),
+    "additional_templates": attr.label_list(allow_files = True, mandatory = False, doc="[Deprecated] Use templates instead."),
+    "image_tag": attr.string(mandatory = False, doc="[Deprecated] Use image attribute instead."),
+    "image_repository": attr.string(doc="[Deprecated] You can use values attr dict to modify repository values."),
+}
+
+_DEPRECATED_ATTRS_MSG = {
+    "values_repo_yaml_path": "You can use values attr dict to modify repository values.",
+    "chart_deps": "Use deps attribute instead.",
+    "helm_chart_version": "Use version attribute instead.",
+    "package_name": "Use chart_name instead.",
+    "additional_templates": "Use templates attribute instead.",
+    "image_tag": "Use image attribute instead.",
+    "image_repository": "You can use values attr dict to modify repository values.",
+}
+
+_ATTRS = dicts.add({
+        "chart_name": attr.string(mandatory = True, doc="Name of the chart. It will be modified in the name field of the Chart.yaml"),
+        "srcs": attr.label_list(allow_files = True, default = [], doc="A list of helm chart source files."),
+        "image": attr.label(allow_single_file = True, mandatory = False, doc="""
+            Reference to image rule use to interpolate the image sha256 in the chart values.yaml.
+            If provided, the sha256 of the image will be placed in the output values.yaml of the chart in the yaml path provided by `values_tag_yaml_path` attribute.
+            Both oci_image or container_image rules are supported."""
+        ),
+        "image_digest": attr.label(allow_single_file = True, mandatory = False, doc="Reference to oci_image digest file. Used internally by the macro (do not use it)."),
+        "values_tag_yaml_path": attr.string(default = ".image.tag", doc="Yaml path used to set the image sha256 inside the chart values.yaml."),
+        "version": attr.string(mandatory = False, doc="Helm chart version to be placed in Chart.yaml manifest"),
+        "app_version": attr.string(doc="Helm chart manifest appVersion. The value is replaced in the output Chart.yaml manifest."),
+        "api_version": attr.string(doc="Helm chart manifest apiVersion. The value is replaced in the output Chart.yaml manifest."),
+        "description": attr.string(doc="Helm chart manifest description. The value is replaced in the output Chart.yaml manifest."),
+        "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo], doc="""
+            A list of helm chart that this helm chart depends on. They will be placed inside the `charts` directory.
+            The dependencies will be traced inside the Chart.yaml manifest as well.
+        """),
+        "deps_conditions": attr.string_dict(doc="""
+            A dictionary containing the conditions that the dependencies of the chart should met to be rendered by helm.
+            The key has to be the name of the dependency chart. The value will be the condition that the values of the chart should have.
+            Check helm doc for more info https://helm.sh/docs/topics/charts/#the-chartyaml-file
+        """),
+        "templates": attr.label_list(allow_files = True, mandatory = False, doc="""
+            A list of files that will be added to the chart. They will be added as addition to the chart templates refernced in the `srcs` attribute.
+        """),
+        "values": attr.string_dict(doc="""
+            A dictionary of key values to be written in to the chart values.
+            keys: `yaml.path` or `.yaml.path`
+            values:  the value to be replaced inside the Chart values.yaml.
+        """),
+        "force_append_repository": attr.bool(default = True, doc="""
+            A flag to specify if @sha256 should be appended to the repository value in the chart values.yaml in case `image` rule attribute is specified.
+            This is intended to meet the when image digest is used inside k8s deployments: `gcr.io/container@sha256:a12e258c58ab92be22e403d08c8ef7eefd6119235eddca01309fe6b21101e100`.
+            If you have this already covered in your deployment templates, set this attr to false.
+            If the flag is set to true, the image rule attr is provided and no `values_repo_yaml_path` is set, the rule will look for the default path of the
+            repository value %s
+        """ % DEFAULT_VALUES_REPO_YAML),
+        "path_to_chart": attr.string(doc="Attribute to specify the path to the root of the chart. This attribute is mandatory if neither Chart.yaml nor values.yaml are provided, and the chart srcs attr is not empty to determinate where in the path of the source files is located the root of the helm chart."),
+        "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
+}, _DEPRECATED_ATTRS, STAMP_ATTRS)
+
+
 
 def _find_outer_file(files):
     file = None if len(files) == 0 else files[0]
@@ -23,7 +155,7 @@ def _filter_manifest_and_values_from_files(files):
     return [f for f in files if not f.path.endswith("Chart.yaml") and not f.path.endswith("values.yaml")]
 
 # locate where the helm chart root is placed
-def _locate_chart_roots(srcs, path_to_chart, name=""):
+def _locate_chart_roots(srcs, path_to_chart="", name=""):
     chart_manifests = []
     values = []
 
@@ -34,8 +166,8 @@ def _locate_chart_roots(srcs, path_to_chart, name=""):
         if src.basename == "values.yaml":
             values += [src]
 
-    if len(chart_manifests) == 0 and len(values) == 0 and not path_to_chart:
-        fail("Chart must have a Chart.yaml manifest, a values.yaml file or use explicit attr path_to_chart. Root path of the chart %s cannot be located" % name)
+    if len(srcs) > 0 and len(chart_manifests) == 0 and len(values) == 0 and not path_to_chart:
+        fail("If you provide some chart source files, you have to provide either a Chart.yaml manifest either a values.yaml file or use the explicit attr 'path_to_chart'. Otherwise the root path of the chart %s cannot be located" % name)
 
     manifest = _find_outer_file(chart_manifests or [])
     value_file = _find_outer_file(values or [])
@@ -174,42 +306,17 @@ def _image_digest_processor(ctx):
         sha_expr=sha_shell_extr_expr,
     )
 
-_DOC = """
+# print a warning message for every deprecated attribute provided to the rule
+def _warn_deprecated_attr(ctx):
+    for name, _ in _DEPRECATED_ATTRS.items():
+        if getattr(ctx.attr, name):
+            additional_msg = _DEPRECATED_ATTRS_MSG.get(name, "")
+            print("WARNING: %s is marked as deprecated and should not be used. It could be removed soon - %s" % (name, additional_msg))
 
-
-
-
-
-"""
-
-_ATTRS = dict({
-        "srcs": attr.label_list(allow_files = True, mandatory = True, doc=""),
-        "chart_name": attr.string(mandatory = True, doc=""),
-        "image": attr.label(allow_single_file = True, mandatory = False, doc=""),
-        "image_digest": attr.label(allow_single_file = True, mandatory = False, doc=""),
-        "values_tag_yaml_path": attr.string(default = ".image.tag", doc=""),
-        "version": attr.string(mandatory = False, doc=""),
-        "app_version": attr.string(doc=""),
-        "api_version": attr.string(doc=""),
-        "description": attr.string(doc=""),
-        "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl", doc=""),
-        "deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo], doc=""),
-        "deps_conditions": attr.string_dict(doc=""),
-        "templates": attr.label_list(allow_files = True, mandatory = False, doc=""),
-        "values": attr.string_dict(doc=""),
-        "force_append_repository": attr.bool(default = True, doc=""),
-        "path_to_chart": attr.string(doc=""),
-        # Mark these attrs as deprecated
-        "chart_deps": attr.label_list(allow_files = True, mandatory = False, providers = [ChartInfo], doc=""),
-        "helm_chart_version": attr.string(mandatory = False, doc=""),
-        "package_name": attr.string(mandatory = False, doc=""),
-        "additional_templates": attr.label_list(allow_files = True, mandatory = False, doc=""),
-        "image_tag": attr.string(mandatory = False, doc=""),
-        "image_repository": attr.string(doc=""),
-        "values_repo_yaml_path": attr.string(default = ".image.repository", doc=""),
-}, **STAMP_ATTRS)
 
 def _chart_srcs_impl(ctx):
+    _warn_deprecated_attr(ctx)
+
     digest_path = ""
     image_tag = ""
 
@@ -287,6 +394,8 @@ def _chart_srcs_impl(ctx):
 
     sha_info = _image_digest_processor(ctx)
 
+    values_repo_path = ctx.attr.values_repo_yaml_path or DEFAULT_VALUES_REPO_YAML
+
     if sha_info:
         sha_extr_expr = sha_info.sha_expr
         values_inputs_depsets.append(depset([sha_info.sha_file]))
@@ -296,7 +405,7 @@ def _chart_srcs_impl(ctx):
         values[ctx.attr.values_tag_yaml_path] = get_make_value_or_default(ctx, ctx.attr.image_tag)
 
     if ctx.attr.image_repository:
-        values[ctx.attr.values_repo_yaml_path] = ctx.attr.image_repository
+        values[values_repo_path] = ctx.attr.image_repository
 
     # image repository substitution is extracted from values.yaml if force_append_repository attr is provided
     image_repo_shell_expr = ''
@@ -309,11 +418,11 @@ def _chart_srcs_impl(ctx):
                 # Add @sha256 suffix to image repository based on actual values
                 image_repo_shell_expr = "$({yq} {repo} {values})@sha256".format(
                     yq=yq_bin.path,
-                    repo=ctx.attr.values_repo_yaml_path,
+                    repo=values_repo_path,
                     values=src_values_path,
                 )
             else:
-                values[ctx.attr.values_repo_yaml_path] = _image_repository + "@sha256"
+                values[values_repo_path] = _image_repository + "@sha256"
 
     all_values = dicts.add({}, ctx.attr.values, values)
 
@@ -335,7 +444,7 @@ def _chart_srcs_impl(ctx):
         "{image_digest_expr}": sha_extr_expr,
         "{image_tag_path}": _normalize_yaml_path(ctx.attr.values_tag_yaml_path),
         "{image_repo_expr}": image_repo_shell_expr,
-        "{image_repo_path}": _normalize_yaml_path(ctx.attr.values_repo_yaml_path)
+        "{image_repo_path}": _normalize_yaml_path(values_repo_path)
     }
 
     if stamp:
