@@ -220,8 +220,7 @@ def _chart_srcs_impl(ctx):
     # rewrite Chart.yaml to override chart info
     out_chart_yaml = ctx.actions.declare_file(paths.join(chart_name, "Chart.yaml"))
 
-    outs = copied_src_files + [out_chart_yaml]
-    values_inputs = [yq_bin] + ctx.files.srcs + copied_src_files
+    values_inputs_depsets = [depset([yq_bin] + ctx.files.srcs + copied_src_files)]
 
     yq_subst_expr = create_yq_substitution_file(ctx, "%s_yq_chart_subst_expr" % ctx.attr.name, get_manifest_subst_args(ctx, chart_deps, chart_yaml == None))
 
@@ -257,7 +256,7 @@ def _chart_srcs_impl(ctx):
     sha_file, sha_extr_expr = image_digest_processor(ctx)
 
     if sha_file:
-        values_inputs += [sha_file]
+        values_inputs_depsets.append(depset([sha_file]))
 
     if ctx.attr.image_tag:
         # extract docker image info from make variable or from rule attribute
@@ -295,8 +294,6 @@ def _chart_srcs_impl(ctx):
     output_values_script_yaml = ctx.actions.declare_file("%s_subst_values.sh" % ctx.attr.name)
     output_values_yaml = ctx.actions.declare_file(paths.join(chart_name, "values.yaml"))
 
-    outs += [output_values_yaml]
-
     values_substitutions = {
         "{yq}": yq_bin.path,
         "{expression}": yq_expression_file.path,
@@ -310,7 +307,7 @@ def _chart_srcs_impl(ctx):
 
     if stamp:
         stamp_files = [stamp.volatile_status_file, stamp.stable_status_file]
-        values_inputs += stamp_files
+        values_inputs_depsets.append(depset(stamp_files))
         values_substitutions = dicts.add(values_substitutions, {
             "{stable}": stamp.stable_status_file.path,
             "{volatile}": stamp.volatile_status_file.path,
@@ -328,17 +325,17 @@ def _chart_srcs_impl(ctx):
         substitutions = values_substitutions,
     )
 
-    values_inputs += [yq_expression_file, output_values_script_yaml]
+    values_inputs_depsets.append(depset([yq_expression_file, output_values_script_yaml]))
 
     ctx.actions.run(
-        inputs = values_inputs,
+        inputs = depset(transitive=values_inputs_depsets),
         outputs = [output_values_yaml],
         executable = output_values_script_yaml,
         progress_message = "Writing values to chart values.yaml file...",
         mnemonic = "SubstChartValues",
     )
 
-    dep_copied_files = []
+    dep_copied_files_depset = []
 
     for dep in chart_deps:
 
@@ -355,11 +352,14 @@ def _chart_srcs_impl(ctx):
                 dst=dep_out,
             )
 
-            dep_copied_files += [dep_out]
+            dep_copied_files_depset.append(depset([dep_out]))
 
     return [
         DefaultInfo(
-            files = depset(direct = outs, transitive = [depset(dep_copied_files)])
+            files = depset(
+                direct = copied_src_files + [out_chart_yaml, output_values_yaml],
+                transitive = dep_copied_files_depset
+            )
         )
     ]
 
