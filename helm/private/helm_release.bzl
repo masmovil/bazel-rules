@@ -1,30 +1,26 @@
 load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
 _DOC = """
-  Installs or upgrades a helm release.
-  Args:
-      name: A unique name for this rule.
-      chart: Chart to install
-      namespace: Namespace where release is installed to
-      namespace_dep: Namespace from k8s rule
-      release_name: Name of the helm release
-      values: Specify values yaml to override default
-      set: Specify key value set config
+  Installs or upgrades a helm chart in to a cluster using helm binary.
 """
 
 _ATTRS = {
-  "chart": attr.label(allow_single_file = True, mandatory = True, doc = ""),
-  "namespace": attr.string(default = "default", doc = ""),
-  "namespace_dep": attr.label(mandatory = False, doc = ""),
-  "values": attr.label_list(allow_files = True, mandatory = False, doc = ""),
-  "release_name": attr.string(mandatory = True, doc = ""),
-  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = ""),
-  "create_namespace": attr.bool(default = True, doc = ""),
-  "wait": attr.bool(default = True, doc = ""),
-  "set": attr.string_dict(doc = ""),
-  # "_script_template": attr.label(allow_single_file = True, default = ":helm-release.sh.tpl", doc = ""),
+  "chart": attr.label(allow_single_file = True, mandatory = True, doc = """
+    The packaged chart archive to be published. It can be a reference to a `helm_chart` rule or a reference to a helm archived file"""
+  ),
+  "namespace": attr.string(default = "default", doc = "The namespace where to install the helm release."),
+  "namespace_dep": attr.label(mandatory = False, doc = "A reference to a `k8s_namespace` rule from where to extract the namespace to be used to install the release."),
+  "values": attr.label_list(allow_files = True, default = [], doc = "A list of value files to be provided to helm install command through -f flag."),
+  "release_name": attr.string(mandatory = True, doc = "The name of the helm release to be installed or upgraded."),
+  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = "Reference to a kubernetes context file tu be used by helm binary."),
+  "create_namespace": attr.bool(default = True, doc = "A flag to indicate helm binary to create the kubernetes namespace if it is not already present in the cluster."),
+  "wait": attr.bool(default = True, doc = "Helm flag to wait for all resources to be created to exit."),
+  "set": attr.string_dict(doc = """
+    A dictionary of key value pairs consisting on yaml paths and values to be replaced in the chart via --set helm option before installing it:
+    "yaml.path": "value"
+  """, default = {}),
   # deprecated
-  "values_yaml": attr.label_list(allow_files = True, mandatory = False, doc = ""),
+  "values_yaml": attr.label_list(allow_files = True, mandatory = False, doc = "[Deprecated] Use `values` attr instead"),
 }
 
 def _helm_release_impl(ctx):
@@ -47,10 +43,10 @@ def _helm_release_impl(ctx):
       args += ['-f', values.short_path]
 
     if ctx.attr.values_yaml:
-      print("WARN: values_yaml attr is marked as DEPRECATED in helm_release bazel rule. Use values attr instead")
+      print("WARN: values_yaml attr is marked as DEPRECATED in helm_release bazel rule. Use `values` attr instead")
 
-    for values in ctx.files.values_yaml:
-      args += ['-f', values.short_path]
+      for values in ctx.files.values_yaml:
+        args += ['-f', values.short_path]
 
     for key, value in ctx.attr.set.items():
       args += ['--set', key + '=' + value]

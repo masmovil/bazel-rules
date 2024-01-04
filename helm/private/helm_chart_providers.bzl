@@ -1,40 +1,34 @@
-load("//helpers:helpers.bzl", "get_make_value_or_default", "write_sh")
 load("@aspect_bazel_lib//lib/private:copy_to_bin.bzl", "copy_files_to_bin_actions")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:shell.bzl", "shell")
 
 _PROVIDER_DOC = """
-
+    `helm_chart` expose ChartInfo providers to be able to access info about a packaged chart. The info available is:
+    - The name of the chart
+    - The version of the chart
+    - The ouput sources of the chart
+    - The output archive file targz
 """
 
 ChartInfo = provider(
     doc = _PROVIDER_DOC,
     fields = {
-        "targz": "",
-        "chart_name": "",
-        "chart_version": "",
-        "chart_srcs": "",
+        "targz": "The output of helm_chart. This is the versioned packaged targz of the chart",
+        "chart_name": "The name of the chart as is reflected in the Chart.yaml manifest and provided by the rule attribute",
+        "chart_version": "If provided, the version of the chart",
+        "chart_srcs": "The sources of the chart before beign packaged into the archived targz",
     }
 )
 
-_DOC = """
-"""
-
 _ATTRS = {
-    "chart_name": attr.string(mandatory = True, doc = ""),
-    "chart_targz": attr.label(allow_single_file = True, mandatory = True, doc = ""),
-    "chart_bin_srcs": attr.label(allow_files = True, mandatory = True, doc = ""),
-    "chart_version": attr.string(mandatory = False, doc = ""),
+    "chart_name": attr.string(mandatory = True),
+    "chart_targz": attr.label(allow_single_file = True, mandatory = True),
+    "chart_bin_srcs": attr.label(allow_files = True, mandatory = True),
+    "chart_version": attr.string(mandatory = False),
 }
 
 def _helm_chart_providers_impl(ctx):
-    """Defines a helm chart (directory containing a Chart.yaml).
-    Args:
-        name: A unique name for this rule.
-        srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
-        update_deps: Whether or not to run a helm dependency update prior to packaging.
-    """
     targz_deps = depset(ctx.files.chart_targz)
 
     return [
@@ -51,6 +45,5 @@ def _helm_chart_providers_impl(ctx):
 
 helm_chart_providers = rule(
     implementation = _helm_chart_providers_impl,
-    doc = _DOC,
     attrs = _ATTRS,
 )

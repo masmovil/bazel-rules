@@ -1,17 +1,42 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """
+    Repository rule to download a `helm_chart` from a remote registry.
 
+    It uses `helm` binary to download the chart, so `helm` has to be available in the PATH of the host machine where bazel is running.
+
+    Default credentials on the host machine are used to authenticate against the remote registry.
+    To use basic auth you must provide the basic credentials through env variables: `HELM_USER` and `HELM_PASSWORD`.
+
+    Oci registries are supported.
+
+    The downloaded chart is defined using the `helm_chart` rule and is available as `:chart` target inside the repo name.
+
+    helm_pull(
+        name = "example_helm_chart",
+        chart_name = "example",
+        repo_url = "oci://docker.pkg.dev/project/helm-charts",
+        version = "1.0.0",
+    )
+
+    # it can be referenced later as:
+    # @example_helm_chart//:chart
+
+    helm_chart(
+        ...
+        deps = [
+            "@example_helm_chart//:chart",
+        ]
+    )
 """
 
 pull_attrs = {
-    "chart_name": attr.string(mandatory = True, doc=""),
-    "repo_url": attr.string(mandatory = True, doc=""),
-    "repo_name": attr.string(mandatory = False, doc=""),
+    "chart_name": attr.string(mandatory = True, doc="The name of the helm_chart to download. It will be appendend at the end of the repository url."),
+    "repo_url": attr.string(mandatory = True, doc="The url where the chart is located. You have to omit the chart name from the url."),
+    "repo_name": attr.string(mandatory = False, doc="The name of the repository. This is only useful if you provide a `repository_config` file and you want the repo url to be located within the repo config."),
     # TODO: extract latest version from repo index and mark version as an optional attr
-    "version": attr.string(mandatory = True, doc=""),
-    "sha256": attr.string(mandatory = False, doc = "Sha of the helm chart"),
-    "repository_config": attr.label(allow_single_file = True, mandatory = False, doc=""),
+    "version": attr.string(mandatory = True, doc="The version of the chart to download."),
+    "repository_config": attr.label(allow_single_file = True, mandatory = False, doc="The repository config file."),
 }
 
 def _helm_pull_impl(rctx):

@@ -1,4 +1,3 @@
-load("//helpers:helpers.bzl", "get_make_value_or_default")
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file_action")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -320,8 +319,8 @@ def _chart_srcs_impl(ctx):
     digest_path = ""
     image_tag = ""
 
-    helm_chart_version = get_make_value_or_default(ctx, ctx.attr.helm_chart_version)
-    app_version = get_make_value_or_default(ctx, ctx.attr.app_version or helm_chart_version)
+    helm_chart_version = ctx.attr.helm_chart_version
+    app_version = ctx.attr.app_version or helm_chart_version
     chart_yaml = None
     yq_bin = ctx.toolchains["@aspect_bazel_lib//lib:yq_toolchain_type"].yqinfo.bin
     copy_to_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"].copy_to_directory_info.bin
@@ -418,7 +417,7 @@ def _chart_srcs_impl(ctx):
 
     if ctx.attr.image_tag:
         # extract docker image info from make variable or from rule attribute
-        values[ctx.attr.values_tag_yaml_path] = get_make_value_or_default(ctx, ctx.attr.image_tag)
+        values[ctx.attr.values_tag_yaml_path] = ctx.attr.image_tag
 
     if ctx.attr.image_repository:
         values[values_repo_path] = ctx.attr.image_repository

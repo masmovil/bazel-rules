@@ -1,15 +1,14 @@
-load("//helpers:helpers.bzl", "write_sh", "get_make_value_or_default")
 load(":helm_chart_providers.bzl", "ChartInfo")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """
+    Publish a helm chart produced by `helm_chart` rule to a remote registry.
 """
 
 def _helm_push_impl(ctx):
     chart = ctx.file.chart
     chart_name = ctx.attr.chart[ChartInfo].chart_name
 
-    repo_url = get_make_value_or_default(ctx, ctx.attr.repository_url)
+    repo_url = ctx.attr.repository_url
 
     is_oci = repo_url.startswith('oci://')
 
@@ -72,8 +71,10 @@ fi
 helm_push = rule(
     implementation = _helm_push_impl,
     attrs = {
-      "chart": attr.label(allow_single_file = True, mandatory = True, providers = [ChartInfo], doc = ""),
-      "repository_url": attr.string(mandatory = True, doc = ""),
+      "chart": attr.label(allow_single_file = True, mandatory = True, providers = [ChartInfo], doc = """
+        The packaged chart archive to be published. It can be a reference to a `helm_chart` rule or a reference to a helm archived file"""
+        ),
+      "repository_url": attr.string(mandatory = True, doc = "The remote url of the registry. Avoid adding the helm chart name in the url."),
     },
     doc = _DOC,
     toolchains = [

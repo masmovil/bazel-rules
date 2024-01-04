@@ -1,16 +1,15 @@
 load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
 _DOC = """
-
+  Uninstall a helm release.
 """
 
-
 _ATTRS = {
-  "namespace": attr.string(mandatory = False, doc = ""),
-  "namespace_dep": attr.label(mandatory = False, doc = ""),
-  "release_name": attr.string(mandatory = True, doc = ""),
-  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = ""),
-  "wait": attr.bool(default = True, doc = ""),
+  "namespace": attr.string(mandatory = False, doc = "The namespace where the helm release is installed."),
+  "namespace_dep": attr.label(mandatory = False, doc = "A reference to a `k8s_namespace` rule from where to extract the namespace where the helm release is installed."),
+  "release_name": attr.string(mandatory = True, doc = "The name of the helm release to be installed or upgraded."),
+  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = "Reference to a kubernetes context file tu be used by helm binary."),
+  "wait": attr.bool(default = True, doc = "Helm flag to wait for all resources to be created to exit."),
 }
 def _helm_uninstall_impl(ctx):
     """Uninstall a helm release.
