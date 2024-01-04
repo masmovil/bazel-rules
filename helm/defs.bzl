@@ -1,4 +1,10 @@
-"""Rules for manipulating helm charts"""
+"""Rules for manipulating helm charts
+To load these rules:
+
+```starlark
+load("//helm:defs.bzl", "helm_chart", ...)
+```
+"""
 
 load("//helm/private:helm_push.bzl", _helm_push = "helm_push")
 load("//helm/private:helm_release.bzl", _helm_release = "helm_release")

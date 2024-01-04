@@ -1,6 +1,11 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
 Rules for manipulating helm charts
+To load these rules:
+
+```starlark
+load("//helm:defs.bzl", "helm_chart", ...)
+```
 
 <a id="chart_srcs"></a>
 
@@ -144,6 +149,11 @@ helm_chart(<a href="#helm_chart-name">name</a>, <a href="#helm_chart-chart_name"
 
 Bazel macro function to package a helm chart in to a targz archive file.
 
+To load the rule use:
+```starlark
+load("//helm:defs.bzl", "helm_chart")
+```
+
 The macro is intended to be used as the public API for packaging a chart.
 
 It also defines a %name%_lint test target to be able to test that your chart is well-formed (using `helm lint`).
@@ -153,9 +163,42 @@ It uses `pkg_tar` bazel rule instead to create the archive file. Check this to f
 - https://github.com/masmovil/bazel-rules/issues/55
 - https://github.com/helm/helm/issues/3612#issuecomment-525340295
 
+This macro exports some providers to share info about charts between rules. Check [helm_chart providers](#providers).
+
 The args are the same that the `chart_srcs` rule, check [chart_srcs](#chart_srcs).
 
-This macro exports some providers to share info about charts between rules. Check [helm_chart providers](#providers).
+```starlark
+load("//helm:defs.bzl", "helm_chart")
+
+helm_chart(
+    name = "basic_chart",
+    chart_name = "example",
+    srcs = glob(["**"]),
+)
+
+helm_chart(
+    name = "basic_chart",
+    chart_name = "example",
+    srcs = glob(["**"]),
+    values = {
+        "override.value": "valueoverrided",
+    }
+)
+
+helm_chart(
+    name = "chart",
+    chart_name = "example",
+    version = "v1.0.0",
+    app_version = "v2.3.4",
+    api_version = "v2",
+    description = "Helm chart description placed inside Chart.yaml",
+    image = ":oci_image",
+    values = {
+        "yaml.path.to.value": "value",
+    },
+)
+```
+
 
 **PARAMETERS**
 

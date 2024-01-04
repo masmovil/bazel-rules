@@ -7,6 +7,11 @@ load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", "strip_prefix
 def helm_chart(name, chart_name, **kwargs):
     """Bazel macro function to package a helm chart in to a targz archive file.
 
+    To load the rule use:
+    ```starlark
+    load("//helm:defs.bzl", "helm_chart")
+    ```
+
     The macro is intended to be used as the public API for packaging a chart.
 
     It also defines a %name%_lint test target to be able to test that your chart is well-formed (using `helm lint`).
@@ -16,9 +21,46 @@ def helm_chart(name, chart_name, **kwargs):
     - https://github.com/masmovil/bazel-rules/issues/55
     - https://github.com/helm/helm/issues/3612#issuecomment-525340295
 
+    This macro exports some providers to share info about charts between rules. Check [helm_chart providers](#providers).
+
     The args are the same that the `chart_srcs` rule, check [chart_srcs](#chart_srcs).
 
-    This macro exports some providers to share info about charts between rules. Check [helm_chart providers](#providers).
+    ```starlark
+    load("//helm:defs.bzl", "helm_chart")
+
+    helm_chart(
+        name = "basic_chart",
+        chart_name = "example",
+        srcs = glob(["**"]),
+    )
+
+    helm_chart(
+        name = "basic_chart",
+        chart_name = "example",
+        srcs = glob(["**"]),
+        values = {
+            "override.value": "valueoverrided",
+        }
+    )
+
+    helm_chart(
+        name = "chart",
+        chart_name = "example",
+        version = "v1.0.0",
+        app_version = "v2.3.4",
+        api_version = "v2",
+        description = "Helm chart description placed inside Chart.yaml",
+        image = ":oci_image",
+        values = {
+            "yaml.path.to.value": "value",
+        },
+    )
+    ```
+
+    Args:
+
+        All: This is a wrapper around `chart_srcs` rule. All the args are propagated to `chart_srcs`. See [chart_srcs](#chart_srcs)
+            to check the available config.
     """
 
 
