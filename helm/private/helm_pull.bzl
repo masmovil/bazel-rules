@@ -18,17 +18,20 @@ _DOC = """
     The downloaded chart is defined using the `helm_chart` rule and it's available as `:chart` target inside the repo name.
 
     ```starlark
+    # WORKSPACE or extensions.bzl/MODULE.bazel
     load("//helm:defs.bzl", "helm_pull")
+
     helm_pull(
         name = "example_helm_chart",
         chart_name = "example",
         repo_url = "oci://docker.pkg.dev/project/helm-charts",
         version = "1.0.0",
     )
+    ```
 
-    # it can be referenced later as:
-    # @example_helm_chart//:chart
+    It can be later referenced in a BUILD file in `helm_chart` dep:
 
+    ```starlark
     helm_chart(
         ...
         deps = [
