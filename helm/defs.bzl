@@ -1,4 +1,4 @@
-"""Rules for manipulation helm packages."""
+"""Rules for manipulating helm charts"""
 
 load("//helm/private:helm_push.bzl", _helm_push = "helm_push")
 load("//helm/private:helm_release.bzl", _helm_release = "helm_release")
@@ -9,24 +9,25 @@ load("//helm/private:chart_srcs.bzl", _chart_srcs = "chart_srcs")
 load("//helm/private:helm_pull.bzl", _helm_pull = "helm_pull", _pull_attr = "pull_attrs")
 load("//helm/private:helm_chart_providers.bzl", _chart_info = "ChartInfo", _helm_chart_providers = "helm_chart_providers")
 
-def helm_chart(name, **kwargs):
-    image = kwargs.get("image")
+# def helm_chart(name, **kwargs):
+#     image = kwargs.get("image")
 
-    if image:
-        _helm_chart(
-            name = name,
-            image_digest = image + ".digest",
-            **kwargs,
-        )
-    else:
-        _helm_chart(
-            name = name,
-            **kwargs,
-        )
+#     if image:
+#         _helm_chart(
+#             name = name,
+#             image_digest = image + ".digest",
+#             **kwargs,
+#         )
+#     else:
+#         _helm_chart(
+#             name = name,
+#             **kwargs,
+#         )
 
 
 # Explicitly re-export the functions
 helm_push = _helm_push
+helm_chart = _helm_chart
 chart_srcs = _chart_srcs
 helm_chart_providers = _helm_chart_providers
 pull_attrs = _pull_attr

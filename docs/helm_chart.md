@@ -1,6 +1,6 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-Rules for manipulation helm packages.
+Rules for manipulating helm charts
 
 <a id="chart_srcs"></a>
 
@@ -139,10 +139,23 @@ ChartInfo(<a href="#ChartInfo-targz">targz</a>, <a href="#ChartInfo-chart_name">
 ## helm_chart
 
 <pre>
-helm_chart(<a href="#helm_chart-name">name</a>, <a href="#helm_chart-kwargs">kwargs</a>)
+helm_chart(<a href="#helm_chart-name">name</a>, <a href="#helm_chart-chart_name">chart_name</a>, <a href="#helm_chart-kwargs">kwargs</a>)
 </pre>
 
+Bazel macro function to package a helm chart in to a targz archive file.
 
+The macro is intended to be used as the public API for packaging a chart.
+
+It also defines a %name%_lint test target to be able to test that your chart is well-formed (using `helm lint`).
+
+To make the output reproducible this macro does not use `helm package` to package the chart into a versioned chart archive file.
+It uses `pkg_tar` bazel rule instead to create the archive file. Check this to find more info about:
+- https://github.com/masmovil/bazel-rules/issues/55
+- https://github.com/helm/helm/issues/3612#issuecomment-525340295
+
+The args are the same that the `chart_srcs` rule, check [chart_srcs](#chart_srcs).
+
+This macro exports some providers to share info about charts between rules. Check [helm_chart providers](#providers).
 
 **PARAMETERS**
 
@@ -150,6 +163,7 @@ helm_chart(<a href="#helm_chart-name">name</a>, <a href="#helm_chart-kwargs">kwa
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
 | <a id="helm_chart-name"></a>name |  <p align="center"> - </p>   |  none |
+| <a id="helm_chart-chart_name"></a>chart_name |  <p align="center"> - </p>   |  none |
 | <a id="helm_chart-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 

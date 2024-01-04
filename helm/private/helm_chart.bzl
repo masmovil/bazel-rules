@@ -19,21 +19,25 @@ def helm_chart(name, chart_name, **kwargs):
     The args are the same that the `chart_srcs` rule, check [chart_srcs](#chart_srcs).
 
     This macro exports some providers to share info about charts between rules. Check [helm_chart providers](#providers).
-
-    Args:
-
     """
+
 
     helm_pkg_target = "%s_package" % name
     helm_pkg_out_strip_target = "%s_src_helm_files" % name
     tar_target = "%s_tar" % name
 
+    image = kwargs.get("image")
     chart_version = kwargs.get("version") or kwargs.get("helm_chart_version")
+
+    chart_srcs_attrs = dict({}, **kwargs)
+
+    if image:
+       chart_srcs_attrs["image_digest"] = image + ".digest"
 
     chart_srcs(
         name = helm_pkg_target,
         chart_name = chart_name,
-        **kwargs,
+        **chart_srcs_attrs,
     )
 
     pkg_files(

@@ -6,7 +6,9 @@ stardoc(
     input = "//helm:defs.bzl",
     out = "helm_chart.md",
     symbol_names = ["helm_chart", "chart_srcs", "ChartInfo"],
-    deps = ["//helm:defs"],
+    deps = [
+        "//helm:defs",
+    ],
 )
 
 stardoc(
