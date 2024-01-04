@@ -2,6 +2,11 @@ load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
 _DOC = """
   Installs or upgrades a helm chart in to a cluster using helm binary.
+
+  To load the rule use:
+  ```starlark
+  load("//helm:defs.bzl", "helm_release")
+  ```
 """
 
 _ATTRS = {
@@ -12,7 +17,7 @@ _ATTRS = {
   "namespace_dep": attr.label(mandatory = False, doc = "A reference to a `k8s_namespace` rule from where to extract the namespace to be used to install the release."),
   "values": attr.label_list(allow_files = True, default = [], doc = "A list of value files to be provided to helm install command through -f flag."),
   "release_name": attr.string(mandatory = True, doc = "The name of the helm release to be installed or upgraded."),
-  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = "Reference to a kubernetes context file tu be used by helm binary."),
+  "kubernetes_context": attr.label(mandatory = False, allow_single_file = True, doc = "Reference to a kubernetes context file used by helm binary."),
   "create_namespace": attr.bool(default = True, doc = "A flag to indicate helm binary to create the kubernetes namespace if it is not already present in the cluster."),
   "wait": attr.bool(default = True, doc = "Helm flag to wait for all resources to be created to exit."),
   "set": attr.string_dict(doc = """

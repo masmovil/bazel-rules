@@ -3,6 +3,11 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 def helm_lint_test(name, chart):
     """Macro function to test that a helm chart is well-formed.
 
+    To load the rule use:
+    ```starlark
+    load("//helm:defs.bzl", "helm_lint_test")
+    ```
+
     It uses `helm lint` command to perform the testing.
 
     Args:
@@ -12,7 +17,7 @@ def helm_lint_test(name, chart):
         chart: The chart to lint
 
             It could be a reference to a `helm_chart` rule that produces an archived chart as a default output.
-            Can be also a reference to an archived chart.
+            It can also be a reference to an archived chart.
 
     """
 

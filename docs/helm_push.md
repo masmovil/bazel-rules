@@ -12,6 +12,11 @@ helm_push(<a href="#helm_push-name">name</a>, <a href="#helm_push-chart">chart</
 
 Publish a helm chart produced by `helm_chart` rule to a remote registry.
 
+To load the rule use:
+```starlark
+load("//helm:defs.bzl", "helm_push")
+```
+
 **ATTRIBUTES**
 
 

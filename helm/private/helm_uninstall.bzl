@@ -2,6 +2,11 @@ load("//k8s:k8s.bzl", "NamespaceDataInfo")
 
 _DOC = """
   Uninstall a helm release.
+
+  To load the rule use:
+  ```starlark
+  load("//helm:defs.bzl", "helm_uninstall")
+  ```
 """
 
 _ATTRS = {

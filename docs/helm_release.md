@@ -13,6 +13,11 @@ helm_release(<a href="#helm_release-name">name</a>, <a href="#helm_release-chart
 
 Installs or upgrades a helm chart in to a cluster using helm binary.
 
+To load the rule use:
+```starlark
+load("//helm:defs.bzl", "helm_release")
+```
+
 **ATTRIBUTES**
 
 
@@ -21,7 +26,7 @@ Installs or upgrades a helm chart in to a cluster using helm binary.
 | <a id="helm_release-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="helm_release-chart"></a>chart |  The packaged chart archive to be published. It can be a reference to a `helm_chart` rule or a reference to a helm archived file   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="helm_release-create_namespace"></a>create_namespace |  A flag to indicate helm binary to create the kubernetes namespace if it is not already present in the cluster.   | Boolean | optional |  `True`  |
-| <a id="helm_release-kubernetes_context"></a>kubernetes_context |  Reference to a kubernetes context file tu be used by helm binary.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
+| <a id="helm_release-kubernetes_context"></a>kubernetes_context |  Reference to a kubernetes context file used by helm binary.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 | <a id="helm_release-namespace"></a>namespace |  The namespace where to install the helm release.   | String | optional |  `"default"`  |
 | <a id="helm_release-namespace_dep"></a>namespace_dep |  A reference to a `k8s_namespace` rule from where to extract the namespace to be used to install the release.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 | <a id="helm_release-release_name"></a>release_name |  The name of the helm release to be installed or upgraded.   | String | required |  |

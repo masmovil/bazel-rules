@@ -2,6 +2,11 @@ load(":helm_chart_providers.bzl", "ChartInfo")
 
 _DOC = """
     Publish a helm chart produced by `helm_chart` rule to a remote registry.
+
+    To load the rule use:
+    ```starlark
+    load("//helm:defs.bzl", "helm_push")
+    ```
 """
 
 def _helm_push_impl(ctx):

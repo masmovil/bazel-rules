@@ -12,6 +12,11 @@ helm_uninstall(<a href="#helm_uninstall-name">name</a>, <a href="#helm_uninstall
 
 Uninstall a helm release.
 
+To load the rule use:
+```starlark
+load("//helm:defs.bzl", "helm_uninstall")
+```
+
 **ATTRIBUTES**
 
 

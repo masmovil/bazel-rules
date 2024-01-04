@@ -3,15 +3,22 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 _DOC = """
     Repository rule to download a `helm_chart` from a remote registry.
 
+    To load the rule use:
+    ```starlark
+    load("//helm:defs.bzl", "helm_pull")
+    ```
+
     It uses `helm` binary to download the chart, so `helm` has to be available in the PATH of the host machine where bazel is running.
 
     Default credentials on the host machine are used to authenticate against the remote registry.
     To use basic auth you must provide the basic credentials through env variables: `HELM_USER` and `HELM_PASSWORD`.
 
-    Oci registries are supported.
+    OCI registries are supported.
 
-    The downloaded chart is defined using the `helm_chart` rule and is available as `:chart` target inside the repo name.
+    The downloaded chart is defined using the `helm_chart` rule and it's available as `:chart` target inside the repo name.
 
+    ```starlark
+    load("//helm:defs.bzl", "helm_pull")
     helm_pull(
         name = "example_helm_chart",
         chart_name = "example",
@@ -28,6 +35,7 @@ _DOC = """
             "@example_helm_chart//:chart",
         ]
     )
+    ```
 """
 
 pull_attrs = {
