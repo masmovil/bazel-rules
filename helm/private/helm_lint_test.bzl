@@ -8,7 +8,7 @@ def helm_lint_test(name, chart):
     load("//helm:defs.bzl", "helm_lint_test")
     ```
 
-    It uses `helm lint` command to perform the testing.
+    It uses `helm lint` command to perform the linting.
 
     Args:
 
