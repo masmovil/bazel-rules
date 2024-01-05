@@ -17,6 +17,8 @@ To load the rule use:
 load("//helm:defs.bzl", "helm_uninstall")
 ```
 
+This rule builds an executable. Use `run` instead of `build` to be uninstall the helm release.
+
 **ATTRIBUTES**
 
 

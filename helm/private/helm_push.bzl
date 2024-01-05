@@ -7,6 +7,8 @@ _DOC = """
     ```starlark
     load("//helm:defs.bzl", "helm_push")
     ```
+
+    This rule builds an executable. Use `run` instead of `build` to be publish the chart.
 """
 
 def _helm_push_impl(ctx):

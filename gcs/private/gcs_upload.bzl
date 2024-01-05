@@ -1,14 +1,27 @@
 
-_DOC = """
+_DOC = """Rule used to upload a single file to a Google Cloud Storage bucket
+
+    To load the rule use:
+    ```starlark
+    load("//gcs:defs.bzl", "gcs_upload")
+    ```
+
+    Example of use:
+
+    ```starlark
+    load("//gcs:defs.bzl", "gcs_upload")
+
+    gcs_upload(
+        name = "push",
+        src = ":file",
+        destination = "gs://my-bucket/file.zip"
+    )
+    ```
+
+    This rule builds an executable. Use `run` instead of `build` to upload the file.
 """
 
 def _gcs_upload_impl(ctx):
-    """Push an artifact to Google Cloud Storage
-    Args:
-        name: A unique name for this rule.
-        src: Source file to upload.
-        destination: Destination. Example: gs://my-bucket/file
-    """
     gsutil_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gsutil_bin
 
     src_file = ctx.file.src
@@ -47,8 +60,8 @@ def _gcs_upload_impl(ctx):
 gcs_upload = rule(
     implementation = _gcs_upload_impl,
     attrs = {
-      "src": attr.label(allow_single_file = True, mandatory = True, doc = ""),
-      "destination": attr.string(mandatory = True, doc = ""),
+      "src": attr.label(allow_single_file = True, mandatory = True, doc = "Source file to upload"),
+      "destination": attr.string(mandatory = True, doc = "Google storage destination url. Example: gs://my-bucket/file"),
     },
     doc = _DOC,
     toolchains = [

@@ -46,6 +46,27 @@ stardoc(
     deps = ["//helm/private:helm_uninstall"],
 )
 
+stardoc(
+    name = "k8s_docs",
+    input = "//k8s/private:k8s_namespace.bzl",
+    out = "k8s_namespace.md",
+    deps = ["//k8s/private:k8s_namespace"],
+)
+
+stardoc(
+    name = "gcs_docs",
+    input = "//gcs/private:gcs_upload.bzl",
+    out = "gcs_upload.md",
+    deps = ["//gcs/private:gcs_upload"],
+)
+
+stardoc(
+    name = "sops_docs",
+    input = "//sops/private:sops_decrypt.bzl",
+    out = "sops_decrypt.md",
+    deps = ["//sops/private:sops_decrypt"],
+)
+
 write_source_files(
     name = "write_docs_md",
     files = {
@@ -55,5 +76,8 @@ write_source_files(
         "helm_lint.md": ":helm_lint_docs",
         "helm_release.md": ":helm_release_docs",
         "helm_uninstall.md": ":helm_uninstall_docs",
+        "k8s_namespace.md": ":k8s_docs",
+        "gcs_docs.md": ":gcs_docs",
+        "sops_docs.md": ":sops_docs",
     },
 )
