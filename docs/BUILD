@@ -77,7 +77,7 @@ write_source_files(
         "helm_release.md": ":helm_release_docs",
         "helm_uninstall.md": ":helm_uninstall_docs",
         "k8s_namespace.md": ":k8s_docs",
-        "gcs_docs.md": ":gcs_docs",
-        "sops_docs.md": ":sops_docs",
+        "gcs_upload.md": ":gcs_docs",
+        "sops_decrypt.md": ":sops_docs",
     },
 )
