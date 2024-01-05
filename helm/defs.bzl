@@ -1,5 +1,4 @@
-"""Rules for manipulating helm charts
-To load these rules:
+"""Rules for manipulating helm charts. To load these rules:
 
 ```starlark
 load("//helm:defs.bzl", "helm_chart", ...)

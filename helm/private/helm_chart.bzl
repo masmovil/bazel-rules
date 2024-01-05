@@ -7,6 +7,10 @@ load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", "strip_prefix
 def helm_chart(name, chart_name, **kwargs):
     """Bazel macro function to package a helm chart in to a targz archive file.
 
+    This is a wrapper around `chart_srcs` rule. All the args are propagated to `chart_srcs` rule.
+    See [chart_srcs](#chart_srcs) arguments to see the available config.
+
+
     To load the rule use:
     ```starlark
     load("//helm:defs.bzl", "helm_chart")

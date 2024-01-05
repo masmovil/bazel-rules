@@ -20,6 +20,9 @@ chart_srcs(<a href="#chart_srcs-name">name</a>, <a href="#chart_srcs-deps">deps<
 Customize helm chart values and configuration.
 
 This rule should not be used directly, users should use `helm_chart` macro instead. See [helm_chart](#helm_chart).
+Despite, if you want to see the configuration arguments you can use to package a helm chart using `helm_chart` rule, check the arguments doc below for `chart_srcs` rule,
+as `helm_chart` is just a wrapper around `chart_srcs` rule and all the arguments are propagated to `chart_srcs` rule.
+
 
 This rule takes chart src files and write them to bazel output dir applying some modifications.
 The rule is designed to be used with a packager to produce an archived file (`pkg_tar` is used).
@@ -147,6 +150,10 @@ helm_chart(<a href="#helm_chart-name">name</a>, <a href="#helm_chart-chart_name"
 </pre>
 
 Bazel macro function to package a helm chart in to a targz archive file.
+
+This is a wrapper around `chart_srcs` rule. All the args are propagated to `chart_srcs` rule.
+See [chart_srcs](#chart_srcs) arguments to see the available config.
+
 
 To load the rule use:
 ```starlark
