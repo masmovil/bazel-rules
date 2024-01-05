@@ -7,7 +7,7 @@ load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", "strip_prefix
 def helm_chart(name, chart_name, **kwargs):
     """Bazel macro function to package a helm chart in to a targz archive file.
 
-    This is a wrapper around `chart_srcs` rule. All the args are propagated to `chart_srcs` rule.
+    The macro is intended to be used as the public API for packaging a chart. It is a wrapper around `chart_srcs` rule. All the args are propagated to `chart_srcs` rule.
     See [chart_srcs](#chart_srcs) arguments to see the available config.
 
 
@@ -16,12 +16,10 @@ def helm_chart(name, chart_name, **kwargs):
     load("//helm:defs.bzl", "helm_chart")
     ```
 
-    The macro is intended to be used as the public API for packaging a chart.
-
     It also defines a %name%_lint test target to be able to test that your chart is well-formed (using `helm lint`).
 
     To make the output reproducible this macro does not use `helm package` to package the chart into a versioned chart archive file.
-    It uses `pkg_tar` bazel rule instead to create the archive file. Check this to find more info about:
+    It uses `pkg_tar` bazel rule instead to create the archive file. Check this to find more info about it:
     - https://github.com/masmovil/bazel-rules/issues/55
     - https://github.com/helm/helm/issues/3612#issuecomment-525340295
 
