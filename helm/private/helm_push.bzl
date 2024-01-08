@@ -19,7 +19,7 @@ def _helm_push_impl(ctx):
 
     is_oci = repo_url.startswith('oci://')
 
-    helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
+    helm_bin = ctx.toolchains["@masmovil_bazel_rules//helm:helm_toolchain_type"].helminfo.bin
 
     script_template = ctx.actions.declare_file(ctx.attr.name + "_run_script.tpl")
 
@@ -85,7 +85,7 @@ helm_push = rule(
     },
     doc = _DOC,
     toolchains = [
-        "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
+        "@masmovil_bazel_rules//helm:helm_toolchain_type",
         "@aspect_bazel_lib//lib:yq_toolchain_type",
     ],
     executable = True,

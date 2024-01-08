@@ -26,7 +26,7 @@ def _helm_uninstall_impl(ctx):
         namespace_dep: Namespace from k8s rule
         release_name: Name of the helm release
     """
-    helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
+    helm_bin = ctx.toolchains["@masmovil_bazel_rules//helm:helm_toolchain_type"].helminfo.bin
 
     namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
 
@@ -67,7 +67,7 @@ helm_uninstall = rule(
     attrs = _ATTRS,
     doc = _DOC,
     toolchains = [
-        "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
+        "@masmovil_bazel_rules//helm:helm_toolchain_type",
     ],
     executable = True,
 )

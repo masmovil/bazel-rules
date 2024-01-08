@@ -63,7 +63,7 @@ _ATTRS = {
 }
 
 def _helm_release_impl(ctx):
-    helm_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/helm:toolchain_type"].helminfo.bin
+    helm_bin = ctx.toolchains["@masmovil_bazel_rules//helm:helm_toolchain_type"].helminfo.bin
 
     namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
 
@@ -119,7 +119,7 @@ helm_release = rule(
     attrs = _ATTRS,
     doc = _DOC,
     toolchains = [
-        "@masmovil_bazel_rules//toolchains/helm:toolchain_type",
+        "@masmovil_bazel_rules//helm:helm_toolchain_type",
     ],
     executable = True,
 )

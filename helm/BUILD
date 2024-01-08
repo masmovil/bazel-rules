@@ -1,5 +1,9 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
+package(default_visibility = ["//visibility:public"])
+
+toolchain_type(name = "helm_toolchain_type")
+
 exports_files(
     glob(["*.bzl"]),
     visibility = ["//docs:__pkg__"],
