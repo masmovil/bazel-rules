@@ -1,5 +1,7 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
+toolchain_type(name = "gcloud_toolchain_type", visibility = ["//visibility:public"])
+
 bzl_library(
     name = "gcs",
     srcs = ["gcs.bzl"],

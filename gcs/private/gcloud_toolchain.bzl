@@ -117,7 +117,7 @@ def _gcloud_repo_impl(rctx):
     )
 
     build_content = """
-load("@masmovil_bazel_rules//toolchains/gcloud:toolchain.bzl", "gcloud_toolchain")
+load("@masmovil_bazel_rules//gcs/private:gcloud_toolchain.bzl", "gcloud_toolchain")
 
 exports_files(["gcloud", "gsutil"])
 
@@ -146,7 +146,7 @@ def _gcloud_toolchain_configure_impl(rctx):
 
 # Forward all the providers
 def _resolved_toolchain_impl(ctx):
-    toolchain_info = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"]
+    toolchain_info = ctx.toolchains["@masmovil_bazel_rules//gcs:gcloud_toolchain_type"]
     return [
         toolchain_info,
         toolchain_info.default,
@@ -158,7 +158,7 @@ def _resolved_toolchain_impl(ctx):
 # https://cs.opensource.google/bazel/bazel/+/master:tools/jdk/java_toolchain_alias.bzl
 resolved_toolchain = rule(
     implementation = _resolved_toolchain_impl,
-    toolchains = ["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"],
+    toolchains = ["@masmovil_bazel_rules//gcs:gcloud_toolchain_type"],
     incompatible_use_toolchain_transition = True,
 )
 """
@@ -177,10 +177,9 @@ resolved_toolchain(name = "resolved_toolchain", visibility = ["//visibility:publ
         build_content += """
 toolchain(
     name = "{platform}_toolchain",
-
     exec_compatible_with = {compatible_with},
     toolchain = "@gcloud_{platform}//:gcloud_toolchain",
-    toolchain_type = "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
+    toolchain_type = "@masmovil_bazel_rules//gcs:gcloud_toolchain_type",
 )
 """.format(
             platform = platform,

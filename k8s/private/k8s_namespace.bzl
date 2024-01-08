@@ -75,9 +75,8 @@ _ATTRS = {
 }
 
 def _k8s_namespace_impl(ctx):
-    kubectl_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/kubectl:toolchain_type"].kubectlinfo.bin
-    gcloud_bin = ctx.toolchains["@masmovil_bazel_rules//toolchains/gcloud:toolchain_type"].gcloudinfo.gcloud_bin
-
+    kubectl_bin = ctx.toolchains["@masmovil_bazel_rules//k8s:kubectl_toolchain_type"].kubectlinfo.bin
+    gcloud_bin = ctx.toolchains["@masmovil_bazel_rules//gcs:gcloud_toolchain_type"].gcloudinfo.gcloud_bin
 
     namespace_name = ctx.attr.namespace_name
     kubernetes_sa = ctx.attr.kubernetes_sa
@@ -139,8 +138,8 @@ k8s_namespace = rule(
     attrs = _ATTRS,
     doc = _DOC,
     toolchains = [
-      "@masmovil_bazel_rules//toolchains/gcloud:toolchain_type",
-      "@masmovil_bazel_rules//toolchains/kubectl:toolchain_type",
+      "@masmovil_bazel_rules//gcs:gcloud_toolchain_type",
+      "@masmovil_bazel_rules//k8s:kubectl_toolchain_type",
     ],
     executable = True,
 )

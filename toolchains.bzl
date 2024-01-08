@@ -1,7 +1,7 @@
 load("//helm/private:helm_toolchain.bzl", "helm_repo", "helm_toolchain_configure", "HELM_VERSIONS")
-load("//toolchains/sops:toolchain.bzl", "sops_repo", "sops_toolchain_configure", "SOPS_VERSIONS")
-load("//toolchains/gcloud:toolchain.bzl", "gcloud_repo", "gcloud_toolchain_configure", "GCLOUD_VERSIONS")
-load("//toolchains/kubectl:toolchain.bzl", "kubectl_repo", "kubectl_toolchain_configure", "KUBECTL_VERSIONS")
+load("//gcs/private:gcloud_toolchain.bzl", "gcloud_repo", "gcloud_toolchain_configure", "GCLOUD_VERSIONS")
+load("//k8s/private:kubectl_toolchain.bzl", "kubectl_repo", "kubectl_toolchain_configure", "KUBECTL_VERSIONS")
+load("//sops/private:sops_toolchain.bzl", "sops_repo", "sops_toolchain_configure", "SOPS_VERSIONS")
 
 def register_helm_toolchains(name, version, register = False):
     helm_platforms = HELM_VERSIONS[version]

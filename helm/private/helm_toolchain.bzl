@@ -190,7 +190,6 @@ resolved_toolchain(name = "resolved_toolchain", visibility = ["//visibility:publ
         build_content += """
 toolchain(
     name = "{platform}_toolchain",
-
     exec_compatible_with = {compatible_with},
     toolchain = "@helm_{platform}//:helm_toolchain",
     toolchain_type = "@masmovil_bazel_rules//helm:helm_toolchain_type",

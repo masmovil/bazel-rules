@@ -1,9 +1,9 @@
 load("@masmovil_bazel_rules//helm:defs.bzl", "helm_pull", "pull_attrs")
 load("@masmovil_bazel_rules//:toolchains.bzl", "register_helm_toolchains", "register_sops_toolchains", "register_gcloud_toolchains", "register_kubectl_toolchains")
 load("@masmovil_bazel_rules//helm/private:helm_toolchain.bzl", "HELM_DEFAULT_VERSION")
-load("@masmovil_bazel_rules//toolchains/sops:toolchain.bzl", "SOPS_DEFAULT_VERSION")
-load("@masmovil_bazel_rules//toolchains/gcloud:toolchain.bzl", "GCLOUD_DEFAULT_VERSION")
-load("@masmovil_bazel_rules//toolchains/kubectl:toolchain.bzl", "KUBECTL_DEFAULT_VERSION")
+load("@masmovil_bazel_rules//k8s/private:kubectl_toolchain.bzl", "KUBECTL_DEFAULT_VERSION")
+load("@masmovil_bazel_rules//sops/private:sops_toolchain.bzl", "SOPS_DEFAULT_VERSION")
+load("@masmovil_bazel_rules//gcs/private:gcloud_toolchain.bzl", "GCLOUD_DEFAULT_VERSION")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
 extended_pull_attrs = dicts.add({
