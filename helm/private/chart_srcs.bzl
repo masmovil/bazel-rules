@@ -4,6 +4,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":helm_chart_providers.bzl", "ChartInfo")
 load("@io_bazel_rules_docker//container:providers.bzl", "ImageInfo", "LayerInfo")
 load("@aspect_bazel_lib//lib:stamping.bzl", "STAMP_ATTRS", "maybe_stamp")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "COPY_FILE_TOOLCHAINS")
 
 DEFAULT_HELM_API_VERSION = "v2"
 DEFAULT_HELM_CHART_VERSION = "1.0.0"
@@ -530,5 +531,6 @@ chart_srcs = rule(
     toolchains = [
         "@aspect_bazel_lib//lib:yq_toolchain_type",
         "@aspect_bazel_lib//lib:copy_to_directory_toolchain_type",
-    ],
+
+    ] + COPY_FILE_TOOLCHAINS,
 )

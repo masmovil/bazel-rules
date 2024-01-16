@@ -1,13 +1,13 @@
 
 module(name = "masmovil_bazel_rules", version = "2.0.0", bazel_compatibility = [">=6.0.0"])
 
-bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.3.0")
 bazel_dep(name = "platforms", version = "0.0.7")
-bazel_dep(name = "bazel_skylib", version = "1.4.1")
-bazel_dep(name = "rules_pkg", version = "0.9.1")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+bazel_dep(name = "rules_pkg", version = "0.10.0")
 
-bazel_dep(name = "rules_oci", version = "1.4.0")
-bazel_dep(name = "stardoc", version = "0.6.2")
+bazel_dep(name = "rules_oci", version = "1.6.0")
+bazel_dep(name = "stardoc", version = "0.6.2", dev_dependency = True)
 
 oci = use_extension("@rules_oci//oci:extensions.bzl", "oci", dev_dependency = True)
 oci.pull(
@@ -30,8 +30,7 @@ register_toolchains("@sops_toolchains//:all")
 register_toolchains("@kubectl_toolchains//:all")
 register_toolchains("@gcloud_toolchains//:all")
 
-utils = use_extension("@masmovil_bazel_rules//:extensions.bzl", "utils")
-
+utils = use_extension("@masmovil_bazel_rules//:extensions.bzl", "utils", dev_dependency = True)
 utils.pull(
     name = "helm_chart_a",
     chart_name = "a_values",
