@@ -184,7 +184,7 @@ toolchain(
     toolchain_type = "@masmovil_bazel_rules//sops:sops_toolchain_type",
 )
 """.format(
-            platform = platform.replace("_", "."),
+            platform = platform,
             compatible_with = meta.compatible_with,
             # user_repository_name = rctx.attr.user_repository_name,
         )
