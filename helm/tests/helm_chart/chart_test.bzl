@@ -41,7 +41,7 @@ def compare_to_yaml_file_test(name, yaml_file_path, explicit_yaml_to_compare, ch
 
     return  test_rulename
 
-def chart_test(name, chart, chart_name, prefix_srcs, expected_files=[], expected_values="", expected_manifest="", expected_deps=[]):
+def chart_test(name, chart, chart_name, prefix_srcs = "", expected_files=[], expected_values="", expected_manifest="", expected_deps=[]):
     unpacked_chart_rule_name = "%s_unpacked" % name
 
     # unpack helm_chart output targz

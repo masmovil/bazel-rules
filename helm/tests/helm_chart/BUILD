@@ -363,3 +363,65 @@ helm_chart(
     "labels.somelabel": "testvalue",
   },
 )
+
+helm_chart(
+  name = "declarative_chart_no_values",
+  chart_name = "declarative_no_values",
+  version = "v1.0.1",
+  app_version = "v1.0.0",
+  api_version = "v2",
+  description = "Description of the declarative chart",
+  templates = [
+    "files/service.yaml",
+    "files/configmap.yaml",
+  ]
+)
+
+chart_test(
+  name = "declarative_chart_no_values_test",
+  chart_name = "declarative_no_values",
+  chart = ":declarative_chart_no_values",
+  expected_manifest = """
+apiVersion: v2
+name: declarative_no_values
+version: v1.0.1
+appVersion: v1.0.0
+description: Description of the declarative chart
+""",
+)
+
+helm_chart(
+  name = "declarative_chart_values",
+  chart_name = "declarative_values",
+  version = "3.0.45",
+  app_version = "0.1.0",
+  api_version = "v2",
+  description = "Description of the declarative chart",
+  templates = [
+    "files/service.yaml",
+  ],
+  values = {
+    "k8s.service.name": "testname",
+    "k8s.service.port": "1050",
+  }
+)
+
+chart_test(
+  name = "declarative_chart_values_test",
+  chart_name = "declarative_values",
+  chart = ":declarative_chart_values",
+  expected_manifest = """
+apiVersion: v2
+name: declarative_values
+version: 3.0.45
+appVersion: 0.1.0
+apiVersion: v2
+description: Description of the declarative chart
+""",
+  expected_values = """
+k8s:
+  service:
+    name: testname
+    port: 1050
+""",
+)

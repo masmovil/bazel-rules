@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  config.yaml: |
+    {}
+kind: ConfigMap
+metadata:
+  labels: {}
+  name: example-configmap
+  namespace: default
