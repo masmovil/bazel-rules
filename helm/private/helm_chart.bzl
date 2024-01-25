@@ -83,7 +83,6 @@ def helm_chart(name, chart_name, **kwargs):
     chart_srcs(
         name = helm_pkg_target,
         chart_name = chart_name,
-        visibility = visibility,
         **chart_srcs_attrs,
     )
 
