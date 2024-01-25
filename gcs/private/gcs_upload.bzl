@@ -22,7 +22,7 @@ _DOC = """Rule used to upload a single file to a Google Cloud Storage bucket
 """
 
 def _gcs_upload_impl(ctx):
-    gsutil_bin = ctx.toolchains["@masmovil_bazel_rules//gcs:gcloud_toolchain_type"].gcloudinfo.gsutil_bin
+    gsutil_bin = ctx.toolchains["@masmovil_bazel_rules_test//gcs:gcloud_toolchain_type"].gcloudinfo.gsutil_bin
 
     src_file = ctx.file.src
 
@@ -65,7 +65,7 @@ gcs_upload = rule(
     },
     doc = _DOC,
     toolchains = [
-      "@masmovil_bazel_rules//gcs:gcloud_toolchain_type",
+      "@masmovil_bazel_rules_test//gcs:gcloud_toolchain_type",
     ],
     executable = True,
 )

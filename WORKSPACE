@@ -1,5 +1,5 @@
 workspace(
-    name = "masmovil_bazel_rules",
+    name = "masmovil_bazel_rules_test",
 )
 
 load("//:repositories.bzl", "mm_repositories", "internal_deps")

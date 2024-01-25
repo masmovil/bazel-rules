@@ -99,7 +99,7 @@ def _helm_push_impl(ctx):
     if not is_oci:
         return _curl_fallback(ctx)
 
-    helm_bin = ctx.toolchains["@masmovil_bazel_rules//helm:helm_toolchain_type"].helminfo.bin
+    helm_bin = ctx.toolchains["@masmovil_bazel_rules_test//helm:helm_toolchain_type"].helminfo.bin
 
     script_template = ctx.actions.declare_file(ctx.attr.name + "_run_oci_script.tpl")
 
@@ -145,7 +145,7 @@ helm_push = rule(
     attrs = push_attrs,
     doc = _DOC,
     toolchains = [
-        "@masmovil_bazel_rules//helm:helm_toolchain_type",
+        "@masmovil_bazel_rules_test//helm:helm_toolchain_type",
     ],
     executable = True,
 )

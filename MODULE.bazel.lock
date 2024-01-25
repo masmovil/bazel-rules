@@ -62,7 +62,7 @@
           "hasNonDevUseExtension": true
         },
         {
-          "extensionBzlFile": "@masmovil_bazel_rules//:extensions.bzl",
+          "extensionBzlFile": "@masmovil_bazel_rules_test//:extensions.bzl",
           "extensionName": "toolchains",
           "usingModule": "<root>",
           "location": {
@@ -139,7 +139,7 @@
           "hasNonDevUseExtension": true
         },
         {
-          "extensionBzlFile": "@masmovil_bazel_rules//:extensions.bzl",
+          "extensionBzlFile": "@masmovil_bazel_rules_test//:extensions.bzl",
           "extensionName": "non_module_dependencies",
           "usingModule": "<root>",
           "location": {
@@ -156,7 +156,7 @@
           "hasNonDevUseExtension": true
         },
         {
-          "extensionBzlFile": "@masmovil_bazel_rules//:docker_extension.bzl",
+          "extensionBzlFile": "@masmovil_bazel_rules_test//:docker_extension.bzl",
           "extensionName": "docker_images",
           "usingModule": "<root>",
           "location": {
