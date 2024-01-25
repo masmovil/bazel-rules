@@ -72,6 +72,8 @@ def helm_chart(name, chart_name, **kwargs):
 
     image = kwargs.get("image")
     chart_version = kwargs.get("version") or kwargs.get("helm_chart_version")
+    # TODO: change how visibility is propagated
+    visibility = kwargs.get("visibility") or ["//visibility:public"]
 
     chart_srcs_attrs = dict({}, **kwargs)
 
@@ -81,6 +83,7 @@ def helm_chart(name, chart_name, **kwargs):
     chart_srcs(
         name = helm_pkg_target,
         chart_name = chart_name,
+        visibility = visibility,
         **chart_srcs_attrs,
     )
 
@@ -88,6 +91,7 @@ def helm_chart(name, chart_name, **kwargs):
         name = helm_pkg_out_strip_target,
         srcs = [helm_pkg_target],
         strip_prefix = strip_prefix.from_pkg(),
+        visibility = visibility,
     )
 
     pkg_tar(
@@ -95,6 +99,7 @@ def helm_chart(name, chart_name, **kwargs):
         out = chart_name + ".tgz",
         extension = "tgz",
         srcs = [helm_pkg_out_strip_target],
+        visibility = visibility,
     )
 
     helm_chart_providers(
@@ -103,9 +108,11 @@ def helm_chart(name, chart_name, **kwargs):
         chart_targz = tar_target,
         chart_version = chart_version,
         chart_bin_srcs = helm_pkg_target,
+        visibility = visibility,
     )
 
     helm_lint_test(
         name = "%s_lint" % name,
+        visibility = visibility,
         chart = name,
     )
