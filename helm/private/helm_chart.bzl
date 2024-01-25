@@ -112,6 +112,5 @@ def helm_chart(name, chart_name, **kwargs):
 
     helm_lint_test(
         name = "%s_lint" % name,
-        visibility = visibility,
         chart = name,
     )
