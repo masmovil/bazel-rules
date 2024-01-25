@@ -292,7 +292,7 @@ def _image_digest_processor(ctx):
             tools = [],
             inputs = [digest_file],
             outputs = [sha_file],
-            command = "cat %s| awk -F':' '{print $2}' > %s" % (digest_file.path, sha_file.path),
+            command = "cat %s > %s" % (digest_file.path, sha_file.path),
             progress_message = "Parse oci image digest sha256 file",
             mnemonic = "FormatDigest",
         )
