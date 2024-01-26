@@ -131,12 +131,13 @@ _ATTRS = dicts.add({
             keys: `yaml.path` or `.yaml.path`
             values:  the value to be replaced inside the Chart values.yaml.
         """),
-        "force_append_repository": attr.bool(default = True, doc="""
-            A flag to specify if @sha256 should be appended to the repository value in the chart values.yaml in case `image` rule attribute is specified.
-            This is intended to meet the when image digest is used inside k8s deployments: `gcr.io/container@sha256:a12e258c58ab92be22e403d08c8ef7eefd6119235eddca01309fe6b21101e100`.
+        "force_repository_append": attr.bool(default = True, doc="""
+            A flag to specify if @ should be appended to the repository value in the chart values.yaml (in case `image` rule attribute is specified).
+            The rules will look for the specified repository value inside the values.yaml.
+            This is intended to meet image url with digest format: `gcr.io/container@sha256:a12e258c58ab92be22e403d08c8ef7eefd6119235eddca01309fe6b21101e100`.
             If you have this already covered in your deployment templates, set this attr to false.
             If the flag is set to true, the image rule attr is provided and no `values_repo_yaml_path` is set, the rule will look for the default path of the
-            repository value %s
+            repository value. %s
         """ % DEFAULT_VALUES_REPO_YAML),
         "path_to_chart": attr.string(doc="Attribute to specify the path to the root of the chart. This attribute is mandatory if neither Chart.yaml nor values.yaml are provided, and the chart srcs attr is not empty to determinate where in the path of the source files is located the root of the helm chart."),
         "_subst_template": attr.label(allow_single_file = True, default = ":substitute.sh.tpl"),
@@ -280,29 +281,13 @@ def _image_digest_processor(ctx):
     # look for a Docker rule ImageInfo provider
     is_oci_image = False if docker_image_provider else True
 
-    sha_file = ""
-    sha_shell_extr_expr = ""
-
-    if is_oci_image:
-        # if it's a image from oci, we get the .digest file from image_digest attr
-        digest_file = ctx.file.image_digest
-
-        sha_file = ctx.actions.declare_file("%s_image_formatted_digest.yaml" % ctx.label.name)
-        ctx.actions.run_shell(
-            tools = [],
-            inputs = [digest_file],
-            outputs = [sha_file],
-            command = "cat %s| awk -F':' '{print $2}' > %s" % (digest_file.path, sha_file.path),
-            progress_message = "Parse oci image digest sha256 file",
-            mnemonic = "FormatDigest",
-        )
-    else:
-        # if it's a docker image we get the digest file via bazel providers
-        sha_file = docker_image_provider.container_parts["digest"]
-
+    sha_file = ctx.file.image_digest if is_oci_image else docker_image_provider.container_parts["digest"]
     sha_shell_extr_expr = "$(cat {sha_file})".format(
         sha_file=sha_file.path
     )
+
+    if not is_oci_image:
+        sha_shell_extr_expr = "sha256:" + sha_shell_extr_expr
 
     return struct(
         sha_file=sha_file,
@@ -426,22 +411,22 @@ def _chart_srcs_impl(ctx):
     if ctx.attr.image_repository:
         values[values_repo_path] = ctx.attr.image_repository
 
-    # image repository substitution is extracted from values.yaml if force_append_repository attr is provided
+    # image repository substitution is extracted from values.yaml if force_repository_append attr is provided
     image_repo_shell_expr = ''
 
-    if ctx.attr.force_append_repository:
+    if ctx.attr.force_repository_append:
         _image_repository = ctx.attr.image_repository
 
         if is_image_from_oci:
             if not _image_repository:
                 # Add @sha256 suffix to image repository based on actual values
-                image_repo_shell_expr = "$({yq} {repo} {values})@sha256".format(
+                image_repo_shell_expr = "$({yq} {repo} {values})@".format(
                     yq=yq_bin.path,
                     repo=values_repo_path,
                     values=src_values_path,
                 )
             else:
-                values[values_repo_path] = _image_repository + "@sha256"
+                values[values_repo_path] = _image_repository + "@"
 
     all_values = dicts.add({}, ctx.attr.values, values)
 

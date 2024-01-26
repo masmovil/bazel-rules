@@ -111,7 +111,7 @@ appVersion: v1.0.0
 """,
 )
 
-IMAGE_SHA_256 = "161a1d97d592b3f1919801578c3a47c8e932071168a96267698f4b669c24c76d"
+IMAGE_SHA_256 = "sha256:161a1d97d592b3f1919801578c3a47c8e932071168a96267698f4b669c24c76d"
 oci_image(
   name = "image",
   base = "@distroless_java",
@@ -135,7 +135,7 @@ labels:
   somelabel: labelvalue
 image:
     tag: %s
-    repository: aio@sha256
+    repository: aio@
 """ % IMAGE_SHA_256,
 )
 
@@ -164,6 +164,7 @@ helm_chart(
   name = "chart_b_deps",
   chart_name = "b_deps",
   srcs = add_prefix_to_paths("charts/b", chart_b_srcs),
+  force_repository_append = False,
   values = {
     "labels.somelabel": "testvalue",
   },
@@ -183,8 +184,8 @@ chart_test(
 labels:
   somelabel: testvalue
 image:
-  tag: 41b9e05eac7ac512e2ec02437c7de74c1c6fc579565ced13a0d24cc6b3a1df34
-  repository: https://registry.io@sha256
+  tag: sha256:41b9e05eac7ac512e2ec02437c7de74c1c6fc579565ced13a0d24cc6b3a1df34
+  repository: https://registry.io@
 """,
 expected_manifest = """
 apiVersion: v2
@@ -205,7 +206,7 @@ labels:
   somelabel: labelvalue
 image:
     tag: %s
-    repository: aio@sha256
+    repository: aio@
 """ % IMAGE_SHA_256,
     "expected_manifest": """
 apiVersion: v1
