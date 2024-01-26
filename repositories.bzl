@@ -1,11 +1,11 @@
 # Internal use only.
 # Install rule dependencies for local testing pourposes only (rule authors).
 
-load("@masmovil_bazel_rules//:toolchains.bzl", "register_helm_toolchains", "register_sops_toolchains", "register_gcloud_toolchains", "register_kubectl_toolchains")
-load("@masmovil_bazel_rules//helm/private:helm_toolchain.bzl", "HELM_DEFAULT_VERSION")
-load("@masmovil_bazel_rules//gcs/private:gcloud_toolchain.bzl", "GCLOUD_DEFAULT_VERSION")
-load("@masmovil_bazel_rules//k8s/private:kubectl_toolchain.bzl", "KUBECTL_DEFAULT_VERSION")
-load("@masmovil_bazel_rules//sops/private:sops_toolchain.bzl", "SOPS_DEFAULT_VERSION")
+load("//:toolchains.bzl", "register_helm_toolchains", "register_sops_toolchains", "register_gcloud_toolchains", "register_kubectl_toolchains")
+load("//helm/private:helm_toolchain.bzl", "HELM_DEFAULT_VERSION")
+load("//gcs/private:gcloud_toolchain.bzl", "GCLOUD_DEFAULT_VERSION")
+load("//k8s/private:kubectl_toolchain.bzl", "KUBECTL_DEFAULT_VERSION")
+load("//sops/private:sops_toolchain.bzl", "SOPS_DEFAULT_VERSION")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_archive = "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
