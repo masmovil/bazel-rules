@@ -130,6 +130,8 @@ _ATTRS = dicts.add({
             A dictionary of key values to be written in to the chart values.
             keys: `yaml.path` or `.yaml.path`
             values:  the value to be replaced inside the Chart values.yaml.
+            This attr supports use of stamped values. To provide a stamped value you have to use ${STAMP_VARIABLE_NAME} as value of the dict with
+            your stamped variable key. Make sure to enable stamping in your rule with the attribute `stamp`.
         """),
         "force_repository_append": attr.bool(default = True, doc="""
             A flag to specify if @ should be appended to the repository value in the chart values.yaml (in case `image` rule attribute is specified).
