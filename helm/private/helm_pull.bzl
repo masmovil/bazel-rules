@@ -65,11 +65,10 @@ def _helm_pull_impl(rctx):
 
     args = ["helm", "pull"]
 
-    # if rctx.attr.repository_config and rctx.attr.repo_name:
-    args += ["%s/%s" % (rctx.attr.repo_name, rctx.attr.chart_name), "--version", rctx.attr.version]
-    # else:
-    #    exact_url = "%s-%s.tgz" % (paths.join(rctx.attr.repo_url, chart_name), version)
-    #    args += [exact_url]
+    if rctx.attr.repository_config and rctx.attr.repo_name:
+        args += ["%s/%s" % (rctx.attr.repo_name, rctx.attr.chart_name), "--version", rctx.attr.version]
+    else:
+        args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name), "--version", rctx.attr.version]
 
     if rctx.attr.repository_config:
         args += ["--repository-config", rctx.file.repository_config.path]
