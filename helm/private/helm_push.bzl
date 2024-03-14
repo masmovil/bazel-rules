@@ -112,7 +112,7 @@ if [ "{REPO_CONFIG_PATH}" != "" ]; then
     EXTRA_ARGS="--repository-config {REPO_CONFIG_PATH}"
 fi
 
-{HELM_BINARY} push {CHART_PATH} {REMOTE}/{CHART_NAME}
+{HELM_BINARY} push {CHART_PATH} {REMOTE}
     """)
 
     runfile_helm_push_script = ctx.actions.declare_file(ctx.attr.name + "_run_oci_script")
