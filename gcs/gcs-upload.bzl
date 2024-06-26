@@ -13,6 +13,7 @@ def _gcs_upload_impl(ctx):
         name: A unique name for this rule.
         src: Source file to upload.
         destination: Destination. Example: gs://my-bucket/file
+        allow_overwrite: Allow overwriting the destination file if it already exists.
     """
 
     src_file = ctx.file.src
@@ -32,14 +33,12 @@ def _gcs_upload_impl(ctx):
         substitutions = {
             "{SRC_FILE}": src_file.short_path,
             "{DESTINATION}": destination,
+            "{NO_CLOBBER}": "-n" if not ctx.attr.allow_overwrite else "", # -n flag to avoid overwriting
             "%{stamp_statements}": "\n".join([
               "read_variables %s" % runfile(ctx, f)
               for f in stamp_files]),
         }
     )
-
-    
-
 
     runfiles = ctx.runfiles(
         files = [ctx.info_file, ctx.version_file, src_file]
@@ -55,6 +54,7 @@ gcs_upload = rule(
     attrs = {
       "src": attr.label(allow_single_file = True, mandatory = True),
       "destination": attr.string(mandatory = True),
+      "allow_overwrite": attr.bool(default = True),
       "_script_template": attr.label(allow_single_file = True, default = ":gcs-upload.sh.tpl"),
     },
     doc = "Upload a file to a Google Cloud Storage Bucket",

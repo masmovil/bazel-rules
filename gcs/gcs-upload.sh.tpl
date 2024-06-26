@@ -31,5 +31,5 @@ function read_variables() {
 
 %{stamp_statements}
 
-gsutil cp {SRC_FILE} {DESTINATION}
+gsutil cp {NO_CLOBBER} {SRC_FILE} {DESTINATION}
 
