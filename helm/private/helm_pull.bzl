@@ -67,6 +67,8 @@ def _helm_pull_impl(rctx):
 
     if rctx.attr.repository_config and rctx.attr.repo_name:
         args += ["%s/%s" % (rctx.attr.repo_name, rctx.attr.chart_name), "--version", rctx.attr.version]
+    elif rctx.attr.repo_url.startswith('oci://'):
+        args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name), "--version", rctx.attr.version]
     else:
         args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name), "--version", rctx.attr.version]
 
@@ -79,12 +81,17 @@ def _helm_pull_impl(rctx):
     if username and password:
         args += ["--username", username, "--password", password]
 
-    args += ["--untar"]
-
     result = rctx.execute(args)
 
     if result.return_code != 0:
-        fail("unable to download helm chart %s with code %s - " % (chart_name, result.return_code) + result.stderr)
+        fail("Unable to download helm chart %s with code %s - " % (chart_name, result.return_code) + result.stderr)
+
+    rctx.extract(
+        archive = "%s-%s.tgz" % (chart_name, version),
+    )
+
+    rctx.delete("%s/%s" % (chart_name, "BUILD.bazel"))
+    rctx.delete("%s/%s" % (chart_name, "BUILD"))
 
     rctx.file(
         "BUILD.bazel",
@@ -97,13 +104,17 @@ helm_chart(
     name = "chart",
     chart_name = "{name}",
     srcs = glob(["{name}/**"]),
-    version = "{version}",
     visibility = ["//visibility:public"],
 )
         """.format(
             name=chart_name,
             version=version,
         ),
+    )
+
+    return dict(
+        name = chart_name,
+        version = version
     )
 
 helm_pull = repository_rule(
