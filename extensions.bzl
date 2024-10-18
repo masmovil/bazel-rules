@@ -45,7 +45,6 @@ def _utils_extension_impl(mctx):
                 name = pull.name,
                 repo_url = pull.repo_url,
                 version = pull.version,
-                # sha256 = pull.sha256,
             )
 
 utils = module_extension(
