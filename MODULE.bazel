@@ -2,6 +2,10 @@
 module(name = "masmovil_bazel_rules", version = "2.0.0", bazel_compatibility = [">=6.0.0"])
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.3.0")
+
+bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+use_repo(bazel_lib_toolchains, "yq_toolchains")
+
 bazel_dep(name = "platforms", version = "0.0.7")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "rules_pkg", version = "0.9.1")
