@@ -7,6 +7,8 @@
 ## helm_release
 
 <pre>
+load("@masmovil_bazel_rules//helm/private:helm_release.bzl", "helm_release")
+
 helm_release(<a href="#helm_release-name">name</a>, <a href="#helm_release-chart">chart</a>, <a href="#helm_release-create_namespace">create_namespace</a>, <a href="#helm_release-kubernetes_context">kubernetes_context</a>, <a href="#helm_release-namespace">namespace</a>, <a href="#helm_release-namespace_dep">namespace_dep</a>,
              <a href="#helm_release-release_name">release_name</a>, <a href="#helm_release-set">set</a>, <a href="#helm_release-values">values</a>, <a href="#helm_release-values_yaml">values_yaml</a>, <a href="#helm_release-wait">wait</a>)
 </pre>

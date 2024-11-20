@@ -7,6 +7,8 @@
 ## sops_decrypt
 
 <pre>
+load("@masmovil_bazel_rules//sops/private:sops_decrypt.bzl", "sops_decrypt")
+
 sops_decrypt(<a href="#sops_decrypt-name">name</a>, <a href="#sops_decrypt-srcs">srcs</a>, <a href="#sops_decrypt-sops_yaml">sops_yaml</a>)
 </pre>
 
