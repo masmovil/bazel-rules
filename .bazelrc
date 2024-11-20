@@ -1,4 +1,4 @@
-build --host_force_python=PY2
+build --enable_bzlmod
 
 test:ci --workspace_status_command=$GITHUB_WORKSPACE/stamp.sh
 
