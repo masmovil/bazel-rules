@@ -1,5 +1,5 @@
 
-module(name = "masmovil_bazel_rules", version = "2.0.0", bazel_compatibility = [">=6.0.0"])
+module(name = "masmovil_bazel_rules", version = "1.0.0", bazel_compatibility = [">=6.0.0"])
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.3.0")
 
