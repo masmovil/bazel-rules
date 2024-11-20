@@ -1,4 +1,4 @@
-load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 
 stardoc(
@@ -80,5 +80,4 @@ write_source_files(
         "gcs_upload.md": ":gcs_docs",
         "sops_decrypt.md": ":sops_docs",
     },
-    diff_test = False
 )
