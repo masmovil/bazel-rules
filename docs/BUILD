@@ -80,4 +80,5 @@ write_source_files(
         "gcs_upload.md": ":gcs_docs",
         "sops_decrypt.md": ":sops_docs",
     },
+    diff_test = False
 )

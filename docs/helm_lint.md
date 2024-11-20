@@ -7,8 +7,6 @@
 ## helm_lint_test
 
 <pre>
-load("@masmovil_bazel_rules//helm/private:helm_lint_test.bzl", "helm_lint_test")
-
 helm_lint_test(<a href="#helm_lint_test-name">name</a>, <a href="#helm_lint_test-chart">chart</a>)
 </pre>
 

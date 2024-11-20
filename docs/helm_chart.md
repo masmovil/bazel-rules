@@ -11,8 +11,6 @@ load("//helm:defs.bzl", "helm_chart", ...)
 ## chart_srcs
 
 <pre>
-load("@masmovil_bazel_rules//helm:defs.bzl", "chart_srcs")
-
 chart_srcs(<a href="#chart_srcs-name">name</a>, <a href="#chart_srcs-deps">deps</a>, <a href="#chart_srcs-srcs">srcs</a>, <a href="#chart_srcs-additional_templates">additional_templates</a>, <a href="#chart_srcs-api_version">api_version</a>, <a href="#chart_srcs-app_version">app_version</a>, <a href="#chart_srcs-chart_deps">chart_deps</a>, <a href="#chart_srcs-chart_name">chart_name</a>,
            <a href="#chart_srcs-deps_conditions">deps_conditions</a>, <a href="#chart_srcs-description">description</a>, <a href="#chart_srcs-force_repository_append">force_repository_append</a>, <a href="#chart_srcs-helm_chart_version">helm_chart_version</a>, <a href="#chart_srcs-image">image</a>,
            <a href="#chart_srcs-image_digest">image_digest</a>, <a href="#chart_srcs-image_repository">image_repository</a>, <a href="#chart_srcs-image_tag">image_tag</a>, <a href="#chart_srcs-package_name">package_name</a>, <a href="#chart_srcs-path_to_chart">path_to_chart</a>, <a href="#chart_srcs-stamp">stamp</a>, <a href="#chart_srcs-templates">templates</a>,
@@ -123,8 +121,6 @@ For compatibility reasons, some attributes are still supported but marked as dep
 ## ChartInfo
 
 <pre>
-load("@masmovil_bazel_rules//helm:defs.bzl", "ChartInfo")
-
 ChartInfo(<a href="#ChartInfo-targz">targz</a>, <a href="#ChartInfo-chart_name">chart_name</a>, <a href="#ChartInfo-chart_version">chart_version</a>, <a href="#ChartInfo-chart_srcs">chart_srcs</a>)
 </pre>
 
@@ -135,6 +131,7 @@ ChartInfo(<a href="#ChartInfo-targz">targz</a>, <a href="#ChartInfo-chart_name">
 - The output archive file targz
 
 **FIELDS**
+
 
 | Name  | Description |
 | :------------- | :------------- |
@@ -149,8 +146,6 @@ ChartInfo(<a href="#ChartInfo-targz">targz</a>, <a href="#ChartInfo-chart_name">
 ## helm_chart
 
 <pre>
-load("@masmovil_bazel_rules//helm:defs.bzl", "helm_chart")
-
 helm_chart(<a href="#helm_chart-name">name</a>, <a href="#helm_chart-chart_name">chart_name</a>, <a href="#helm_chart-kwargs">kwargs</a>)
 </pre>
 

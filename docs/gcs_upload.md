@@ -7,8 +7,6 @@
 ## gcs_upload
 
 <pre>
-load("@masmovil_bazel_rules//gcs/private:gcs_upload.bzl", "gcs_upload")
-
 gcs_upload(<a href="#gcs_upload-name">name</a>, <a href="#gcs_upload-src">src</a>, <a href="#gcs_upload-destination">destination</a>)
 </pre>
 

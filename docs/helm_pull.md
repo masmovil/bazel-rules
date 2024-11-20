@@ -7,8 +7,6 @@
 ## helm_pull
 
 <pre>
-load("@masmovil_bazel_rules//helm/private:helm_pull.bzl", "helm_pull")
-
 helm_pull(<a href="#helm_pull-name">name</a>, <a href="#helm_pull-chart_name">chart_name</a>, <a href="#helm_pull-repo_mapping">repo_mapping</a>, <a href="#helm_pull-repo_name">repo_name</a>, <a href="#helm_pull-repo_url">repo_url</a>, <a href="#helm_pull-repository_config">repository_config</a>, <a href="#helm_pull-version">version</a>)
 </pre>
 
@@ -58,7 +56,7 @@ helm_chart(
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="helm_pull-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="helm_pull-chart_name"></a>chart_name |  The name of the helm_chart to download. It will be appendend at the end of the repository url.   | String | required |  |
-| <a id="helm_pull-repo_mapping"></a>repo_mapping |  In `WORKSPACE` context only: a dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.<br><br>For example, an entry `"@foo": "@bar"` declares that, for any time this repository depends on `@foo` (such as a dependency on `@foo//some:target`, it should actually resolve that dependency within globally-declared `@bar` (`@bar//some:target`).<br><br>This attribute is _not_ supported in `MODULE.bazel` context (when invoking a repository rule inside a module extension's implementation function).   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  |
+| <a id="helm_pull-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.<p>For example, an entry `"@foo": "@bar"` declares that, for any time this repository depends on `@foo` (such as a dependency on `@foo//some:target`, it should actually resolve that dependency within globally-declared `@bar` (`@bar//some:target`).   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | required |  |
 | <a id="helm_pull-repo_name"></a>repo_name |  The name of the repository. This is only useful if you provide a `repository_config` file and you want the repo url to be located within the repo config.   | String | optional |  `""`  |
 | <a id="helm_pull-repo_url"></a>repo_url |  The url where the chart is located. You have to omit the chart name from the url.   | String | required |  |
 | <a id="helm_pull-repository_config"></a>repository_config |  The repository config file.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |

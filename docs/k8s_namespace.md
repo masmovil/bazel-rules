@@ -7,8 +7,6 @@
 ## k8s_namespace
 
 <pre>
-load("@masmovil_bazel_rules//k8s/private:k8s_namespace.bzl", "k8s_namespace")
-
 k8s_namespace(<a href="#k8s_namespace-name">name</a>, <a href="#k8s_namespace-gcp_gke_project">gcp_gke_project</a>, <a href="#k8s_namespace-gcp_sa">gcp_sa</a>, <a href="#k8s_namespace-gcp_sa_project">gcp_sa_project</a>, <a href="#k8s_namespace-kubernetes_context">kubernetes_context</a>, <a href="#k8s_namespace-kubernetes_sa">kubernetes_sa</a>,
               <a href="#k8s_namespace-namespace_name">namespace_name</a>, <a href="#k8s_namespace-workload_identity_namespace">workload_identity_namespace</a>)
 </pre>
@@ -87,15 +85,16 @@ Example of use with `helm_release`:
 ## NamespaceDataInfo
 
 <pre>
-load("@masmovil_bazel_rules//k8s/private:k8s_namespace.bzl", "NamespaceDataInfo")
-
 NamespaceDataInfo(<a href="#NamespaceDataInfo-namespace">namespace</a>)
 </pre>
 
+
+
 **FIELDS**
+
 
 | Name  | Description |
 | :------------- | :------------- |
-| <a id="NamespaceDataInfo-namespace"></a>namespace |  -    |
+| <a id="NamespaceDataInfo-namespace"></a>namespace |  (Undocumented)    |
 
 

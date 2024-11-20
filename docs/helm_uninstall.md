@@ -7,8 +7,6 @@
 ## helm_uninstall
 
 <pre>
-load("@masmovil_bazel_rules//helm/private:helm_uninstall.bzl", "helm_uninstall")
-
 helm_uninstall(<a href="#helm_uninstall-name">name</a>, <a href="#helm_uninstall-kubernetes_context">kubernetes_context</a>, <a href="#helm_uninstall-namespace">namespace</a>, <a href="#helm_uninstall-namespace_dep">namespace_dep</a>, <a href="#helm_uninstall-release_name">release_name</a>, <a href="#helm_uninstall-wait">wait</a>)
 </pre>
 

@@ -7,8 +7,6 @@
 ## helm_push
 
 <pre>
-load("@masmovil_bazel_rules//helm/private:helm_push.bzl", "helm_push")
-
 helm_push(<a href="#helm_push-name">name</a>, <a href="#helm_push-chart">chart</a>, <a href="#helm_push-repository_config">repository_config</a>, <a href="#helm_push-repository_name">repository_name</a>, <a href="#helm_push-repository_url">repository_url</a>)
 </pre>
 
