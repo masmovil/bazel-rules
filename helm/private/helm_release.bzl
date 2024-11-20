@@ -47,7 +47,7 @@ _ATTRS = {
   "chart": attr.label(allow_single_file = True, mandatory = True, doc = """
     The packaged chart archive to be published. It can be a reference to a `helm_chart` rule or a reference to a helm archived file"""
   ),
-  "namespace": attr.string(mandatory = False, doc = "The namespace literal where to install the helm release. Set to `""` to use namespace from current kube context"),
+  "namespace": attr.string(mandatory = False, doc = "The namespace literal where to install the helm release. Set to `\"\"` to use namespace from current kube context"),
   "namespace_dep": attr.label(mandatory = False, doc = "A reference to a `k8s_namespace` rule from where to extract the namespace to be used to install the release.Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace"),
   "values": attr.label_list(allow_files = True, default = [], doc = "A list of value files to be provided to helm install command through -f flag."),
   "release_name": attr.string(mandatory = True, doc = "The name of the helm release to be installed or upgraded."),
