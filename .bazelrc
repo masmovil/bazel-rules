@@ -1,5 +1,7 @@
 build --host_force_python=PY2
 
+test:ci --workspace_status_command=$GITHUB_WORKSPACE/stamp.sh
+
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
 # This needs to be last statement in this
