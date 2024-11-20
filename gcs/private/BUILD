@@ -12,7 +12,7 @@ bzl_library(
     srcs = ["gcs_upload.bzl"],
     visibility = [
         "//docs:__pkg__",
-        "//helm:__subpackages__",
+        "//gcs:__subpackages__",
     ],
     deps = [],
 )
