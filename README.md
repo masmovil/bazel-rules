@@ -17,10 +17,10 @@ Check out [github releases page](https://github.com/masmovil/bazel-rules/release
  - [helm_release](docs/helm_release.md) Installs or upgrades a helm chart in to a cluster using the helm binary toolchain.
  - [helm_uninstall](docs/helm_uninstall.md) Uninstall a helm release.
 
-## Sops
+## Sops
 - [sops_decrypt](docs/sops_decrypt.md) Decrypt secrets using [sops](https://github.com/mozilla/sops)
 
-## k8s
+## k8s
 - [k8s_namespace](docs/k8s_namespace.md) Create a kubernetes namespace in a k8s cluster with workload identity support. You can also configure GKE Workload Identity with it.
 
 ## gcs
