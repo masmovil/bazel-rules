@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "STABLE_TEST_VAR TEST_VALUE"
+echo "TEST_VAR VOLATILE_TEST_VALUE"

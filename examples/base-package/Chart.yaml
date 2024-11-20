@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Bazel rules example. Chart base that will be used as a dependency
-name: base-package
-version: 1.0.0

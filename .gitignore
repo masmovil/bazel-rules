@@ -1,2 +1,4 @@
 bazel-*
 .idea
+.bazelrc.user
+.DS_Store

@@ -1,0 +1,8 @@
+apiVersion: v2
+name: withdeps
+description: Helm chart with dependencies
+version: 1.0.0
+appVersion: 1.0.0
+dependencies:
+  - name: a
+    version: 1.0.1
