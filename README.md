@@ -1,4 +1,4 @@
-# bazel rules
+# Masorange rules helm
 
 This repository contains Bazel rules to manipulate and operate Helm charts with Bazel, decrpyt sops secrets, and run operations over cloud services.
 
