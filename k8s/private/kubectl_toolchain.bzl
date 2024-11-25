@@ -37,6 +37,12 @@ KUBECTL_PLATFORMS = {
             "@platforms//cpu:x86_64",
         ],
     ),
+    "linux_arm64": struct(
+        compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:aarch64",
+        ],
+    ),
     "windows_amd64": struct(
         compatible_with = [
             "@platforms//os:windows",
