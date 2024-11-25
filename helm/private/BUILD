@@ -47,6 +47,7 @@ bzl_library(
     ],
     deps = [
         "@bazel_skylib//rules:write_file",
+        ":helm_chart_providers",
     ],
 )
 
