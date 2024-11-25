@@ -51,7 +51,7 @@ def register_kubectl_toolchains(name, version, register = False):
         for platform, _ in kubectl_platforms.items():
             native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
 
-def masmovil_bazel_rules_toolchains_repos():
+def masorange_rules_helm_toolchains_repos():
     register_helm_toolchains("helm", HELM_DEFAULT_VERSION, True)
     register_sops_toolchains("sops", SOPS_DEFAULT_VERSION, True)
     register_gcloud_toolchains("gcloud", GCLOUD_DEFAULT_VERSION, True)

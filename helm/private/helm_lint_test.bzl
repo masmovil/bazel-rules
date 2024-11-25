@@ -20,7 +20,7 @@ def _helm_lint_test_impl(ctx):
 
     chart_targz = ctx.file.chart
 
-    helm_bin = ctx.toolchains["@masmovil_bazel_rules//helm:helm_toolchain_type"].helminfo.bin
+    helm_bin = ctx.toolchains["@masorange_rules_helm//helm:helm_toolchain_type"].helminfo.bin
 
     ctx.actions.write(
         output = ctx.outputs.executable,
@@ -38,7 +38,7 @@ helm_lint_test = rule(
     attrs = _ATTRS,
     doc = _DOC,
     toolchains = [
-        "@masmovil_bazel_rules//helm:helm_toolchain_type",
+        "@masorange_rules_helm//helm:helm_toolchain_type",
     ],
     test = True,
 )

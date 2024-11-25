@@ -98,7 +98,7 @@ def _helm_pull_impl(rctx):
         """
 package(default_visibility = ["//visibility:public"])
 
-load("@masmovil_bazel_rules//helm:defs.bzl", "helm_chart")
+load("@masorange_rules_helm//helm:defs.bzl", "helm_chart")
 
 helm_chart(
     name = "chart",
