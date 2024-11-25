@@ -45,7 +45,7 @@ HELM_PLATFORMS = {
             "@platforms//os:linux",
         ],
     ),
-    "linux_386": struct(
+    "linux_i386": struct(
         compatible_with = [
             "@platforms//os:linux",
             "@platforms//cpu:x86_32",
@@ -130,7 +130,7 @@ def _helm_repo_impl(rctx):
     )
 
     build_content = """
-load("@masmovil_bazel_rules//helm/private:helm_toolchain.bzl", "helm_toolchain")
+load("@masorange_rules_helm//helm/private:helm_toolchain.bzl", "helm_toolchain")
 
 exports_files(["{0}"])
 
@@ -159,7 +159,7 @@ def _helm_toolchain_configure_impl(rctx):
 
 # Forward all the providers
 def _resolved_toolchain_impl(ctx):
-    toolchain_info = ctx.toolchains["@masmovil_bazel_rules//helm:helm_toolchain_type"]
+    toolchain_info = ctx.toolchains["@masorange_rules_helm//helm:helm_toolchain_type"]
     return [
         toolchain_info,
         toolchain_info.default,
@@ -171,7 +171,7 @@ def _resolved_toolchain_impl(ctx):
 # https://cs.opensource.google/bazel/bazel/+/master:tools/jdk/java_toolchain_alias.bzl
 resolved_toolchain = rule(
     implementation = _resolved_toolchain_impl,
-    toolchains = ["@masmovil_bazel_rules//helm:helm_toolchain_type"],
+    toolchains = ["@masorange_rules_helm//helm:helm_toolchain_type"],
     incompatible_use_toolchain_transition = True,
 )
 """
@@ -192,7 +192,7 @@ toolchain(
     name = "{platform}_toolchain",
     exec_compatible_with = {compatible_with},
     toolchain = "@helm_{platform}//:helm_toolchain",
-    toolchain_type = "@masmovil_bazel_rules//helm:helm_toolchain_type",
+    toolchain_type = "@masorange_rules_helm//helm:helm_toolchain_type",
 )
 """.format(
             platform = platform,

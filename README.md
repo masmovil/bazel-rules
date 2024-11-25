@@ -1,10 +1,8 @@
-# bazel rules
-
-![Build Status](https://github.com/masmovil/bazel-rules/actions/workflows/integration-tests.yaml/badge.svg)
+# Masorange rules helm
 
 This repository contains Bazel rules to manipulate and operate Helm charts with Bazel, decrpyt sops secrets, and run operations over cloud services.
 
-# Installation
+# Installation
 These rules support installation via both `bzlmod` and `non-bzlmod`.
 
 Check out [github releases page](https://github.com/masmovil/bazel-rules/releases) to see the latest version of the rules and how to install them using bazel.

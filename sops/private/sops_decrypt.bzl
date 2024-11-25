@@ -53,7 +53,7 @@ _DOC = """Decrypt secrets using [sops](https://github.com/mozilla/sops)
 
 
 def _sops_decrypt_impl(ctx):
-    sops = ctx.toolchains["@masmovil_bazel_rules//sops:sops_toolchain_type"].sopsinfo.bin
+    sops = ctx.toolchains["@masorange_rules_helm//sops:sops_toolchain_type"].sopsinfo.bin
 
     inputs = [ctx.file.sops_yaml, sops]
     outputs = []
@@ -91,6 +91,6 @@ sops_decrypt = rule(
       "sops_yaml": attr.label(allow_single_file = True, mandatory = True, doc = ""),
     },
     toolchains = [
-        "@masmovil_bazel_rules//sops:sops_toolchain_type",
+        "@masorange_rules_helm//sops:sops_toolchain_type",
     ],
 )

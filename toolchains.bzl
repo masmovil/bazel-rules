@@ -12,19 +12,20 @@ def register_helm_toolchains(name, version, register = False):
     helm_toolchain_configure(name="%s_toolchains" % name)
 
     if register:
-        native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
+        for platform, _ in helm_platforms.items():
+            native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
 
 def register_sops_toolchains(name, version, register = False):
     sops_platforms = SOPS_VERSIONS[version]
 
     for platform, sha in sops_platforms.items():
-        # sops_repo(name="%s.%s" % (name, platform.replace("_", ".")), version=version, platform=platform, sha=sha)
         sops_repo(name="%s_%s" % (name, platform), version=version, platform=platform, sha=sha)
 
     sops_toolchain_configure(name="%s_toolchains" % name)
 
     if register:
-        native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
+        for platform, _ in sops_platforms.items():
+            native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
 
 def register_gcloud_toolchains(name, version, register = False):
     gcloud_platforms = GCLOUD_VERSIONS[version]
@@ -35,7 +36,8 @@ def register_gcloud_toolchains(name, version, register = False):
     gcloud_toolchain_configure(name="%s_toolchains" % name)
 
     if register:
-        native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
+        for platform, _ in gcloud_platforms.items():
+            native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
 
 def register_kubectl_toolchains(name, version, register = False):
     kubectl_platforms = KUBECTL_VERSIONS[version]
@@ -46,9 +48,10 @@ def register_kubectl_toolchains(name, version, register = False):
     kubectl_toolchain_configure(name="%s_toolchains" % name)
 
     if register:
-        native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
+        for platform, _ in kubectl_platforms.items():
+            native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
 
-def masmovil_bazel_rules_toolchains_repos():
+def masorange_rules_helm_register_toolchains():
     register_helm_toolchains("helm", HELM_DEFAULT_VERSION, True)
     register_sops_toolchains("sops", SOPS_DEFAULT_VERSION, True)
     register_gcloud_toolchains("gcloud", GCLOUD_DEFAULT_VERSION, True)

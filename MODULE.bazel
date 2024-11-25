@@ -1,5 +1,5 @@
 
-module(name = "masmovil_bazel_rules", version = "1.0.1", bazel_compatibility = [">=6.0.0"])
+module(name = "masorange_rules_helm", version = "1.1.0", bazel_compatibility = [">=6.0.0"])
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.3.0")
 
@@ -21,7 +21,7 @@ oci.pull(
 )
 use_repo(oci, "distroless_java")
 
-toolchains = use_extension("@masmovil_bazel_rules//:extensions.bzl", "toolchains")
+toolchains = use_extension("@masorange_rules_helm//:extensions.bzl", "toolchains")
 toolchains.install()
 
 use_repo(toolchains, "helm_toolchains")
@@ -34,7 +34,7 @@ register_toolchains("@sops_toolchains//:all")
 register_toolchains("@kubectl_toolchains//:all")
 register_toolchains("@gcloud_toolchains//:all")
 
-utils = use_extension("@masmovil_bazel_rules//:extensions.bzl", "utils", dev_dependency = True)
+utils = use_extension("@masorange_rules_helm//:extensions.bzl", "utils", dev_dependency = True)
 utils.pull(
     name = "helm_chart_a",
     chart_name = "a_values",
@@ -43,5 +43,5 @@ utils.pull(
 )
 use_repo(utils, "helm_chart_a")
 
-deps = use_extension("@masmovil_bazel_rules//:deps_extension.bzl", "non_module_dependencies")
+deps = use_extension("@masorange_rules_helm//:deps_extension.bzl", "non_module_dependencies")
 use_repo(deps, "io_bazel_rules_docker")
