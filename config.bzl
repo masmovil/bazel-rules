@@ -2,12 +2,12 @@ load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies",
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 load("@aspect_bazel_lib//lib:repositories.bzl", "register_coreutils_toolchains")
-load("//:toolchains.bzl", "masmovil_bazel_rules_toolchains_repos")
+load("//:toolchains.bzl", "masorange_rules_helm_toolchains_repos")
 
 
 def mm_config():
     # toolchains
-    masmovil_bazel_rules_toolchains_repos()
+    masorange_rules_helm_toolchains_repos()
 
     # aspect_bazel_lib
     aspect_bazel_lib_dependencies()

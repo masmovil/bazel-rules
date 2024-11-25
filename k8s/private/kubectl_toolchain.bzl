@@ -110,7 +110,7 @@ def _kubectl_repo_impl(rctx):
     )
 
     build_content = """
-load("@masmovil_bazel_rules//k8s/private:kubectl_toolchain.bzl", "kubectl_toolchain")
+load("@masorange_rules_helm//k8s/private:kubectl_toolchain.bzl", "kubectl_toolchain")
 
 exports_files(["kubectl"])
 
@@ -139,7 +139,7 @@ def _kubectl_toolchain_configure_impl(rctx):
 
 # Forward all the providers
 def _resolved_toolchain_impl(ctx):
-    toolchain_info = ctx.toolchains["@masmovil_bazel_rules//k8s:kubectl_toolchain_type"]
+    toolchain_info = ctx.toolchains["@masorange_rules_helm//k8s:kubectl_toolchain_type"]
     return [
         toolchain_info,
         toolchain_info.default,
@@ -151,7 +151,7 @@ def _resolved_toolchain_impl(ctx):
 # https://cs.opensource.google/bazel/bazel/+/master:tools/jdk/java_toolchain_alias.bzl
 resolved_toolchain = rule(
     implementation = _resolved_toolchain_impl,
-    toolchains = ["@masmovil_bazel_rules//k8s:kubectl_toolchain_type"],
+    toolchains = ["@masorange_rules_helm//k8s:kubectl_toolchain_type"],
     incompatible_use_toolchain_transition = True,
 )
 """
@@ -172,7 +172,7 @@ toolchain(
     name = "{platform}_toolchain",
     exec_compatible_with = {compatible_with},
     toolchain = "@kubectl_{platform}//:kubectl_toolchain",
-    toolchain_type = "@masmovil_bazel_rules//k8s:kubectl_toolchain_type",
+    toolchain_type = "@masorange_rules_helm//k8s:kubectl_toolchain_type",
 )
 """.format(
             platform = platform,
