@@ -8,7 +8,7 @@ GCLOUD_VERSIONS = {
         "darwin-x86_64": "9d1af0d2b5e7c8a30145831b99ce46272fc0aba754d7d23dcd3ede414b9ff75a",
         "darwin-x86": "e98b4bf6449b9207ff5c4bd3df12a1b38ffa0f498274b26f2d80cfe7fb124f81",
         "darwin-arm": "d986d0c6531be038b71218f8e7e666c5b4d18ef580d6a063550406ed07e460f9",
-        "windows-x86": "19fd1d359d4efd0824f89e568b08d58d734d78c1bee66f34b0e29dd9c43b1ce2"
+        "windows-x86": "19fd1d359d4efd0824f89e568b08d58d734d78c1bee66f34b0e29dd9c43b1ce2",
         "windows-x86_64": "82270ab11e486c50e552a8ec4e4152a234ddd97d23d062deb85d5d91faa8e5e7"
     },
     "473.0.0": {
@@ -18,7 +18,7 @@ GCLOUD_VERSIONS = {
         "darwin-x86_64": "9ddd90144a004d9ff630781e9b8f144c21b2cea8fb45038073b7fb82399ed478",
         "darwin-x86": "7c15cd239528437f7f8f1718709c653c03edf2ff53907c4e834c5eeab7a3a55e",
         "darwin-arm": "4b534bf60585b6f6918daf0feeb0b68b39a689a794404e5a4f8fd8ce844de31c",
-        "windows-x86": "e8166b3755f01ced1e8e7b5c289743eecc0cf89b4c2481ca48008d5f78bf404f"
+        "windows-x86": "e8166b3755f01ced1e8e7b5c289743eecc0cf89b4c2481ca48008d5f78bf404f",
         "windows-x86_64": "9eacd3f507d3e9fd7a9ed4b8651056be18124ee22369ffcea9f5a3646e0a70a2"
     },
     "450.0.0": {
@@ -28,7 +28,7 @@ GCLOUD_VERSIONS = {
         "darwin-x86_64": "fe25b8b77a4f734fd5d00f5ef59adc077cec0818c1a168b068457034b2ede295",
         "darwin-x86": "544acdadd2dbf690a08b058f18d0d00eff2efafda8a3d5ff1f55f25da1bbc4f1",
         "darwin-arm": "3796e974808e321ac107593b15fe8c80f59a0a39dffbf5380ce1722a281e6049",
-        "windows-x86": "8b52bbfa97fd83da8a489e3a720d58ce5ab11e5e60244a8fb5c9f8fc0b61be7f"
+        "windows-x86": "8b52bbfa97fd83da8a489e3a720d58ce5ab11e5e60244a8fb5c9f8fc0b61be7f",
         "windows-x86_64": "2589b411cc9ccdc371e437149bcbfad4281f14153fd00dccfcd5ca9f6d334379"
     }
 }
