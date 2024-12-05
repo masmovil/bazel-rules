@@ -26,7 +26,7 @@ def _helm_lint_test_impl(ctx):
         output = ctx.outputs.executable,
         content = """
           {helm} lint {chart}
-        """.format(helm=helm_bin.path, chart=chart_targz.short_path),
+        """.format(helm=helm_bin.short_path, chart=chart_targz.short_path),
     )
 
     return [
