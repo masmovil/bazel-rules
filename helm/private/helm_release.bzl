@@ -8,21 +8,55 @@ _DOC = """
   load("//helm:defs.bzl", "helm_release")
   ```
 
-  This rule builds an executable. Use `run` instead of `build` to be install the release.
+  This rule builds an executable. Use `run` instead of `build` to execute it.
 
   ```starklark
 helm_release(
-    name = "chart_install",
+    name = "install",
+    remote_chart = "oci://docker.pkg.dev/helm-charts/test_helm_chart",
+    version = "0.7.5",
+    namespace = "myapp",
+    release_name = "helm-release-name",
+    values = ["additional_values.yaml"],
+)
+
+helm_release(
+    name = "install",
     chart = ":chart",
     namespace = "myapp",
-    tiller_namespace = "tiller-system",
-    release_name = "release-name",
-    values_yaml = glob(["charts/myapp/values.yaml"]),
-    kubernetes_context = "mm-k8s-context",
+    release_name = "helm-release-name",
+    values = glob(["charts/myapp/values.yaml"]),
 )
 ```
 
-Example of use with k8s_namespace:
+Example of use providing a kubernetes context config:
+```starklark
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    release_name = "release-name",
+    values = glob(["charts/myapp/values.yaml"]),
+    kubernetes_context = "mm-k8s-c<ontext",
+)
+```
+
+Example of use decryptying sops secrets:
+```starklark
+
+sops_decrypt(
+  name = "secret",
+  srcs = ["secrets.yaml"],
+)
+
+helm_release(
+    name = "chart_install",
+    chart = ":chart",
+    release_name = "release-name",
+    values = glob(["charts/myapp/values.yaml"]) + [":secret"],
+)
+```
+
+Example of use with k8s_namespace annotated with a GCP SA:
 ```starklark
 k8s_namespace(
   name = "test-namespace",
@@ -30,23 +64,24 @@ k8s_namespace(
   kubernetes_sa = "test-kubernetes-sa",
   kubernetes_context = "mm-k8s-context",
 )
+
 helm_release(
     name = "chart_install",
     chart = ":chart",
     namespace_dep = ":test-namespace",
-    tiller_namespace = "tiller-system",
     release_name = "release-name",
-    values_yaml = glob(["charts/myapp/values.yaml"]),
-    kubernetes_context = "mm-k8s-context",
+    values = glob(["charts/myapp/values.yaml"]),
 )
 ```
 
 """
 
 _ATTRS = {
-  "chart": attr.label(allow_single_file = True, mandatory = True, doc = """
-    The packaged chart archive to be published. It can be a reference to a `helm_chart` rule or a reference to a helm archived file"""
+  "remote_chart": attr.string(mandatory = False, doc = "Helm registry url of the chart to be installed. If `chart` attribute is also providedd, `remote_chart` has preference."),
+  "chart": attr.label(allow_single_file = True, mandatory = False, doc = """
+    The packaged chart archive to be published. It can be a reference to a `helm_chart` rule or a reference to a helm archived file. To specify a helm chart from a remote repository use `remote_chart` instead."""
   ),
+  "version": attr.string(mandatory = False, doc = "Chart version to be installed in a kubernetes cluster. This option will only be used if the `remote_chart` attribute is used."),
   "namespace": attr.string(mandatory = False, doc = "The namespace literal where to install the helm release. Set to `\"\"` to use namespace from current kube context"),
   "namespace_dep": attr.label(mandatory = False, doc = "A reference to a `k8s_namespace` rule from where to extract the namespace to be used to install the release.Namespace where this release is installed to. Must be a label to a k8s_namespace rule. It takes precedence over namespace"),
   "values": attr.label_list(allow_files = True, default = [], doc = "A list of value files to be provided to helm install command through -f flag."),
@@ -63,35 +98,52 @@ _ATTRS = {
 }
 
 def _helm_release_impl(ctx):
+    files = []
+
     helm_bin = ctx.toolchains["@masorange_rules_helm//helm:helm_toolchain_type"].helminfo.bin
 
     namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
 
-    args = ['upgrade', ctx.attr.release_name, ctx.file.chart.short_path, "--install"]
+    args = ["upgrade", ctx.attr.release_name, ctx.file.chart.short_path, '--install']
 
     if namespace:
       args += ["--namespace", namespace]
 
     if ctx.attr.create_namespace:
-      args.append('--create-namespace')
+      args.append("--create-namespace")
 
     if ctx.attr.kubernetes_context:
-      args += ['--kube-context', ctx.attr.file.kubernetes_context.short_path]
+      args += ["--kube-context", ctx.attr.file.kubernetes_context.short_path]
 
     if ctx.attr.wait:
-      args.append('--wait')
+      args.append("--wait")
+
+    if not ctx.attr.chart and not ctx.attr.remote_chart:
+      fail("You must provide a valid reference to a helm chart in order to install one. Use `chart` or `remote_chart` to do it.")
+
+    if ctx.attr.chart and ctx.attr.remote_chart:
+      print("WARN: You have provide both `remote_chart` and `chart` attributes, only `remote_chart` will be used.")
+
+    if ctx.attr.remote_chart:
+      if not ctx.attr.version:
+        print("WARN: No chart version has been provided via `version` attribute. The latest chart published to the registry will be used.")
+
+      args.append("--version", ctx.attr.version)
+
+    if not ctx.attr.remote_chart and ctx.attr.chart:
+      files += [ctx.file.chart]
 
     for values in ctx.files.values:
-      args += ['-f', values.short_path]
+      args += ["-f", values.short_path]
 
     if ctx.attr.values_yaml:
       print("WARN: values_yaml attr is marked as DEPRECATED in helm_release bazel rule. Use `values` attr instead")
 
       for values in ctx.files.values_yaml:
-        args += ['-f', values.short_path]
+        args += ["-f", values.short_path]
 
     for key, value in ctx.attr.set.items():
-      args += ['--set', key + '=' + value]
+      args += ["--set", key + '=' + value]
 
     exec_file = ctx.actions.declare_file(ctx.label.name + "_helm_release.sh")
 
@@ -104,11 +156,10 @@ def _helm_release_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = [
-            ctx.file.chart,
+        files = files + [
+            helm_bin,
             ctx.info_file,
             ctx.version_file,
-            helm_bin,
         ] + ctx.files.values_yaml + ctx.files.values
     )
 
