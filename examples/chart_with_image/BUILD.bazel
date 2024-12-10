@@ -1,0 +1,24 @@
+load("//helm:defs.bzl", "helm_chart")
+load("@rules_oci//oci:defs.bzl", "oci_image")
+
+oci_image(
+    name = "image",
+    base = "@distroless_java",
+    entrypoint = [
+		"java",
+	],
+	tars = [],
+)
+
+helm_chart(
+	name = "package",
+    image = ":image",
+    force_repository_append = False,
+    values_tag_yaml_path = "k8s.deployment.image.digest",
+    values = {
+      "k8s.deployment.appVersion": "v1.0.0",
+    },
+	srcs = [
+		glob(["test_chart/**/*.yaml"])
+	]
+)

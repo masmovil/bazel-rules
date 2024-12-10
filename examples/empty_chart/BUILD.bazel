@@ -1,0 +1,11 @@
+load("//helm:defs.bzl", "helm_chart")
+
+helm_chart(
+    name = "package",
+    chart_name = "random_chart_name",
+    version = "v1.0.0",
+    app_version = "v2.3.4",
+    api_version = "v2",
+    description = "Helm chart description placed inside Chart.yaml",
+    srcs = [],
+)
