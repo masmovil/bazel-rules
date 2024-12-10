@@ -2,14 +2,15 @@ load("//helm:defs.bzl", "helm_chart", "helm_release")
 
 helm_chart(
     name = "package",
-    chart_name = "random_chart_name",
+    chart_name = "random-chart-name",
     srcs = glob(["test_chart/**"]),
 )
 
 helm_release(
     name = "install",
-    chart = ":chart",
+    chart = ":package",
     namespace = "myapp",
     release_name = "release-name",
+    wait = True,
     values = glob(["charts/myapp/values.yaml"]),
 )

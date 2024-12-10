@@ -2,7 +2,7 @@ load("//helm:defs.bzl", "helm_chart", "helm_push", "helm_lint_test")
 
 helm_chart(
     name = "package",
-    chart_name = "test_chart",
+    chart_name = "test-chart",
     srcs = glob(["test_chart/**"]),
 )
 

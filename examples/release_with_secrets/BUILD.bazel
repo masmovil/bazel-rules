@@ -3,7 +3,7 @@ load("//sops:defs.bzl", "sops_decrypt")
 
 helm_chart(
     name = "package",
-    chart_name = "random_chart_name",
+    chart_name = "chart-name",
     srcs = glob(["test_chart/**"]),
 )
 
