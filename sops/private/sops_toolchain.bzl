@@ -180,7 +180,7 @@ resolved_toolchain(name = "resolved_toolchain", visibility = ["//visibility:publ
 toolchain(
     name = "{platform}_toolchain",
     exec_compatible_with = {compatible_with},
-    toolchain = "@sops.{platform}//:sops_toolchain",
+    toolchain = "@sops_{platform}//:sops_toolchain",
     toolchain_type = "@masorange_rules_helm//sops:sops_toolchain_type",
 )
 """.format(
