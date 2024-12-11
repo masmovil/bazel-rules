@@ -13,12 +13,11 @@ oci_image(
 helm_chart(
 	name = "package",
     image = ":image",
+    chart_name = "chart",
     force_repository_append = False,
     values_tag_yaml_path = "k8s.deployment.image.digest",
     values = {
       "k8s.deployment.appVersion": "v1.0.0",
     },
-	srcs = [
-		glob(["test_chart/**/*.yaml"])
-	]
+	srcs = glob(["test_chart/**/*.yaml"]),
 )

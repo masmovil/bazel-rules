@@ -2,10 +2,9 @@ load("//helm:defs.bzl", "helm_chart")
 
 helm_chart(
     name = "package",
-    srcs = [
-      "chart/values.yaml"
-    ],
-    deps = [
-      "@helm_chart_a//:chart"
-    ],
+    chart_name = "chart",
+    srcs = glob(['test_chart/**/*.yaml'])
+    # deps = [
+    #   "@nginx-chart//:chart"
+    # ],
 )

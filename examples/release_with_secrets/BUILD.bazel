@@ -9,7 +9,7 @@ helm_chart(
 
 sops_decrypt(
     name = "decrypt",
-    srcs = [":secrets.yaml"]
+    srcs = [":secrets.enc.yaml"]
 )
 
 helm_release(
