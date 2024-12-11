@@ -18,7 +18,25 @@ _DOC = """
     The downloaded chart is defined using the `helm_chart` rule and it's available as `:chart` target inside the repo name.
 
     ```starlark
-    # WORKSPACE or extensions.bzl/MODULE.bazel
+    # With bzlmod, you typically will:
+    # MODULE.bazel
+    bazel_dep(name = "masorange_rules_helm", version = "1.3.1")
+
+    helm = use_extension("@masmovil_bazel_rules//:extensions.bzl", "utils")
+
+    helm.pull(
+        name = "some_chart",
+        chart_name = "chart_name",
+        # do not add the chart name to the end of the url
+        repo_url = "oci://docker.pkg.dev/helm-charts",
+        version = "v1-stable",
+    )
+    use_repo(helm, "some_chart")
+```
+
+In non bzlmod workspaces:
+```starlark
+    # WORKSPACE
     load("//helm:defs.bzl", "helm_pull")
 
     helm_pull(
@@ -31,7 +49,7 @@ _DOC = """
 
     It can be later referenced in a BUILD file in `helm_chart` dep:
 
-    ```starlark
+```starlark
     helm_chart(
         ...
         deps = [
@@ -45,8 +63,7 @@ pull_attrs = {
     "chart_name": attr.string(mandatory = True, doc="The name of the helm_chart to download. It will be appendend at the end of the repository url."),
     "repo_url": attr.string(mandatory = True, doc="The url where the chart is located. You have to omit the chart name from the url."),
     "repo_name": attr.string(mandatory = False, doc="The name of the repository. This is only useful if you provide a `repository_config` file and you want the repo url to be located within the repo config."),
-    # TODO: extract latest version from repo index and mark version as an optional attr
-    "version": attr.string(mandatory = True, doc="The version of the chart to download."),
+    "version": attr.string(mandatory = False, doc="The version of the chart to download. If no specified, the latest version will be pulled."),
     "repository_config": attr.label(allow_single_file = True, mandatory = False, doc="The repository config file."),
 }
 
@@ -66,11 +83,14 @@ def _helm_pull_impl(rctx):
     args = ["helm", "pull"]
 
     if rctx.attr.repository_config and rctx.attr.repo_name:
-        args += ["%s/%s" % (rctx.attr.repo_name, rctx.attr.chart_name), "--version", rctx.attr.version]
+        args += ["%s/%s" % (rctx.attr.repo_name, rctx.attr.chart_name)]
     elif rctx.attr.repo_url.startswith('oci://'):
-        args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name), "--version", rctx.attr.version]
+        args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name)]
     else:
-        args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name), "--version", rctx.attr.version]
+        args += ["%s/%s" % (rctx.attr.repo_url, rctx.attr.chart_name)]
+
+    if rctx.attr.version:
+        args += ["--version", rctx.attr.version]
 
     if rctx.attr.repository_config:
         args += ["--repository-config", rctx.file.repository_config.path]
