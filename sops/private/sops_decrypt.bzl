@@ -64,6 +64,7 @@ def _sops_decrypt_impl(ctx):
 
         args = ctx.actions.args()
 
+        args.add("--output", out_file.path)
         args.add("--decrypt", src.path)
         args.add("--config", ctx.file.sops_yaml.path)
 

@@ -36,12 +36,12 @@ register_toolchains("@gcloud_toolchains//:all")
 
 utils = use_extension("@masorange_rules_helm//:extensions.bzl", "utils", dev_dependency = True)
 utils.pull(
-    name = "helm_chart_a",
-    chart_name = "a_values",
-    repo_url = "http://localhost:8080/charts",
-    version = "0.0.0",
+    name = "nginx-chart",
+    chart_name = "nginx",
+    repo_url = "oci://localhost",
+    version = "1.10.0"
 )
-use_repo(utils, "helm_chart_a")
+use_repo(utils, "nginx-chart")
 
 deps = use_extension("@masorange_rules_helm//:deps_extension.bzl", "non_module_dependencies")
 use_repo(deps, "io_bazel_rules_docker")

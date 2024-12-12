@@ -104,7 +104,19 @@ def _helm_release_impl(ctx):
 
     namespace = ctx.attr.namespace_dep[NamespaceDataInfo].namespace if ctx.attr.namespace_dep else ctx.attr.namespace
 
-    args = ["upgrade", ctx.attr.release_name, ctx.file.chart.short_path, '--install']
+    args = ["upgrade", ctx.attr.release_name]
+
+    if not ctx.attr.remote_chart and ctx.attr.chart:
+      files += [ctx.file.chart]
+      args.append(ctx.file.chart.short_path)
+
+    args.append('--install')
+
+    if ctx.attr.remote_chart:
+      if not ctx.attr.version:
+        print("WARN: No chart version has been provided via `version` attribute. The latest chart published to the registry will be used.")
+
+      args += ["--version", ctx.attr.version]
 
     if namespace:
       args += ["--namespace", namespace]
@@ -123,15 +135,6 @@ def _helm_release_impl(ctx):
 
     if ctx.attr.chart and ctx.attr.remote_chart:
       print("WARN: You have provide both `remote_chart` and `chart` attributes, only `remote_chart` will be used.")
-
-    if ctx.attr.remote_chart:
-      if not ctx.attr.version:
-        print("WARN: No chart version has been provided via `version` attribute. The latest chart published to the registry will be used.")
-
-      args.append("--version", ctx.attr.version)
-
-    if not ctx.attr.remote_chart and ctx.attr.chart:
-      files += [ctx.file.chart]
 
     for values in ctx.files.values:
       args += ["-f", values.short_path]
