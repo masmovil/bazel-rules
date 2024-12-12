@@ -17,7 +17,9 @@ jobs:
                 disk-cache: ${{ github.workflow }}
                 repository-cache: true
             - name: Bazel test
-              run: bazel test //... --config=ci
+              run: |
+                gpg --import examples/release_with_secrets/pgp/sops_functional_tests_key.asc
+                bazel test //... --config=ci
             - name: Prepare release
               run: .github/workflows/release-gen.sh ${{ env.GITHUB_REF_NAME }} ${{ env.GITHUB_REPOSITORY }} > release_notes.txt
             - name: Release
