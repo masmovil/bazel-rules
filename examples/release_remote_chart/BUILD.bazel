@@ -1,0 +1,10 @@
+load("//helm:defs.bzl", "helm_release")
+
+helm_release(
+    name = "install",
+    remote_chart = "oci://docker.pkg.dev/helm-charts/test_helm_chart",
+    version = "v1.0.0",
+    namespace = "myapp",
+    release_name = "release-name",
+    values = ["additional_values.yaml"],
+)

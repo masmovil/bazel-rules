@@ -1,0 +1,27 @@
+load("//helm:defs.bzl", "helm_chart", "helm_release")
+load("//sops:defs.bzl", "sops_decrypt")
+
+helm_chart(
+    name = "package",
+    chart_name = "chart-name",
+    srcs = glob(["test_chart/**"]),
+)
+
+sops_decrypt(
+    name = "decrypt",
+    srcs = [":secrets.enc.yaml"]
+)
+
+helm_release(
+    name = "install1",
+    chart = ":package",
+    release_name = "release-name1",
+    values = [":decrypt"],
+)
+
+helm_release(
+    name = "install2",
+    remote_chart = "oci://docker.pkg.dev/helm-charts/test_helm_chart",
+    release_name = "release-name2",
+    values = [":decrypt"],
+)
