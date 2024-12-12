@@ -45,7 +45,7 @@ _DOC = """Decrypt secrets using [sops](https://github.com/mozilla/sops)
         chart = ":chart",
         namespace = "myapp",
         release_name = "release-name",
-        values_yaml = glob(["charts/myapp/values.yaml"]) + [":decrypt_secret_files"],
+        values = glob(["charts/myapp/values.yaml"]) + [":decrypt_secret_files"],
     )
     ```
 
@@ -64,6 +64,7 @@ def _sops_decrypt_impl(ctx):
 
         args = ctx.actions.args()
 
+        args.add("--output", out_file.path)
         args.add("--decrypt", src.path)
         args.add("--config", ctx.file.sops_yaml.path)
 
