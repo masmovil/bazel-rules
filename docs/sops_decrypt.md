@@ -56,7 +56,7 @@ helm_release(
     chart = ":chart",
     namespace = "myapp",
     release_name = "release-name",
-    values_yaml = glob(["charts/myapp/values.yaml"]) + [":decrypt_secret_files"],
+    values = glob(["charts/myapp/values.yaml"]) + [":decrypt_secret_files"],
 )
 ```
 
