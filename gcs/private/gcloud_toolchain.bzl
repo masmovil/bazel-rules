@@ -2,12 +2,12 @@ GCLOUD_DEFAULT_VERSION = "502.0.0"
 
 GCLOUD_VERSIONS = {
     "502.0.0": {
-        "linux-x86_64": "beb7c8ef61c46ede9295bf68bfb331fbd158575cc3343db585d37b891c890336",
-        "linux-arm": "44eb95fd169f92c197f88df527c3aa27d5db9aa977c2fa2d28fa1cf506b00c9f",
-        "linux-x86": "10303f55226fac633761ae52e1dbcbcaf7c59fe11232f8196e6e361fc38e2e77",
-        "darwin-x86_64": "9d1af0d2b5e7c8a30145831b99ce46272fc0aba754d7d23dcd3ede414b9ff75a",
-        "darwin-x86": "e98b4bf6449b9207ff5c4bd3df12a1b38ffa0f498274b26f2d80cfe7fb124f81",
-        "darwin-arm": "d986d0c6531be038b71218f8e7e666c5b4d18ef580d6a063550406ed07e460f9",
+        "linux-x86_64": "b40e9fe64c3d2b0c7ff289b50ca39f572cce54c783c0f8579810f2307c8fdf0b",
+        "linux-arm": "9a7315d287347d77f45e399ac13b51e6fcde8a1120d14faa7cd47e7ee959a6e6",
+        "linux-x86": "cad9ef0f5072a967ff6eb495b7fffb550ee63455fde9231e6155b471fd583d98",
+        "darwin-x86_64": "8af3013b524591ef5347a3df48caa9d4b1a3510c50c1d45b64442a365c021f65",
+        "darwin-x86": "0c652a53cc577e9157e4ae48ead5d28645dc81901b5db3940c79171a401986c6",
+        "darwin-arm": "40a14db24af99154b6b42aeb114f2828711d3209b72e7a583ad3ca0b4c669f87",
         "windows-x86": "19fd1d359d4efd0824f89e568b08d58d734d78c1bee66f34b0e29dd9c43b1ce2",
         "windows-x86_64": "82270ab11e486c50e552a8ec4e4152a234ddd97d23d062deb85d5d91faa8e5e7"
     },
