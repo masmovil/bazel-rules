@@ -140,15 +140,15 @@ def _gcloud_repo_impl(rctx):
     rctx.download_and_extract(
         url = url,
         sha256 = sha,
-        stripPrefix = "google-cloud-sdk/bin",
+        stripPrefix = "google-cloud-sdk",
     )
 
     build_content = """
 load("@masorange_rules_helm//gcs/private:gcloud_toolchain.bzl", "gcloud_toolchain")
 
-exports_files(["gcloud", "gsutil"])
+exports_files(["bin/gcloud", "bin/gsutil", "lib/gcloud.py"])
 
-gcloud_toolchain(name = "gcloud_toolchain", gcloud_bin = "gcloud", gsutil_bin = "gsutil", visibility = ["//visibility:public"])
+gcloud_toolchain(name = "gcloud_toolchain", gcloud_bin = "bin/gcloud", gsutil_bin = "bin/gsutil", gcloud_py = "lib/gcloud.py", visibility = ["//visibility:public"])
 """
 
     # Base BUILD file for this repository
