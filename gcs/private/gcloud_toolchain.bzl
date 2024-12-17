@@ -122,6 +122,7 @@ gcloud_toolchain = rule(
   attrs = {
     "gcloud_bin": attr.label(allow_single_file = True, mandatory = True),
     "gsutil_bin": attr.label(allow_single_file = True, mandatory = True),
+    "gcloud_py": attr.label(allow_single_file = True, mandatory = True),
   },
 )
 
