@@ -89,18 +89,18 @@ GcloudInfo = provider(
   fields = {
     "gcloud_bin": "Gcloud executable binary",
     "gsutil_bin": "Gsutil executable binary",
-    "gcloud_py": "Gcloud py executable",
+    "gcloud_files": "Gcloud files",
   },
 )
 
 def _gcloud_toolchain_impl(ctx):
   gcloud=ctx.file.gcloud_bin
-  gcloud_py_f=ctx.file.gcloud_py
+  gcloud_files_var=ctx.file.gcloud_files
   gsutil=ctx.file.gsutil_bin
 
   template_variables = platform_common.TemplateVariableInfo({
     "GCLOUD_BIN": gcloud.path,
-    "GCLOUD_PY": gcloud_py_f.path,
+    "GCLOUD_FILES": gcloud_files_var.path,
     "GSUTIL_BIN": gsutil.path,
   })
   default_info = DefaultInfo(
@@ -109,7 +109,7 @@ def _gcloud_toolchain_impl(ctx):
   )
   gcloudinfo = GcloudInfo(
     gcloud_bin = gcloud,
-    gcloud_py = gcloud_py_f,
+    gcloud_files = gcloud_files_var,
     gsutil_bin = gsutil,
   )
 
@@ -126,7 +126,7 @@ gcloud_toolchain = rule(
   attrs = {
     "gcloud_bin": attr.label(allow_single_file = True, mandatory = True),
     "gsutil_bin": attr.label(allow_single_file = True, mandatory = True),
-    "gcloud_py": attr.label(allow_single_file = True, mandatory = True),
+    "gcloud_files": attr.label(allow_single_file = True, mandatory = True),
   },
 )
 
@@ -153,7 +153,7 @@ load("@masorange_rules_helm//gcs/private:gcloud_toolchain.bzl", "gcloud_toolchai
 
 exports_files(["bin/gcloud", "bin/gsutil", "lib/gcloud.py"])
 
-gcloud_toolchain(name = "gcloud_toolchain", gcloud_bin = "bin/gcloud", gsutil_bin = "bin/gsutil", gcloud_py = ".", visibility = ["//visibility:public"])
+gcloud_toolchain(name = "gcloud_toolchain", gcloud_bin = "bin/gcloud", gsutil_bin = "bin/gsutil", gcloud_files = ".", visibility = ["//visibility:public"])
 """
 
     # Base BUILD file for this repository
