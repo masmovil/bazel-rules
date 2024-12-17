@@ -89,15 +89,18 @@ GcloudInfo = provider(
   fields = {
     "gcloud_bin": "Gcloud executable binary",
     "gsutil_bin": "Gsutil executable binary",
+    "gcloud_py": "Gcloud py executable",
   },
 )
 
 def _gcloud_toolchain_impl(ctx):
   gcloud=ctx.file.gcloud_bin
+  gcloud_py_f=ctx.file.gcloud_py
   gsutil=ctx.file.gsutil_bin
 
   template_variables = platform_common.TemplateVariableInfo({
     "GCLOUD_BIN": gcloud.path,
+    "GCLOUD_PY": gcloud_py_f.path,
     "GSUTIL_BIN": gsutil.path,
   })
   default_info = DefaultInfo(
@@ -106,6 +109,7 @@ def _gcloud_toolchain_impl(ctx):
   )
   gcloudinfo = GcloudInfo(
     gcloud_bin = gcloud,
+    gcloud_py = gcloud_py_f,
     gsutil_bin = gsutil,
   )
 
